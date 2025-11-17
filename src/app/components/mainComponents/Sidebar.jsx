@@ -21,7 +21,7 @@ export default function Sidebar({ isOpen }) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: "ড্যাশবোর্ড", href: "/pages/dashboard" },
-    { icon: GraduationCap, label: "সকল ছাত্র", href: "/students" },
+    { icon: GraduationCap, label: "সকল ছাত্র", href: "/pages/allStudents" },
     { icon: NotebookPen, label: "হিসাব", href: "/account" },
     { icon: Zap, label: "পরীক্ষা", href: "/exam" },
     { icon: HelpCircle, label: "মার্কশিট", href: "/marksheet" },
@@ -30,12 +30,12 @@ export default function Sidebar({ isOpen }) {
   return (
     <aside
       className={cn(
-        "bg-[#F0F5F2] w-80 h-screen flex flex-col transition-all duration-300 ",
+        "bg-[#F0F5F2] w-80 h-screen flex flex-col transition-all duration-300",
         !isOpen && "-ml-64"
       )}
     >
       {/* Logo */}
-      <div className="p-6 ">
+      <div className="p-6">
         <div className="flex items-center gap-2">
           <div className="rounded-full">
             <Image
@@ -62,6 +62,7 @@ export default function Sidebar({ isOpen }) {
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = pathname === item.href;
+
           return (
             <Link
               key={item.label}
@@ -70,11 +71,12 @@ export default function Sidebar({ isOpen }) {
                 "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                 isActive
                   ? "bg-[#2B7752] text-white shadow-md font-semibold"
-                  : "text-[#424D47] font-medium"
+                  : "text-[#424D47] font-semibold"
               )}
             >
               <Icon className="w-5 h-5" />
-              <span className="text-sm font-medium">{item.label}</span>
+              {/* Slightly smaller text */}
+              <span className="text-sm font-semibold">{item.label}</span>
             </Link>
           );
         })}
@@ -84,7 +86,7 @@ export default function Sidebar({ isOpen }) {
       <div className="p-4 border-t border-emerald-200">
         <div className="flex items-center gap-2 text-xs text-emerald-700">
           <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-          <span>অনলাইন</span>
+          <span>Software company</span>
         </div>
       </div>
     </aside>

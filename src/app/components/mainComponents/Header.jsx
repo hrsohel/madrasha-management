@@ -29,7 +29,7 @@ export default function Header({ onMenuClick }) {
 
   return (
     <div className="p-5">
-      <header className="bg-[#F7F7F7] rounded-lg border-gray-100 px-6 py-4 flex items-center justify-between">
+      <header className="bg-[#F7F7F7] rounded-md px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -74,7 +74,7 @@ export default function Header({ onMenuClick }) {
                   variant="ghost"
                   className="flex items-center gap-3 hover:bg-transparent"
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white text-sm font-semibold">
                     MH
                   </div>
                   <div className="hidden sm:flex flex-col items-start">
