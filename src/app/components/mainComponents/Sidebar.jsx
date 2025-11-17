@@ -20,11 +20,11 @@ export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "ড্যাশবোর্ড", href: "/pages/dashboard" },
-    { icon: GraduationCap, label: "সকল ছাত্র", href: "/pages/allStudents" },
-    { icon: NotebookPen, label: "হিসাব", href: "/account" },
-    { icon: Zap, label: "পরীক্ষা", href: "/exam" },
-    { icon: HelpCircle, label: "মার্কশিট", href: "/marksheet" },
+    { icon: LayoutDashboard, label: "Dashboard", href: "/pages/dashboard" },
+    { icon: GraduationCap, label: "All Students", href: "/pages/all-students" },
+    { icon: NotebookPen, label: "Accounts", href: "/pages/accounts" },
+    { icon: Zap, label: "Examinations", href: "/pages/examinations" },
+    { icon: HelpCircle, label: "Marksheets", href: "/pages/marksheets" },
   ];
 
   return (
