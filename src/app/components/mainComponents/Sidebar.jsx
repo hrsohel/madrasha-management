@@ -20,11 +20,11 @@ export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: "Dashboard", href: "/pages/dashboard" },
-    { icon: GraduationCap, label: "All Students", href: "/pages/all-students" },
-    { icon: NotebookPen, label: "Accounts", href: "/pages/accounts" },
-    { icon: Zap, label: "Examinations", href: "/pages/examinations" },
-    { icon: HelpCircle, label: "Marksheets", href: "/pages/marksheets" },
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: GraduationCap, label: "All Students", href: "/all-students" },
+    { icon: NotebookPen, label: "Accounts", href: "/accounts" },
+    { icon: Zap, label: "Examinations", href: "/examinations" },
+    { icon: HelpCircle, label: "Marksheets", href: "/marksheets" },
   ];
 
   return (
