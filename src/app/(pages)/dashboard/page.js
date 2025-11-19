@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Filter,
   Search,
@@ -361,7 +362,7 @@ export default function DashboardPage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* MODAL */}
       {activeModal && (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black/50   bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-4">
             {renderModalContent()}
           </div>
@@ -579,9 +580,12 @@ export default function DashboardPage() {
                   <td className="p-3 font-semibold">{student.bloodGroup}</td>
 
                   <td className="p-3">
-                    <a className="text-[#006FAA] cursor-pointer underline font-semibold">
+                    <Link
+                      href={`/students/${student.id}`}
+                      className="text-[#006FAA] cursor-pointer underline font-semibold"
+                    >
                       আরও
-                    </a>
+                    </Link>
                   </td>
                 </tr>
               ))}

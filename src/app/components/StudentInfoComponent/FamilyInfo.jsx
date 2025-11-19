@@ -1,0 +1,305 @@
+import { useState } from "react";
+import { Pencil, X } from "lucide-react";
+
+export default function FamilyInfo() {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <div className="   ">
+      <div className=" mx-auto flex gap-6 mt-10">
+        {/* Left Sidebar */}
+        <div className="w-64 bg-[#F7F7F7] rounded-lg shadow-sm p-4">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">
+            অভিভাবকের তথ্য
+          </h2>
+          <ul className="space-y-2">
+            <li className="text-sm text-gray-700 py-2 px-3 hover:bg-gray-50 rounded cursor-pointer">
+              ঠিকানা
+            </li>
+            <li className="text-sm text-gray-700 py-2 px-3 hover:bg-gray-50 rounded cursor-pointer">
+              পূর্বতন মাদ্রাসার তথ্য
+            </li>
+            <li className="text-sm text-gray-700 py-2 px-3 hover:bg-gray-50 rounded cursor-pointer">
+              আর্থিক মুরব্বি / স্থানীয় মুরব্বি
+            </li>
+            <li className="text-sm text-gray-700 py-2 px-3 hover:bg-gray-50 rounded cursor-pointer">
+              ভর্তি পরীক্ষার সনদাংশ
+            </li>
+          </ul>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 bg-[#F7F7F7] rounded-lg shadow-sm">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b px-6 py-4">
+            <h1 className="text-xl font-semibold text-gray-800">
+              অভিভাবকের তথ্য
+            </h1>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-2 px-4 py-2 border border-green-600 text-green-700 rounded-md hover:bg-green-50 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>Edit</span>
+            </button>
+          </div>
+
+          <div className="p-6">
+            {/* পিতার তথ্য */}
+            <div className="mb-8">
+              <h3 className="text-base font-semibold text-gray-700 mb-4 pb-2 border-b">
+                পিতার তথ্য
+              </h3>
+              <div className="grid grid-cols-3 gap-8">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">নাম</p>
+                  <p className="text-sm text-gray-800">
+                    মোঃ আবদুল্লাহ রহমান খান
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">মোবাইল নম্বর</p>
+                  <p className="text-sm text-gray-800">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">NID</p>
+                  <p className="text-sm text-gray-800">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                </div>
+              </div>
+            </div>
+
+            {/* মাতার তথ্য */}
+            <div className="mb-8">
+              <h3 className="text-base font-semibold text-gray-700 mb-4 pb-2 border-b">
+                মাতার তথ্য
+              </h3>
+              <div className="grid grid-cols-3 gap-8">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">নাম</p>
+                  <p className="text-sm text-gray-800">
+                    মোঃ আবদুল্লাহ রহমান খান
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">মোবাইল নম্বর</p>
+                  <p className="text-sm text-gray-800">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">NID</p>
+                  <p className="text-sm text-gray-800">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                </div>
+              </div>
+            </div>
+
+            {/* অভিভাবকের তথ্য */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-4 pb-2 border-b">
+                অভিভাবকের তথ্য
+              </h3>
+              <div className="grid grid-cols-4 gap-8">
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">সম্পর্ক</p>
+                  <p className="text-sm text-gray-800">পিতা</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">নাম</p>
+                  <p className="text-sm text-gray-800">
+                    মোঃ আবদুল্লাহ রহমান খান
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">মোবাইল নম্বর</p>
+                  <p className="text-sm text-gray-800">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">NID</p>
+                  <p className="text-sm text-gray-800">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-xl max-h-[90vh] overflow-y-auto ">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-dashed border-gray-300">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  পিতা-মাতা ও অভিভাবকের তথ্য
+                </h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              {/* পিতার তথ্য */}
+              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  পিতার তথ্য
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      নাম
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      মোবাইল নম্বর
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">
+                    NID
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+
+              {/* মাতার তথ্য */}
+              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  মাতার তথ্য
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      নাম
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      নম্বর
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-700 mb-1">
+                    NID
+                  </label>
+                  <input
+                    type="text"
+                    defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
+                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+              </div>
+
+              {/* অভিভাবকের তথ্য */}
+              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  অভিভাবকের তথ্য
+                </h3>
+
+                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      সম্পর্ক
+                    </label>
+                    <select className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                      <option>পিতা</option>
+                      <option>মাতা</option>
+                      <option>ভাই</option>
+                      <option>অন্যান্য</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      নাম
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      মোবাইল নম্বর
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-700 mb-1">
+                      NID
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
+                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Note */}
+              <p className="text-xs text-gray-600 mb-4 p-3 bg-gray-50 rounded border border-dashed border-gray-300">
+                আ্যাকাউন্টের তথ্য যাচাইয়ের জন্য সকল তথ্য সঠিক ভাবে তুলনাপূর্বক
+                জমা করুন। যদি 'অন্য' নতুন শিক্ষার্থীর তথ্যটি আপডেট করা থাকে।
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button className="px-6 py-2 bg-green-700 text-white rounded text-sm hover:bg-green-800 transition-colors">
+                  সেভ করুন
+                </button>
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
+                >
+                  আপডেটের করুন
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
