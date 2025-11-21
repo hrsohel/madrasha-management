@@ -8,7 +8,7 @@ export default function FamilyInfo() {
     <div className="   ">
       <div className=" mx-auto flex gap-6 mt-10">
         {/* Left Sidebar */}
-        <div className="w-64 bg-[#F7F7F7] rounded-lg shadow-sm p-4">
+        <div className="w-48 bg-[#F7F7F7] rounded-lg shadow-sm p-4">
           <h2 className="text-lg font-semibold text-[#246545] mb-4">
             অভিভাবকের তথ্য
           </h2>
@@ -26,6 +26,7 @@ export default function FamilyInfo() {
               ভর্তি পরীক্ষার সনদাংশ
             </li>
           </ul>
+
         </div>
 
         {/* Main Content */}

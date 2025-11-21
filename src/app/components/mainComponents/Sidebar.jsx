@@ -10,6 +10,7 @@ import {
   Menu,
   GraduationCap,
   NotebookPen,
+  DollarSign,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,6 +24,7 @@ export default function Sidebar({ isOpen }) {
     { icon: LayoutDashboard, label: "ডেশবোর্ড", href: "/dashboard" },
     { icon: GraduationCap, label: "সকল ছাত্র", href: "/all-students" },
     { icon: NotebookPen, label: "হিসাব", href: "/accounts" },
+    { icon: DollarSign, label: "ফি ম্যানেজমেন্ট", href: "/FeeManagement" },
     { icon: Zap, label: "পরীক্ষা", href: "/examinations" },
     { icon: HelpCircle, label: "মার্কশীট", href: "/marksheets" },
   ];
