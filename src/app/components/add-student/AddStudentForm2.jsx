@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function AddStudentForm2() {
+export default function AddStudentForm2({setPagination}) {
     return (
         <div className="bg-[#F7F7F7] rounded-lg shadow-xl overflow-hidden w-[60%] mx-auto">
             <div className=" text-white p-6">
@@ -113,18 +113,18 @@ export default function AddStudentForm2() {
 
             {/* Navigation Buttons */}
             <div className="bg-gray-50 px-8 py-6 flex justify-between items-center border-t">
-                <button className="flex items-center gap-2 px-6 py-3 border border-green-600 text-green-600 rounded-lg bg-[#E7FEF2] transition font-bold">
+                <button onClick={() => setPagination(1)} className="flex items-center gap-2 px-6 py-3 border border-green-600 text-green-600 rounded-lg bg-[#E7FEF2] transition font-bold">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5.49997 12H19M11 18C11 18 4.99997 13.5811 4.99997 12C4.99997 10.4188 11 6 11 6" stroke="#246545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M5.49997 12H19M11 18C11 18 4.99997 13.5811 4.99997 12C4.99997 10.4188 11 6 11 6" stroke="#246545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
 
                     পূর্বের ধাপে ফিরে যান
                 </button>
 
-                <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+                <button onClick={() => setPagination(3)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2">
                     পরবর্তী ধাপে যান
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M18.5 12H5M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M18.5 12H5M13 18C13 18 19 13.5811 19 12C19 10.4188 13 6 13 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
 
                 </button>

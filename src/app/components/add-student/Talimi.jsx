@@ -8,7 +8,7 @@ export default function Talimi() {
                 <div>
                     <div className='flex items-center justify-center gap-2 px-[12px] py-[8px] bg-[#E7FEF2] rounded-md'>
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M10.5 4.5L13.5 7.5M2.83636 12.2319L2.25 15.75L5.76814 15.1636C6.37908 15.0619 6.94294 14.7717 7.38089 14.3337L15.3148 6.39966C15.895 5.81941 15.8951 4.87867 15.3148 4.29844L13.7015 2.68518C13.1212 2.10493 12.1804 2.10494 11.6002 2.6852L3.66631 10.6192C3.22835 11.0572 2.93818 11.621 2.83636 12.2319Z" stroke="#246545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10.5 4.5L13.5 7.5M2.83636 12.2319L2.25 15.75L5.76814 15.1636C6.37908 15.0619 6.94294 14.7717 7.38089 14.3337L15.3148 6.39966C15.895 5.81941 15.8951 4.87867 15.3148 4.29844L13.7015 2.68518C13.1212 2.10493 12.1804 2.10494 11.6002 2.6852L3.66631 10.6192C3.22835 11.0572 2.93818 11.621 2.83636 12.2319Z" stroke="#246545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <span className='text-[14px] font-semibold text-[#2B7752]'>Edit</span>
                     </div>

@@ -1,6 +1,9 @@
 import React from 'react'
 
-export default function TopPagination() {
+export default function TopPagination({pagination}) {
+  const obj = {
+    "১": 1, "২": 2, "৩": 3, "৪": 4, "৫": 5
+  }
   return (
     <div>
         <div className="text-center mb-6">
@@ -20,7 +23,7 @@ export default function TopPagination() {
                 </div>
                 {index < 4 && (
                   <div
-                    className={`h-1 w-full ${step <= 1 ? 'bg-green-600' : 'bg-[#EBFFEE]'
+                    className={`h-1 w-full ${obj[step] < pagination ? 'bg-green-600' : 'bg-[#EBFFEE]'
                       }`}
                   />
                 )}

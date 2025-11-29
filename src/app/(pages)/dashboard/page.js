@@ -23,6 +23,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
+import { useRouter } from "next/navigation";
 
 // ----------------------
 // Filter Dropdown Options
@@ -207,6 +208,8 @@ const StatItem = ({ label, value }) => (
 
 // ----------------------
 export default function DashboardPage() {
+  
+  const history = useRouter()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
@@ -392,7 +395,7 @@ export default function DashboardPage() {
             ডাটা এক্সপোর্ট
           </Button>
 
-          <Button className="bg-[#2B7752] text-white rounded-sm w-[150px] font-semibold flex py-5 items-center justify-center gap-1">
+          <Button onClick={() => history.push("/add-student")} className="bg-[#2B7752] text-white rounded-sm w-[150px] font-semibold flex py-5 items-center justify-center gap-1">
             <CirclePlus size={22} />
             নতুন ছাত্র
           </Button>

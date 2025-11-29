@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function AddStudentform4() {
+export default function AddStudentform4({setPagination}) {
     return (
         <div className=" shadow-xl overflow-hidden w-[60%] mx-auto">
             {/* <div className=" text-[#246545] p-6">
@@ -113,14 +113,14 @@ export default function AddStudentform4() {
 
             {/* Navigation Buttons */}
             <div className="bg-gray-50 px-8 py-6 flex justify-between items-center border-t">
-                <button className="flex items-center gap-2 px-6 py-3 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition font-bold">
+                <button onClick={() => setPagination(3)} className="flex items-center gap-2 px-6 py-3 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition font-bold">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     পূর্বের ধাপে ফিরে যান
                 </button>
 
-                <button className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2">
+                <button onClick={() => setPagination(5)} className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2">
                     পরবর্তী ধাপে যান
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />

@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function AddSrudentform1() {
+export default function AddSrudentform1({setPagination}) {
     return (
         <div className='flex items-start justify-center gap-4'>
             <div className="relative">
@@ -12,9 +12,9 @@ export default function AddSrudentform1() {
                 <button className="absolute -bottom-8 -right-8 text-white p-3 rounded-full shadow-lgtransition cursor-pointer">
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <g filter="url(#filter0_d_307_23591)">
-                            <path d="M4 4C4 1.79086 5.79086 0 8 0H32C34.2091 0 36 1.79086 36 4V28C36 30.2091 34.2091 32 32 32H8C5.79086 32 4 30.2091 4 28V4Z" fill="#E7FEF2" shape-rendering="crispEdges" />
-                            <path d="M8 0.5H32C33.933 0.5 35.5 2.067 35.5 4V28C35.5 29.933 33.933 31.5 32 31.5H8C6.067 31.5 4.5 29.933 4.5 28V4C4.5 2.067 6.067 0.5 8 0.5Z" stroke="#2B7752" shape-rendering="crispEdges" />
-                            <path d="M22 10L26 14M11.7818 20.3092L11 25L15.6909 24.2182C16.5054 24.0825 17.2573 23.6956 17.8412 23.1116L28.4198 12.5329C29.1934 11.7592 29.1934 10.5049 28.4197 9.73126L26.2687 7.58024C25.495 6.80658 24.2406 6.80659 23.4669 7.58027L12.8884 18.159C12.3045 18.7429 11.9176 19.4947 11.7818 20.3092Z" stroke="#246545" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M4 4C4 1.79086 5.79086 0 8 0H32C34.2091 0 36 1.79086 36 4V28C36 30.2091 34.2091 32 32 32H8C5.79086 32 4 30.2091 4 28V4Z" fill="#E7FEF2" shapeRendering="crispEdges" />
+                            <path d="M8 0.5H32C33.933 0.5 35.5 2.067 35.5 4V28C35.5 29.933 33.933 31.5 32 31.5H8C6.067 31.5 4.5 29.933 4.5 28V4C4.5 2.067 6.067 0.5 8 0.5Z" stroke="#2B7752" shapeRendering="crispEdges" />
+                            <path d="M22 10L26 14M11.7818 20.3092L11 25L15.6909 24.2182C16.5054 24.0825 17.2573 23.6956 17.8412 23.1116L28.4198 12.5329C29.1934 11.7592 29.1934 10.5049 28.4197 9.73126L26.2687 7.58024C25.495 6.80658 24.2406 6.80659 23.4669 7.58027L12.8884 18.159C12.3045 18.7429 11.9176 19.4947 11.7818 20.3092Z" stroke="#246545" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </g>
                         <defs>
                             <filter id="filter0_d_307_23591" x="0" y="0" width="40" height="40" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
@@ -187,7 +187,7 @@ export default function AddSrudentform1() {
 
                     {/* Submit Button */}
                     <div className="mt-10 text-center">
-                        <button className="bg-[#2B7752] hover:bg-green-700 text-white font-bold text-xl py-4 px-16 rounded-lg shadow-lg transition transform hover:scale-105 w-full">
+                        <button onClick={() => setPagination(2)} className="bg-[#2B7752] hover:bg-green-700 text-white font-bold text-xl py-4 px-16 rounded-lg shadow-lg transition transform hover:scale-105 w-full">
                             পরবর্তী ধাপে যান
                         </button>
                     </div>

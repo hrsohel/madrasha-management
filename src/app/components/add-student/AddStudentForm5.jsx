@@ -1,7 +1,9 @@
 "use client"
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
 
-export default function AddStudentForm5() {
+export default function AddStudentForm5({setPagination}) {
+    const history = useRouter()
     const [fees, setFees] = useState({
         admission: true,
         book: true,
@@ -119,14 +121,14 @@ export default function AddStudentForm5() {
 
             {/* Navigation Buttons */}
             <div className="bg-gray-50 px-8 py-6 flex justify-between items-center border-t">
-                <button className="flex items-center gap-2 px-6 py-3 border border-green-600 text-[#2B7752] rounded-lg hover:bg-green-50 transition font-bold">
+                <button onClick={() => setPagination(4)} className="flex items-center gap-2 px-6 py-3 border border-green-600 text-[#2B7752] rounded-lg hover:bg-green-50 transition font-bold">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                     </svg>
                     পূর্বের ধাপে ফিরে যান
                 </button>
 
-                <button className="bg-[#2B7752] hover:bg-green-700 text-white font-bold py-3 px-10 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-3 text-lg">
+                <button onClick={() => history.push("/preview")} className="bg-[#2B7752] hover:bg-green-700 text-white font-bold py-3 px-10 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-3 text-lg">
                     জমা দিন
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
