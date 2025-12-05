@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function MadrshaInfo() {
+export default function MadrshaInfo({ madrasaData }) {
   return (
     <div className='bg-[#F7F7F7] px-4 rounded-md mt-12'>
             <div className='flex items-center justify-between mt-6 bg-[#F7F7F7] p-4'>
@@ -17,15 +17,15 @@ export default function MadrshaInfo() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>নাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>দারুল উলুম মূঈনুস সুন্নাহ</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{madrasaData.oldMadrasaName}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>সর্বশেষ উত্তীর্ণ ক্লাস</p>
-                    <p className='text-[16px] text-[#424D47]'>নাজেরা </p>
+                    <p className='text-[16px] text-[#424D47]'>{madrasaData.oldMadrasaClass} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>সর্বশেষ উত্তীর্ণ রেজাল্ট</p>
-                    <p className='text-[16px] text-[#424D47]'>মুমতাজ </p>
+                    <p className='text-[16px] text-[#424D47]'>{madrasaData.oldMadrasaResult} </p>
                 </div>
             </div>
         </div>

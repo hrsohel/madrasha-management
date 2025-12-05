@@ -1,7 +1,45 @@
 import Image from 'next/image'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { addStudent, resetAddStudentStatus, clearStudentFormData } from '../../../lib/features/students/studentSlice'
 
-export default function Reciepe({setNavigateToReciepe}) {
+export default function Reciepe({ setNavigateToReciepe }) {
+    const dispatch = useDispatch();
+    const studentFormData = useSelector((state) => state.students.studentFormData);
+    const { loading, error, success } = useSelector((state) => state.students);
+
+    const [localLoading, setLocalLoading] = useState(false);
+    const [localError, setLocalError] = useState(null);
+
+    useEffect(() => {
+        setLocalLoading(loading);
+        if (error) {
+            setLocalError(error.message || JSON.stringify(error));
+        }
+        if (success) {
+            // Optionally handle success feedback
+            dispatch(resetAddStudentStatus());
+            dispatch(clearStudentFormData()); // Clear form data after successful submission
+            // setNavigateToReciepe(2); // Navigation should happen after API call in handleSubmit
+        }
+    }, [loading, error, success, dispatch]);
+
+    const handleSubmit = async () => {
+        if (!studentFormData) {
+            setLocalError("Student data is missing. Please go back and fill the form.");
+            return;
+        }
+        setLocalLoading(true);
+        setLocalError(null);
+        try {
+            await dispatch(addStudent(studentFormData)).unwrap();
+            setNavigateToReciepe(2); // Navigate on successful API call
+        } catch (err) {
+            setLocalError(err.message || JSON.stringify(err));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
     return (
         <div
 
@@ -41,7 +79,7 @@ export default function Reciepe({setNavigateToReciepe}) {
                     <p className='text-white'>ভর্তি রশিদ </p>
                 </div>
                 <div className=' w-full'>
-                    <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>১২ নভেম্বর ২০২৫</span></p>
+                    <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>{new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' })}</span></p>
                 </div>
             </div>
             <div className='mt-6 px-24'>
@@ -51,19 +89,19 @@ export default function Reciepe({setNavigateToReciepe}) {
             </div>
             <div className='flex items-center justify-between px-24 mt-6'>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-start gap-6'><span>নাম</span> <span>:</span> <span>মোঃ আরিফুর রহমান খান</span></p>
-                    <p className='flex items-center justify-start gap-6'><span>রোল</span> <span>:</span> <span>২</span></p>
-                    <p className='flex items-center justify-start gap-6'><span>শিফট</span> <span>:</span> <span>সকাল</span></p>
+                    <p className='flex items-center justify-start gap-6'><span>নাম</span> <span>:</span> <span>{studentFormData.student.fullName}</span></p>
+                    <p className='flex items-center justify-start gap-6'><span>রোল</span> <span>:</span> <span>{studentFormData.student.rollNumber}</span></p>
+                    <p className='flex items-center justify-start gap-6'><span>শিফট</span> <span>:</span> <span>{studentFormData.student.shift}</span></p>
                 </div>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-center gap-6'><span>আইডি</span> <span>:</span> <span>DUMS01</span></p>
-                    <p className='flex items-center justify-center gap-6'><span>শ্রেণী</span> <span>:</span> <span>নার্সারি</span></p>
-                    <p className='flex items-center justify-center gap-6'><span>বিভাগ</span> <span>:</span> <span>নুরানী</span></p>
+                    <p className='flex items-center justify-center gap-6'><span>আইডি</span> <span>:</span> <span>{studentFormData.student.studentId}</span></p>
+                    <p className='flex items-center justify-center gap-6'><span>শ্রেণী</span> <span>:</span> <span>{studentFormData.student.class}</span></p>
+                    <p className='flex items-center justify-center gap-6'><span>বিভাগ</span> <span>:</span> <span>{studentFormData.student.department}</span></p>
                 </div>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-end gap-6'><span>আবাসিক অবস্থা</span> <span>:</span> <span className='text-[#14AE5C]'>আবাসিক</span></p>
-                    <p className='flex items-center justify-end gap-6 mr-12'><span>শাখা</span> <span>:</span> <span>ক</span></p>
-                    <p className='flex items-center justify-end gap-6'><span>সেশন</span> <span>:</span> <span>২৪ - ২৫</span></p>
+                    <p className='flex items-center justify-end gap-6'><span>আবাসিক অবস্থা</span> <span>:</span> <span className='text-[#14AE5C]'>{studentFormData.student.residentialStatus}</span></p>
+                    <p className='flex items-center justify-end gap-6 mr-12'><span>শাখা</span> <span>:</span> <span>{studentFormData.student.section}</span></p>
+                    <p className='flex items-center justify-end gap-6'><span>সেশন</span> <span>:</span> <span>{studentFormData.student.session}</span></p>
                 </div>
             </div>
             <div className='mt-6 px-24'>
@@ -73,15 +111,15 @@ export default function Reciepe({setNavigateToReciepe}) {
             </div>
             <div className='flex items-center justify-between px-24 mt-6'>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-start gap-6'><span>সর্বমোট </span> <span>:</span> <span>৫০০৳</span></p>
-                    <p className='flex items-center justify-start gap-6'><span>প্রদেয় পরিমাণ</span> <span>:</span> <span>৫০০৳</span></p>
+                    <p className='flex items-center justify-start gap-6'><span>সর্বমোট </span> <span>:</span> <span>{(Object.values(studentFormData.fees).reduce((sum, fee) => sum + fee, 0)).toLocaleString('bn-BD')}৳</span></p>
+                    <p className='flex items-center justify-start gap-6'><span>প্রদেয় পরিমাণ</span> <span>:</span> <span>{(Object.values(studentFormData.fees).reduce((sum, fee) => sum + fee, 0) - (studentFormData.fees.helpAmount || 0)).toLocaleString('bn-BD')}৳</span></p>
                 </div>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-center gap-6'><span>সাহায্য </span> <span>:</span> <span>২০০</span></p>
-                    <p className='flex items-center justify-center gap-6'><span>কথায়</span> <span>:</span> <span>পাঁচশত টাকা মাত্র </span></p>
+                    <p className='flex items-center justify-center gap-6'><span>সাহায্য </span> <span>:</span> <span>{(studentFormData.fees.helpAmount || 0).toLocaleString('bn-BD')}</span></p>
+                    <p className='flex items-center justify-center gap-6'><span>কথায়</span> <span>:</span> <span>{studentFormData.fees.amountInWords || 'Not Available'} </span></p>
                 </div>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-end gap-6'><span>সাহায্যের খাত </span> <span>:</span> <span>যাকাত </span></p>
+                    <p className='flex items-center justify-end gap-6'><span>সাহায্যের খাত </span> <span>:</span> <span>{studentFormData.fees.helpType || 'N/A'} </span></p>
                 </div>
             </div>
             <div className='flex items-center justify-between mt-10 px-24'>
@@ -99,10 +137,11 @@ export default function Reciepe({setNavigateToReciepe}) {
                     ড্রাফট সেভ করুন
                 </button>
 
-                <button onClick={() => setNavigateToReciepe(2)} className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md">
-                    ভর্তি কনফার্ম করুন 
+                <button onClick={handleSubmit} className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md" disabled={localLoading}>
+                    {localLoading ? 'জমা হচ্ছে...' : 'ভর্তি কনফার্ম করুন'}
                 </button>
-            </div>
-        </div>
-    )
-}
+                        </div>
+                        {localError && <p className="text-red-500 text-center mt-4">{localError}</p>}
+                    </div>
+                )
+                }

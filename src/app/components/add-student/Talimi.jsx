@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Talimi() {
+export default function Talimi({ madrasaData }) {
   return (
     <div className='bg-[#F7F7F7] px-4 rounded-md mt-12'>
             <div className='flex items-center justify-between mt-6 bg-[#F7F7F7] p-4'>
@@ -22,11 +22,11 @@ export default function Talimi() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>হযরতের নাম  </p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>মোঃ আরিফুর রহমান খান</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{madrasaData.talimiGuardianName}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>হযরতের মোবাইল নম্বর</p>
-                    <p className='text-[16px] text-[#424D47]'>+৮৮০১৭৭৫৬২৩২৬</p>
+                    <p className='text-[16px] text-[#424D47]'>{madrasaData.talimiGuardianPhone}</p>
                 </div>
             </div>
         </div>

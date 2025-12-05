@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function PersonalInfo() {
+export default function PersonalInfo({ studentData }) {
     return (
         <div className='bg-[#F7F7F7] px-4'>
             <div className='flex items-center justify-between mt-6 bg-[#F7F7F7] p-4'>
@@ -22,29 +22,29 @@ export default function PersonalInfo() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>নাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>মোঃ আরিফুর রহমান খান</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.name}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্ম তারিখ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>২০ জানুয়ারি ২০২০ , ৫ বছর</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.dob} {studentData.dob ? `, ${new Date().getFullYear() - new Date(studentData.dob).getFullYear()} বছর` : ''}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্মসনদ/NID </p>
-                    <p className='text-[16px] text-[#424D47]'>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                    <p className='text-[16px] text-[#424D47]'>{studentData.nid || studentData.birthCertificate}</p>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জেন্ডার</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>ছাত্র</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.gender}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>রক্তের গ্রুপ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>O+</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.bloodGroup}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>মোবাইল নম্বর</p>
-                    <p className='text-[16px] text-[#424D47]'>+৮৮০১৭৭৫৬২৩২৬</p>
+                    <p className='text-[16px] text-[#424D47]'>{studentData.phone}</p>
                 </div>
             </div>
             <div className='mt-6 bg-[#F7F7F7]'>
@@ -55,39 +55,39 @@ export default function PersonalInfo() {
             <div className='flex items-center justify-start gap-4 mt-4'>
                 <div className='w-1/2'>
                     <p className='text-[16px] text-[#63736C]'>আইডি</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>DUMS01</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.uid}</p>
                 </div>
                 <div className='w-1/2'>
                     <p className='text-[16px] text-[#63736C]'>আবাসিক অবস্থা</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>আবাসিক</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.residential}</p>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>রোল নম্বর</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>২</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.roll}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শ্রেণী</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>নার্সারি</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.class}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শাখা</p>
-                    <p className='text-[16px] text-[#424D47]'>ক</p>
+                    <p className='text-[16px] text-[#424D47]'>{studentData.section}</p>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শিফট</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>সকাল</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.shift}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>বিভাগ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>নুরানী</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.division}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>সেশন</p>
-                    <p className='text-[16px] text-[#424D47]'>২৪ - ২৫</p>
+                    <p className='text-[16px] text-[#424D47]'>{studentData.session}</p>
                 </div>
             </div>
         </div>

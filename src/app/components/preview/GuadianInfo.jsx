@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function GuadianInfo() {
+export default function GuadianInfo({ guardianData }) {
     return (
         <div className='bg-[#F7F7F7] px-4 rounded-md mt-12'>
             <div className='flex items-center justify-between mt-6 bg-[#F7F7F7] p-4'>
@@ -22,15 +22,15 @@ export default function GuadianInfo() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>নাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>মোঃ আরিফুর রহমান খান</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{guardianData.fatherName}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্ম তারিখ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>২০ জানুয়ারি ২০২০ , ৫ বছর</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>N/A</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্মসনদ/NID </p>
-                    <p className='text-[16px] text-[#424D47]'>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                    <p className='text-[16px] text-[#424D47]'>{guardianData.fatherNID}</p>
                 </div>
             </div>
             <div className='mt-6 bg-[#F7F7F7]'>
@@ -41,15 +41,15 @@ export default function GuadianInfo() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>নাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>মোঃ আরিফুর রহমান খান</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{guardianData.motherName}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্ম তারিখ</p>
-                    <p className='text-[16px] text-[#424D47]'>২০ জানুয়ারি ২০২০ , ৫ বছর</p>
+                    <p className='text-[16px] text-[#424D47]'>N/A</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জন্মসনদ/NID </p>
-                    <p className='text-[16px] text-[#424D47]'>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                    <p className='text-[16px] text-[#424D47]'>{guardianData.motherNID}</p>
                 </div>
             </div>
             <div className='mt-6 bg-[#F7F7F7]'>
@@ -60,19 +60,19 @@ export default function GuadianInfo() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>সম্পর্ক </p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>পিতা</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{guardianData.guardianRelation}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>নাম</p>
-                    <p className='text-[16px] text-[#424D47] '>মোঃ আরিফুর রহমান খান</p>
+                    <p className='text-[16px] text-[#424D47] '>{guardianData.guardianName}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>মোবাইল নম্বর</p>
-                    <p className='text-[16px] text-[#424D47]'>+৮৮০১৭৭৫৬২৩২৬</p>
+                    <p className='text-[16px] text-[#424D47]'>{guardianData.guardianPhone}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>NID</p>
-                    <p className='text-[16px] text-[#424D47]'>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                    <p className='text-[16px] text-[#424D47]'>{guardianData.guardianNID}</p>
                 </div>
             </div>
         </div>

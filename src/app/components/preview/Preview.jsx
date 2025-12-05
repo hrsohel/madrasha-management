@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Preview() {
+export default function Preview({ studentData, guardianData, addressData, madrasaData, feesData }) {
     return (
         <div className='w-full mt-4 mx-auto'>
             <div className='border-[1px] border-gray-200 relative'>

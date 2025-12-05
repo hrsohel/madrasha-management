@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Addrress() {
+export default function Addrress({ addressData }) {
     return (
         <div className='bg-[#F7F7F7] px-4 rounded-md mt-12'>
             <div className='flex items-center justify-between mt-6 bg-[#F7F7F7] p-4'>
@@ -22,42 +22,42 @@ export default function Addrress() {
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>গ্রাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>শাহজালাল </p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{addressData.presentVillage} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>উপজেলা/থানা </p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>সুরমা </p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{addressData.presentUpazila} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জেলা </p>
-                    <p className='text-[16px] text-[#424D47]'>সিলেট </p>
+                    <p className='text-[16px] text-[#424D47]'>{addressData.presentDistrict} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>বিভাগ  </p>
-                    <p className='text-[16px] text-[#424D47]'>সিলেট </p>
+                    <p className='text-[16px] text-[#424D47]'>{addressData.presentDivision} </p>
                 </div>
             </div>
             <div className='mt-6 bg-[#F7F7F7]'>
                 <div className='border-[1px] border-gray-200 relative bg-[#F7F7F7]'>
-                    <h1 className='text-[#246545] absolute top-1/2 left-0 -translate-y-1/2 pr-4 bg-[#F7F7F7] py-1 font-sembold text-[18px]'>বর্তমান ঠিকানা </h1>
+                    <h1 className='text-[#246545] absolute top-1/2 left-0 -translate-y-1/2 pr-4 bg-[#F7F7F7] py-1 font-sembold text-[18px]'>স্থায়ী ঠিকানা </h1>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8 mt-4'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>গ্রাম</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>শাহজালাল </p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{addressData.isSameAsPresent ? addressData.presentVillage : addressData.permanentVillage} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>উপজেলা/থানা </p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>সুরমা </p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{addressData.isSameAsPresent ? addressData.presentUpazila : addressData.permanentUpazila} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জেলা </p>
-                    <p className='text-[16px] text-[#424D47]'>সিলেট </p>
+                    <p className='text-[16px] text-[#424D47]'>{addressData.isSameAsPresent ? addressData.presentDistrict : addressData.permanentDistrict} </p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>বিভাগ  </p>
-                    <p className='text-[16px] text-[#424D47]'>সিলেট </p>
+                    <p className='text-[16px] text-[#424D47]'>{addressData.isSameAsPresent ? addressData.presentDivision : addressData.permanentDivision} </p>
                 </div>
             </div>
             {/* <div className='mt-6 bg-[#F7F7F7]'>
