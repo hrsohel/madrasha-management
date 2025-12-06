@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Pencil, X } from "lucide-react";
 
-export default function FamilyInfo() {
+export default function FamilyInfo({ guardian }) {
   const [showModal, setShowModal] = useState(false);
 
   return (
@@ -55,16 +55,16 @@ export default function FamilyInfo() {
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    মোঃ আবদুল্লাহ রহমান খান
+                    {guardian?.fatherName}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.fatherPhone}</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.fatherNID}</p>
                 </div>
               </div>
             </div>
@@ -78,16 +78,16 @@ export default function FamilyInfo() {
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    মোঃ আবদুল্লাহ রহমান খান
+                    {guardian?.motherName}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold  mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.motherPhone}</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.motherNID}</p>
                 </div>
               </div>
             </div>
@@ -100,21 +100,21 @@ export default function FamilyInfo() {
               <div className="grid grid-cols-4 gap-8">
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">সম্পর্ক</p>
-                  <p className="text-sm text-[#424D47] font-semibold">পিতা</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianRelation}</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    মোঃ আবদুল্লাহ রহমান খান
+                    {guardian?.guardianName}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">+৮৮০১৭৯৫৬৯৩০১৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianPhone}</p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">৯৪৯৮৫৯৫১৮৭৯৫১৮৯</p>
+                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianNID}</p>
                 </div>
               </div>
             </div>
@@ -156,7 +156,7 @@ export default function FamilyInfo() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
+                      defaultValue={guardian?.fatherName}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -166,7 +166,7 @@ export default function FamilyInfo() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
+                      defaultValue={guardian?.fatherPhone}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -174,132 +174,136 @@ export default function FamilyInfo() {
 
                 <div>
                   <label className="block text-xs text-gray-700 mb-1">
-                    NID
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
-                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-              </div>
-
-              {/* মাতার তথ্য */}
-              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">
-                  মাতার তথ্য
-                </h3>
-
-                <div className="grid grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      নাম
+                      NID
                     </label>
                     <input
                       type="text"
-                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      নম্বর
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
+                      defaultValue={guardian?.fatherNID}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs text-gray-700 mb-1">
-                    NID
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
-                    className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                </div>
-              </div>
+                {/* মাতার তথ্য */}
+                <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                    মাতার তথ্য
+                  </h3>
 
-              {/* অভিভাবকের তথ্য */}
-              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
-                <h3 className="text-sm font-semibold text-gray-700 mb-4">
-                  অভিভাবকের তথ্য
-                </h3>
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        নাম
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={guardian?.motherName}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        নম্বর
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={guardian?.motherPhone}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-3">
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      সম্পর্ক
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option>পিতা</option>
-                      <option>মাতা</option>
-                      <option>ভাই</option>
-                      <option>অন্যান্য</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      নাম
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="মোঃ আবদুল্লাহ রহমান খান"
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      মোবাইল নম্বর
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue="+৮৮০১৭৯৫৬৯৩০১৯"
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
                   <div>
                     <label className="block text-xs text-gray-700 mb-1">
                       NID
                     </label>
                     <input
                       type="text"
-                      defaultValue="৯৪৯৮৫৯৫১৮৭৯৫১৮৯"
+                      defaultValue={guardian?.motherNID}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
                 </div>
-              </div>
 
-              {/* Note */}
-              <p className="text-xs text-gray-600 mb-4 p-3 bg-gray-50 rounded border border-dashed border-gray-300">
-                আপডেটকৃত তথ্য সংরক্ষণ করতে 'সেভ করুন' বাটনে ক্লিক করুন অথবা 'ক্যানসেল' করুন।
-              </p>
+                {/* অভিভাবকের তথ্য */}
+                <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                  <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                    অভিভাবকের তথ্য
+                  </h3>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button className="px-6 py-2 bg-[#246545] text-white rounded text-sm hover:bg-green-800 transition-colors">
-                  সেভ করুন
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
-                >
-                  ক্যানসেল করুন
-                </button>
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        সম্পর্ক
+                      </label>
+                      <select 
+                        defaultValue={guardian?.guardianRelation}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <option>Father</option>
+                        <option>Mother</option>
+                        <option>Brother</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        নাম
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={guardian?.guardianName}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        মোবাইল নম্বর
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={guardian?.guardianPhone}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        NID
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue={guardian?.guardianNID}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Note */}
+                <p className="text-xs text-gray-600 mb-4 p-3 bg-gray-50 rounded border border-dashed border-gray-300">
+                  আপডেটকৃত তথ্য সংরক্ষণ করতে 'সেভ করুন' বাটনে ক্লিক করুন অথবা 'ক্যানসেল' করুন।
+                </p>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3">
+                  <button className="px-6 py-2 bg-[#246545] text-white rounded text-sm hover:bg-green-800 transition-colors">
+                    সেভ করুন
+                  </button>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-6 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
+                  >
+                    ক্যানসেল করুন
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
+        )}
+      </div>
+    );
+  }
+  

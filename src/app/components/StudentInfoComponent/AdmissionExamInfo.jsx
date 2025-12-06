@@ -1,13 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 
-export default function AdmissionExamInfo() {
+export default function AdmissionExamInfo({ admissionExamInfo }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [examInfo, setExamInfo] = useState({
-    examinerName: "মোহ আবিছুর রহমান খান",
-    examResult: "মুমতাজ",
+    examinerName: admissionExamInfo?.admissionExaminer || "",
+    examResult: admissionExamInfo?.admissionResult || "",
+    notes: admissionExamInfo?.notes || "",
   });
+
+  useEffect(() => {
+    setExamInfo({
+      examinerName: admissionExamInfo?.admissionExaminer || "",
+      examResult: admissionExamInfo?.admissionResult || "",
+      notes: admissionExamInfo?.notes || "",
+    });
+  }, [admissionExamInfo]);
 
   return (
     <div className=" bg-[#F7F7F7] mt-10">
@@ -47,6 +56,13 @@ export default function AdmissionExamInfo() {
                   {examInfo.examResult}
                 </p>
               </div>
+              {/* Notes */}
+              <div>
+                <p className="text-sm text-[#63736C] mb-2">নোটস</p>
+                <p className="text-sm text-[#424D47] font-semibold">
+                  {examInfo.notes}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -80,7 +96,7 @@ export default function AdmissionExamInfo() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="মোহ আবিছুর রহমান খান"
+                  defaultValue={examInfo.examinerName}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -92,7 +108,19 @@ export default function AdmissionExamInfo() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="মুমতাজ"
+                  defaultValue={examInfo.examResult}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
+                />
+              </div>
+
+              {/* Notes */}
+              <div className="mb-6">
+                <label className="block text-sm text-gray-700 mb-2">
+                  নোটস
+                </label>
+                <input
+                  type="text"
+                  defaultValue={examInfo.notes}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>

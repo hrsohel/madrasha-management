@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 
-export default function AcademicYearInfo() {
+export default function AcademicYearInfo({ oldMadrasaInfo }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [info, setInfo] = useState({
-    supervisorName: "মোহ আবিছুর রহমান খান",
-    mobileNumber: "+৮৮০১৭৭৫১৬৩৬",
+    supervisorName: oldMadrasaInfo?.talimiGuardianName || "",
+    mobileNumber: oldMadrasaInfo?.talimiGuardianPhone || "",
   });
+
+  useEffect(() => {
+    setInfo({
+      supervisorName: oldMadrasaInfo?.talimiGuardianName || "",
+      mobileNumber: oldMadrasaInfo?.talimiGuardianPhone || "",
+    });
+  }, [oldMadrasaInfo]);
 
   return (
     <div className="  mt-10 ">
@@ -82,7 +89,7 @@ export default function AcademicYearInfo() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="মোহ আবিছুর রহমান খান"
+                  defaultValue={info.supervisorName}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -94,7 +101,7 @@ export default function AcademicYearInfo() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="+৮৮০১৭৭৫১৬৩৬"
+                  defaultValue={info.mobileNumber}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -107,7 +114,7 @@ export default function AcademicYearInfo() {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <button className="flex-1 px-6 py-3 bg-[#246545] text-white rounded-md hover:bg-[#1F553E] transition-colors font-medium">
+                <button className="flex-1 px-6 py-3 bg-[#2B7752] text-white rounded-md hover:bg-[#1F553E] transition-colors font-medium">
                   সেভ করুন
                 </button>
 

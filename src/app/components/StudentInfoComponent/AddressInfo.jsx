@@ -1,25 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 
-export default function AddressInfo() {
+export default function AddressInfo({ address }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSameAddress, setIsSameAddress] = useState(false);
+  const [isSameAddress, setIsSameAddress] = useState(address?.isSameAsPresent || false);
 
   const [currentAddress, setCurrentAddress] = useState({
-    division: "সিলেট",
-    district: "সিলেট",
-    upazila: "সুরমা",
-    village: "শাহজালাল",
-    additionalInfo: "",
+    division: address?.presentDivision || "",
+    district: address?.presentDistrict || "",
+    upazila: address?.presentUpazila || "",
+    union: address?.presentUnion || "",
+    village: address?.presentVillage || "",
+    additionalInfo: address?.presentOthers || "",
   });
 
   const [permanentAddress, setPermanentAddress] = useState({
-    division: "সিলেট",
-    district: "সিলেট",
-    upazila: "সুরমা",
-    village: "শাহজালাল",
-    additionalInfo: "",
+    division: address?.permanentDivision || "",
+    district: address?.permanentDistrict || "",
+    upazila: address?.permanentUpazila || "",
+    union: address?.permanentUnion || "",
+    village: address?.permanentVillage || "",
+    additionalInfo: address?.permanentOthers || "",
   });
+
+  useEffect(() => {
+    setIsSameAddress(address?.isSameAsPresent || false);
+    setCurrentAddress({
+      division: address?.presentDivision || "",
+      district: address?.presentDistrict || "",
+      upazila: address?.presentUpazila || "",
+      union: address?.presentUnion || "",
+      village: address?.presentVillage || "",
+      additionalInfo: address?.presentOthers || "",
+    });
+    setPermanentAddress({
+      division: address?.permanentDivision || "",
+      district: address?.permanentDistrict || "",
+      upazila: address?.permanentUpazila || "",
+      union: address?.permanentUnion || "",
+      village: address?.permanentVillage || "",
+      additionalInfo: address?.permanentOthers || "",
+    });
+  }, [address]);
+
 
   return (
     <div>
@@ -135,18 +158,25 @@ export default function AddressInfo() {
                     <label className="block text-sm text-gray-700 mb-1">
                       বিভাগ
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option>সিলেট</option>
-                      <option>ঢাকা</option>
-                      <option>চট্টগ্রাম</option>
+                    <select
+                      defaultValue={currentAddress.division}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option>Dhaka</option>
+                      <option>Chittagong</option>
+                      <option>Sylhet</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm text-gray-700 mb-1">
                       জেলা
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option>সিলেট</option>
+                    <select
+                      defaultValue={currentAddress.district}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option>Dhaka</option>
+                      <option>Sylhet</option>
                     </select>
                   </div>
                 </div>
@@ -156,16 +186,24 @@ export default function AddressInfo() {
                     <label className="block text-sm text-gray-700 mb-1">
                       উপজেলা/থানা
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option>সুরমা</option>
+                    <select
+                      defaultValue={currentAddress.upazila}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option>h</option>
+                      <option>Surma</option>
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm text-gray-700 mb-1">
                       ইউনিয়ন
                     </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                      <option>শাহজালাল</option>
+                    <select
+                      defaultValue={currentAddress.union}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      <option>Ward No 10</option>
+                      <option>Shahjalal</option>
                     </select>
                   </div>
                 </div>
@@ -177,7 +215,7 @@ export default function AddressInfo() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="শাহজালাল"
+                      defaultValue={currentAddress.village}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -187,6 +225,7 @@ export default function AddressInfo() {
                     </label>
                     <input
                       type="text"
+                      defaultValue={currentAddress.additionalInfo}
                       placeholder="ঠিকানা সম্পর্কিত অন্য কোনো তথ্য"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
@@ -222,12 +261,13 @@ export default function AddressInfo() {
                       বিভাগ
                     </label>
                     <select
+                      defaultValue={permanentAddress.division}
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                     >
-                      <option>সিলেট</option>
-                      <option>ঢাকা</option>
-                      <option>চট্টগ্রাম</option>
+                      <option>Dhaka</option>
+                      <option>Chittagong</option>
+                      <option>Sylhet</option>
                     </select>
                   </div>
                   <div>
@@ -235,10 +275,12 @@ export default function AddressInfo() {
                       জেলা
                     </label>
                     <select
+                      defaultValue={permanentAddress.district}
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                     >
-                      <option>সিলেট</option>
+                      <option>Dhaka</option>
+                      <option>Sylhet</option>
                     </select>
                   </div>
                 </div>
@@ -249,10 +291,12 @@ export default function AddressInfo() {
                       উপজেলা/থানা
                     </label>
                     <select
+                      defaultValue={permanentAddress.upazila}
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                     >
-                      <option>সুরমা</option>
+                      <option>hjhjhjh</option>
+                      <option>Surma</option>
                     </select>
                   </div>
                   <div>
@@ -260,10 +304,12 @@ export default function AddressInfo() {
                       ইউনিয়ন
                     </label>
                     <select
+                      defaultValue={permanentAddress.union}
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                     >
-                      <option>শাহজালাল</option>
+                      <option>Ward No 10</option>
+                      <option>Shahjalal</option>
                     </select>
                   </div>
                 </div>
@@ -275,7 +321,7 @@ export default function AddressInfo() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="শাহজালাল"
+                      defaultValue={permanentAddress.village}
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
                     />
@@ -286,6 +332,7 @@ export default function AddressInfo() {
                     </label>
                     <input
                       type="text"
+                      defaultValue={permanentAddress.additionalInfo}
                       placeholder="ঠিকানা সম্পর্কিত অন্য কোনো তথ্য"
                       disabled={isSameAddress}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"

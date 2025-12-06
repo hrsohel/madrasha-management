@@ -9,19 +9,63 @@ import StudentInfo from "@/app/components/StudentInfoComponent/StudentInfo";
 import AdmissionExamInfo from "@/app/components/StudentInfoComponent/AdmissionExamInfo";
 
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchStudentById, clearSelectedStudent } from "@/lib/features/students/studentSlice";
 
 export default function StudentDetailsPage() {
   const { id } = useParams();
+  const dispatch = useDispatch();
+  const { selectedStudent, selectedStudentLoading, selectedStudentError } = useSelector(
+    (state) => state.students
+  );
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchStudentById(id));
+    }
+    return () => {
+      dispatch(clearSelectedStudent()); // Clean up when component unmounts
+    };
+  }, [id, dispatch]);
+
+  if (selectedStudentLoading) {
+    return <div className="text-center p-6">Loading student details...</div>;
+  }
+
+  if (selectedStudentError) {
+    return (
+      <div className="text-center p-6 text-red-500">
+        Error: {selectedStudentError.message || JSON.stringify(selectedStudentError)}
+      </div>
+    );
+  }
+
+  if (!selectedStudent) {
+    return <div className="text-center p-6">No student found.</div>;
+  }
+
+  // Extract relevant data for sub-components
+  const studentData = {
+    ...selectedStudent,
+    // Assuming guardian and addresse are arrays, and we want the first one
+    guardian: selectedStudent.guardian ? selectedStudent.guardian[0] : null,
+    address: selectedStudent.addresse ? selectedStudent.addresse[0] : null,
+    admissionExamInfo: selectedStudent.oldMadrasaInfo ? selectedStudent.oldMadrasaInfo[0] : null,
+    fees: selectedStudent.fees ? selectedStudent.fees[0] : null,
+  };
+
 
   return (
-    <div>
-      <StudentInfo />
-      <FamilyInfo />
-      <AddressInfo />
-      <GuardianInfo />
-      <AcademicYearInfo />
-      <AdmissionExamInfo />
-      <StudentAdmissionReceipt />
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-bold mb-6">Student Details: {studentData.name}</h1>
+      <StudentInfo student={studentData} />
+      {studentData.guardian && <FamilyInfo guardian={studentData.guardian} />}
+      {studentData.address && <AddressInfo address={studentData.address} />}
+      {studentData.guardian && <GuardianInfo guardian={studentData.guardian} />}
+      {studentData.admissionExamInfo && <AcademicYearInfo oldMadrasaInfo={studentData.admissionExamInfo} />} 
+      {studentData.admissionExamInfo && <AdmissionExamInfo admissionExamInfo={studentData.admissionExamInfo} />}
+      {studentData.fees && <StudentAdmissionReceipt fees={studentData.fees} />}
     </div>
   );
 }

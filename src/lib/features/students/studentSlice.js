@@ -14,17 +14,69 @@ export const addStudent = createAsyncThunk(
         },
         body: JSON.stringify(studentData),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
-        // If the server returns a non-OK status, reject with the error message
         return rejectWithValue(data);
       }
-
       return data;
     } catch (error) {
-      // Handle network errors or other exceptions
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async Thunk for fetching all students
+export const fetchAllStudents = createAsyncThunk(
+  'students/fetchAllStudents',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/get-all-students`);
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data);
+      }
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async Thunk for fetching a single student by ID
+export const fetchStudentById = createAsyncThunk(
+  'students/fetchStudentById',
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/get_student_with_guardian_address/${id}`);
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data);
+      }
+      return data.data[0] || null;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async Thunk for updating a student
+export const updateStudent = createAsyncThunk(
+  'students/updateStudent',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/update-student/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(responseData);
+      }
+      return responseData.data;
+    } catch (error) {
       return rejectWithValue(error.message);
     }
   }
@@ -33,10 +85,14 @@ export const addStudent = createAsyncThunk(
 const studentSlice = createSlice({
   name: 'students',
   initialState: {
+    students: [],
     loading: false,
-    student: null,
+    isUpdating: false,
     error: null,
     success: false,
+    selectedStudent: null,
+    selectedStudentLoading: false,
+    selectedStudentError: null,
     studentFormData: {
       student: {},
       address: {},
@@ -47,17 +103,12 @@ const studentSlice = createSlice({
   },
   reducers: {
     setStudentFormData: (state, action) => {
-      console.log('Reducer: setStudentFormData - Action Payload:', action.payload);
       const sectionName = Object.keys(action.payload)[0];
       if (sectionName) {
-        console.log(`Reducer: setStudentFormData - Merging into section: ${sectionName}`);
-        console.log('Reducer: setStudentFormData - Current state for section:', state.studentFormData[sectionName]);
-        console.log('Reducer: setStudentFormData - Incoming data for section:', action.payload[sectionName]);
         state.studentFormData[sectionName] = {
           ...state.studentFormData[sectionName],
           ...action.payload[sectionName],
         };
-        console.log('Reducer: setStudentFormData - New state for section:', state.studentFormData[sectionName]);
       }
     },
     clearStudentFormData: (state) => {
@@ -73,6 +124,11 @@ const studentSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.success = false;
+    },
+    clearSelectedStudent: (state) => {
+      state.selectedStudent = null;
+      state.selectedStudentLoading = false;
+      state.selectedStudentError = null;
     },
   },
   extraReducers: (builder) => {
@@ -92,9 +148,54 @@ const studentSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.success = false;
+      })
+      // Reducers for fetchAllStudents
+      .addCase(fetchAllStudents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllStudents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.students = action.payload;
+      })
+      .addCase(fetchAllStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Reducers for fetchStudentById
+      .addCase(fetchStudentById.pending, (state) => {
+        state.selectedStudentLoading = true;
+        state.selectedStudentError = null;
+        state.selectedStudent = null;
+      })
+      .addCase(fetchStudentById.fulfilled, (state, action) => {
+        state.selectedStudentLoading = false;
+        state.selectedStudent = action.payload;
+        state.selectedStudentError = null;
+      })
+      .addCase(fetchStudentById.rejected, (state, action) => {
+        state.selectedStudentLoading = false;
+        state.selectedStudent = null;
+        state.selectedStudentError = action.payload;
+      })
+      // Reducers for updateStudent
+      .addCase(updateStudent.pending, (state) => {
+        state.isUpdating = true;
+        state.error = null;
+      })
+      .addCase(updateStudent.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        const index = state.students.findIndex(student => student._id === action.payload._id);
+        if (index !== -1) {
+          state.students[index] = action.payload;
+        }
+      })
+      .addCase(updateStudent.rejected, (state, action) => {
+        state.isUpdating = false;
+        state.error = action.payload;
       });
   },
 });
 
-export const { setStudentFormData, clearStudentFormData, resetAddStudentStatus } = studentSlice.actions;
+export const { setStudentFormData, clearStudentFormData, resetAddStudentStatus, clearSelectedStudent } = studentSlice.actions;
 export default studentSlice.reducer;

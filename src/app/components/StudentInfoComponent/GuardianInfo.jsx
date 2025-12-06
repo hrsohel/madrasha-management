@@ -1,14 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 
-export default function GuardianInfo() {
+export default function GuardianInfo({ oldMadrasaInfo }) { // Changed prop name
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [guardianInfo, setGuardianInfo] = useState({
-    name: "মোহ আবিছুর রহমান খান",
-    lastPassedClass: "নাসারি",
-    lastPassedResult: "সর্বশেষ উত্তীর্ণ (রোলনং)",
+  const [madrasaInfo, setMadrasaInfo] = useState({
+    name: oldMadrasaInfo?.oldMadrasaName || "",
+    lastPassedClass: oldMadrasaInfo?.oldMadrasaClass || "",
+    lastPassedResult: oldMadrasaInfo?.oldMadrasaResult || "",
   });
+
+  useEffect(() => {
+    setMadrasaInfo({
+      name: oldMadrasaInfo?.oldMadrasaName || "",
+      lastPassedClass: oldMadrasaInfo?.oldMadrasaClass || "",
+      lastPassedResult: oldMadrasaInfo?.oldMadrasaResult || "",
+    });
+  }, [oldMadrasaInfo]);
+
 
   return (
     <div className="">
@@ -37,7 +46,7 @@ export default function GuardianInfo() {
                   পূর্বতন মাদ্রাসার নাম
                 </p>
                 <p className="text-sm text-[#424D47] font-semibold">
-                  {guardianInfo.name}
+                  {madrasaInfo.name}
                 </p>
               </div>
 
@@ -47,7 +56,7 @@ export default function GuardianInfo() {
                   সর্বশেষ উত্তীর্ণ ক্লাস
                 </p>
                 <p className="text-sm text-[#424D47] font-semibold">
-                  {guardianInfo.lastPassedClass}
+                  {madrasaInfo.lastPassedClass}
                 </p>
               </div>
 
@@ -57,7 +66,7 @@ export default function GuardianInfo() {
                   সর্বশেষ উত্তীর্ণ (রোলনং)
                 </p>
                 <p className="text-sm text-[#424D47] font-semibold">
-                  {guardianInfo.lastPassedResult}
+                  {madrasaInfo.lastPassedResult}
                 </p>
               </div>
             </div>
@@ -92,7 +101,7 @@ export default function GuardianInfo() {
                 </label>
                 <input
                   type="text"
-                  defaultValue="মোহ আবিছুর রহমান খান"
+                  defaultValue={madrasaInfo.name}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -103,13 +112,13 @@ export default function GuardianInfo() {
                   সর্বশেষ উত্তীর্ণ ক্লাস
                 </label>
                 <div className="relative">
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white text-gray-700 cursor-pointer">
-                    <option>নাসারি</option>
-                    <option>প্রথম</option>
-                    <option>দ্বিতীয়</option>
-                    <option>তৃতীয়</option>
-                    <option>চতুর্থ</option>
-                    <option>পঞ্চম</option>
+                  <select 
+                    defaultValue={madrasaInfo.lastPassedClass}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white text-gray-700 cursor-pointer"
+                  >
+                    <option>Hifz Completed</option>
+                    <option>Nursery</option>
+                    <option>Class One</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                     <svg
@@ -135,13 +144,13 @@ export default function GuardianInfo() {
                   সর্বশেষ উত্তীর্ণ (রোলনং)
                 </label>
                 <div className="relative">
-                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white text-gray-700 cursor-pointer">
-                    <option>সর্বশেষ উত্তীর্ণ (রোলনং)</option>
-                    <option>১</option>
-                    <option>২</option>
-                    <option>৩</option>
-                    <option>৪</option>
-                    <option>৫</option>
+                  <select 
+                    defaultValue={madrasaInfo.lastPassedResult}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent appearance-none bg-white text-gray-700 cursor-pointer"
+                  >
+                    <option>Passed</option>
+                    <option>Failed</option>
+                    <option>N/A</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                     <svg

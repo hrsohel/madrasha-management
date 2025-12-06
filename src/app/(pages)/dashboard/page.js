@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Filter,
@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import ClientOnly from "@/app/components/ClientOnly";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchAllStudents, updateStudent } from "@/lib/features/students/studentSlice";
 
 // shadcn SELECT
 import {
@@ -43,11 +45,20 @@ const filterOptions = {
 // ----------------------
 const ResidenceStatusBadge = ({ status }) => {
   const statusColors = {
-    আবাসিক: "text-[#008043]",
-    "অর্ধ-আবাসিক": "text-[#BF6A02]",
-    অনাবাসিক: "text-[#AC59F3]",
+    Hostel: "text-[#008043]", // Assuming Hostel maps to আবাসিক
+    DayScholar: "text-[#BF6A02]", // Assuming DayScholar maps to অর্ধ-আবাসিক
+    NonResidential: "text-[#AC59F3]", // Assuming NonResidential maps to অনাবাসিক
     ইনঅ্যাকটিভ: "text-[#EC221F] bg-red-100",
   };
+
+  const statusMap = {
+    Hostel: "আবাসিক",
+    DayScholar: "অর্ধ-আবাসিক",
+    NonResidential: "অনাবাসিক",
+    // Add other mappings if necessary
+  };
+
+  const displayStatus = statusMap[status] || status;
 
   const colorClass = statusColors[status] || "bg-gray-100 text-gray-700";
 
@@ -58,128 +69,10 @@ const ResidenceStatusBadge = ({ status }) => {
       {status === "ইনঅ্যাকটিভ" && (
         <span className="w-2 h-2 rounded-full bg-red-500 inline-block "></span>
       )}
-      {status}
+      {displayStatus}
     </span>
   );
 };
-
-// ----------------------
-// Main Table Student Data
-// ----------------------
-const studentData = [
-  {
-    id: "DUMS01",
-    roll: "১",
-    name: "মোঃ আরিফুর রহমান খান",
-    residenceType: "আবাসিক",
-    classGrade: "-",
-    section: "-",
-    department: "নাজেরা",
-    departmentColor: "bg-yellow-500",
-    educationType: "সকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "O+",
-  },
-  {
-    id: "DUMS01",
-    roll: "২",
-    name: "মোঃ নাথানকুজ্জামান সিদ্দিকী",
-    residenceType: "আবাসিক",
-    classGrade: "-",
-    section: "-",
-    department: "নাজেরা",
-    departmentColor: "bg-yellow-500",
-    educationType: "সকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "A+",
-  },
-  {
-    id: "DUMS02",
-    roll: "৩",
-    name: "মোঃ তাওসিফুর রহমান (ত...",
-    residenceType: "ইনঅ্যাকটিভ",
-    classGrade: "৯০ - ৭৫",
-    section: "ক",
-    department: "হিফজ",
-    departmentColor: "bg-pink-500",
-    educationType: "বিকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "O+",
-  },
-  {
-    id: "DUMS02",
-    roll: "৮",
-    name: "মোঃ ইয়ার্ন হোসেন শুভ",
-    residenceType: "আবাসিক",
-    classGrade: "২০ - ২৫",
-    section: "ক",
-    department: "হিফজ",
-    departmentColor: "bg-pink-500",
-    educationType: "সকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "A+",
-  },
-  {
-    id: "DUMS03",
-    roll: "৫",
-    name: "মোঃ রফিকুর রহমান চৌধুরী",
-    residenceType: "আবাসিক",
-    classGrade: "নাসারি",
-    section: "খ",
-    department: "নুরানী",
-    departmentColor: "bg-orange-500",
-    educationType: "বিকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "O+",
-  },
-  {
-    id: "DUMS03",
-    roll: "৬",
-    name: "মোঃ তানভীকুল ইসলাম রানি",
-    residenceType: "আবাসিক",
-    classGrade: "নাসারি",
-    section: "খ",
-    department: "নুরানী",
-    departmentColor: "bg-orange-500",
-    educationType: "সকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "A+",
-  },
-  {
-    id: "DUMS04",
-    roll: "৭",
-    name: "মোঃ সাইয়ুর রহমান আনাম",
-    residenceType: "অনাবাসিক",
-    classGrade: "৬ষ্ঠ বর্ষ",
-    section: "ক",
-    department: "কিতাব",
-    departmentColor: "bg-red-500",
-    educationType: "বিকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "O+",
-  },
-  {
-    id: "DUMS04",
-    roll: "৮",
-    name: "মোঃ শফিকুল ইসলাম শুভ",
-    residenceType: "আবাসিক",
-    classGrade: "৬ষ্ঠ বর্ষ",
-    section: "খ",
-    department: "কিতাব",
-    departmentColor: "bg-red-500",
-    educationType: "বিকাল",
-    session: "ছাত্র",
-    sessionYear: "২৪ - ২৫",
-    bloodGroup: "A+",
-  },
-];
 
 // ----------------------
 // All Dropdown Action Items
@@ -188,10 +81,10 @@ const dropdownItems = [
   { label: "একটি সিলেক্ট করুন", value: "select" },
   { label: "ক্লাস পরিবর্তন", value: "class" },
   { label: "শাখা পরিবর্তন", value: "section" },
-  { label: "বিভাগ পরিবর্তন", value: "department" },
+  { label: "বিভাগ পরিবর্তন", value: "division" },
   { label: "শিফট পরিবর্তন", value: "shift" },
-  { label: "আবাসিক অবস্থা পরিবর্তন", value: "residence" },
-  { label: "রক্তের গ্রুপ পরিবর্তন", value: "blood-group" },
+  { label: "আবাসিক অবস্থা পরিবর্তন", value: "residential" },
+  { label: "রক্তের গ্রুপ পরিবর্তন", value: "bloodGroup" },
   { label: "জেন্ডার পরিবর্তন", value: "gender" },
   { label: "সেশন পরিবর্তন", value: "session" },
   { label: "ইউজারঅ্যাক্টিভ করুন", value: "activate" },
@@ -208,11 +101,34 @@ const StatItem = ({ label, value }) => (
 
 // ----------------------
 export default function DashboardPage() {
-  
-  const history = useRouter()
+  const history = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeModal, setActiveModal] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
+  const [selectedStudents, setSelectedStudents] = useState([]);
+
+  const dispatch = useDispatch();
+  const { students, loading, error, isUpdating } = useSelector((state) => state.students);
+
+  useEffect(() => {
+    dispatch(fetchAllStudents());
+  }, [dispatch]);
+
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedStudents(students.map((s) => s._id));
+    } else {
+      setSelectedStudents([]);
+    }
+  };
+
+  const handleSelectStudent = (id) => {
+    if (selectedStudents.includes(id)) {
+      setSelectedStudents(selectedStudents.filter((studentId) => studentId !== id));
+    } else {
+      setSelectedStudents([...selectedStudents, id]);
+    }
+  };
 
   const closeModal = () => {
     setActiveModal(null);
@@ -226,82 +142,101 @@ export default function DashboardPage() {
     setIsDropdownOpen(false);
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted:", activeModal, selectedOption);
-    closeModal();
+  const handleSubmit = async () => {
+    if (selectedStudents.length === 0) {
+      alert("Please select students to update.");
+      return;
+    }
+    if (!selectedOption && !['activate', 'archive'].includes(activeModal)) {
+      alert("Please select a value to update.");
+      return;
+    }
+  
+    const payload = { [activeModal]: selectedOption };
+  
+    try {
+      await Promise.all(
+        selectedStudents.map(id => dispatch(updateStudent({ id, data: payload })).unwrap())
+      );
+      alert("Students updated successfully!");
+      setSelectedStudents([]);
+      closeModal();
+    } catch (err) {
+      alert(`Failed to update students: ${err.message || JSON.stringify(err)}`);
+    }
   };
 
   const modalConfigs = {
     class: {
       title: "ক্লাস পরিবর্তন",
       selectLabel: "ক্লাস সিলেক্ট করুন",
-      options: ["প্রথম", "দ্বিতীয়", "তৃতীয়", "চতুর্থ", "পঞ্চম"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর ক্লাস পরিবর্তন হবে!",
+      options: ["Class Seven", "Class Eight", "Class Nine", "Class Ten"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their class changed!`,
     },
     section: {
       title: "শাখা পরিবর্তন",
       selectLabel: "শাখা সিলেক্ট করুন",
-      options: ["ক", "খ", "গ"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর শাখা পরিবর্তন হবে!",
+      options: ["A", "B", "C"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their section changed!`,
     },
-    department: {
+    division: {
       title: "বিভাগ পরিবর্তন",
       selectLabel: "বিভাগ সিলেক্ট করুন",
-      options: ["বিজ্ঞান", "মানবিক", "ব্যবসায় শিক্ষা"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর বিভাগ পরিবর্তন হবে!",
+      options: ["Dhaka", "Chittagong", "Sylhet"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their division changed!`,
     },
     shift: {
       title: "শিফট পরিবর্তন",
       selectLabel: "শিফট সিলেক্ট করুন",
-      options: ["সকাল", "দিবা", "সন্ধ্যা"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর শিফট পরিবর্তন হবে!",
+      options: ["Morning", "Day", "Evening"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their shift changed!`,
     },
-    residence: {
+    residential: {
       title: "আবাসিক অবস্থা পরিবর্তন",
       selectLabel: "আবাসিক অবস্থা সিলেক্ট করুন",
-      options: ["আবাসিক", "অর্ধ-আবাসিক", "অনাবাসিক"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর আবাসিক অবস্থা পরিবর্তন হবে!",
+      options: ["Hostel", "DayScholar", "NonResidential"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their residence status changed!`,
     },
-    "blood-group": {
+    bloodGroup: {
       title: "রক্তের গ্রুপ পরিবর্তন",
       selectLabel: "রক্তের গ্রুপ সিলেক্ট করুন",
       options: ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর রক্তের গ্রুপ পরিবর্তন হবে!",
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their blood group changed!`,
     },
     gender: {
       title: "জেন্ডার পরিবর্তন",
       selectLabel: "জেন্ডার সিলেক্ট করুন",
-      options: ["পুরুষ", "মহিলা"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর জেন্ডার পরিবর্তন হবে!",
+      options: ["Male", "Female"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their gender changed!`,
     },
     session: {
       title: "সেশন পরিবর্তন",
       selectLabel: "সেশন সিলেক্ট করুন",
-      options: ["২৩-২৪", "২৪-২৫", "২৫-২৬"],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীর সেশন পরিবর্তন হবে!",
+      options: ["23-24", "24-25", "25-26"],
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will have their session changed!`,
     },
     activate: {
       title: "ইউজারঅ্যাক্টিভ করুন",
       selectLabel: "",
       options: [],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীকে অ্যাক্টিভ করা হবে!",
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will be activated!`,
       noSelect: true,
     },
     archive: {
       title: "আর্কাইভ করুন",
       selectLabel: "",
       options: [],
-      helpText: "আপনার কি নিশ্চিত?",
-      helpSubtext: "২০ জন সিলেক্টেড শিক্ষার্থীকে আর্কাইভ করা হবে!",
+      helpText: "Are you sure?",
+      helpSubtext: `${selectedStudents.length} selected students will be archived!`,
       noSelect: true,
     },
   };
@@ -332,7 +267,7 @@ export default function DashboardPage() {
             >
               <option value="">একটি নির্বাচন করুন</option>
               {config.options.map((opt, idx) => (
-                <option key={idx}>{opt}</option>
+                <option key={idx} value={opt}>{opt}</option>
               ))}
             </select>
           </div>
@@ -346,9 +281,10 @@ export default function DashboardPage() {
         <div className="flex gap-3">
           <button
             onClick={handleSubmit}
-            className="px-5 py-2 bg-[#BF6A02] text-white rounded-md font-semibold"
+            disabled={isUpdating}
+            className="px-5 py-2 bg-[#BF6A02] text-white rounded-md font-semibold disabled:bg-gray-400"
           >
-            আপডেট করুন
+            {isUpdating ? 'Updating...' : 'আপডেট করুন'}
           </button>
           <button
             onClick={closeModal}
@@ -446,15 +382,15 @@ export default function DashboardPage() {
       {/* STATS GRID */}
       <div className="rounded-md p-4 mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-9 gap-4">
         {[
-          ["মোট ছাত্র", "৩০০০"],
-          ["আবাসিক", "৮৫০০"],
-          ["অনাবাসিক", "২০০"],
-          ["অর্ধ-আবাসিক", "৬০০"],
-          ["নাজেরা", "৭০০"],
-          ["হিফজ", "২০০"],
-          ["সুন্নী", "২০০"],
-          ["কিতাব", "১০০০"],
-          ["ইন্টারমিডিয়েট", "২"],
+          ["মোট ছাত্র", students.length], // Update total student count
+          ["আবাসিক", students.filter(s => s.residential === "Hostel").length],
+          ["অর্ধ-আবাসিক", students.filter(s => s.residential === "DayScholar").length],
+          ["অনাবাসিক", students.filter(s => s.residential === "NonResidential").length],
+          ["নাজেরা", students.filter(s => s.class === "Nazera").length], // Assuming class names need mapping
+          ["হিফজ", students.filter(s => s.class === "Hifz").length],
+          ["সুন্নী", students.filter(s => s.class === "Sunni").length],
+          ["কিতাব", students.filter(s => s.class === "Kitab").length],
+          ["ইন্টারমিডিয়েট", students.filter(s => s.class === "Intermediate").length],
         ].map(([label, value], idx) => (
           <div key={idx} className="bg-[#ebffee] rounded-md p-3 font-semibold">
             <StatItem label={label} value={value} />
@@ -467,9 +403,14 @@ export default function DashboardPage() {
         <div className="p-4 border-b border-gray-200 flex gap-4 items-center">
           <div className="bg-[#DFF2FF] flex gap-6 px-[14px] py-2 items-center rounded-md">
             <div>
-              <input type="checkbox" className="mr-2" />
+              <input 
+                type="checkbox" 
+                className="mr-2" 
+                onChange={handleSelectAll}
+                checked={selectedStudents.length === students.length && students.length > 0}
+              />
               <span className="text-sm text-[#0086CB] font-semibold">
-                ২০ জন সিলেক্টেড
+                {selectedStudents.length} জন সিলেক্টেড
               </span>
             </div>
 
@@ -482,8 +423,12 @@ export default function DashboardPage() {
                 <ChevronDown size={16} />
               </button>
 
-              <button className="px-4 py-2 text-white border-2 rounded-md text-sm flex items-center gap-2 font-semibold bg-[#2B7752]">
-                <MousePointerClick className="mb-1" /> অ্যাকশন
+              <button 
+                onClick={handleSubmit}
+                disabled={isUpdating}
+                className="px-4 py-2 text-white border-2 rounded-md text-sm flex items-center gap-2 font-semibold bg-[#2B7752] disabled:bg-gray-400"
+              >
+                <MousePointerClick className="mb-1" /> {isUpdating ? 'Updating...' : 'অ্যাকশন'}
               </button>
 
               {isDropdownOpen && (
@@ -504,96 +449,118 @@ export default function DashboardPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-sm table-auto divide-y divide-gray-200 text-center">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3">
-                  <input type="checkbox" />
-                </th>
-                {[
-                  "আইডি",
-                  "রোল",
-                  "নাম",
-                  "শ্রেণী/শাখা",
-                  "বিভাগ/শিফট",
-                  "জেন্ডার/দেশন",
-                  "রক্তের গ্রুপ",
-                  "আ্যাকশান",
-                ].map((th, idx) => (
-                  <th key={idx} className="px-4 py-3 font-medium">
-                    {th}
+          {loading && <p className="text-center p-4">Loading students...</p>}
+          {error && <p className="text-center p-4 text-red-500">Error: {error.message || JSON.stringify(error)}</p>}
+          {!loading && !error && students.length > 0 && (
+            <table className="w-full text-sm table-auto divide-y divide-gray-200 text-center">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3">
+                    <input 
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={selectedStudents.length === students.length && students.length > 0}
+                    />
                   </th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {studentData.map((student, index) => (
-                <tr
-                  key={index}
-                  className={index % 2 ? "bg-gray-50" : "bg-white"}
-                >
-                  <td className="p-3">
-                    <input type="checkbox" />
-                  </td>
-
-                  <td className="p-3 font-semibold">{student.id}</td>
-                  <td className="p-3 font-semibold">{student.roll}</td>
-
-                  <td className="p-3 font-semibold">
-                    <div className="flex flex-col items-center gap-1">
-                      <span>{student.name}</span>
-                      <ResidenceStatusBadge status={student.residenceType} />
-                    </div>
-                  </td>
-
-                  <td className="p-3">
-                    <div className="flex flex-col items-center font-semibold">
-                      <span>{student.classGrade}</span>
-                      <span className="text-xs">{student.section}</span>
-                    </div>
-                  </td>
-
-                  <td className="p-3">
-                    <div className="flex flex-col items-center gap-1 font-semibold">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-2 h-2 rounded-full ${student.departmentColor}`}
-                        ></span>
-                        <span>{student.department}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`w-2 h-2 rounded-full ${student.departmentColor}`}
-                        ></span>
-                        <span>{student.educationType}</span>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="p-3">
-                    <div className="flex flex-col items-center">
-                      <span className="font-semibold">{student.session}</span>
-                      <span className="text-xs font-semibold">
-                        {student.sessionYear}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td className="p-3 font-semibold">{student.bloodGroup}</td>
-
-                  <td className="p-3">
-                    <Link
-                      href={`/students/${student.id}`}
-                      className="text-[#006FAA] cursor-pointer underline font-semibold"
-                    >
-                      আরও
-                    </Link>
-                  </td>
+                  {[
+                    "আইডি",
+                    "রোল",
+                    "নাম",
+                    "শ্রেণী/শাখা",
+                    "বিভাগ/শিফট",
+                    "জেন্ডার/দেশন",
+                    "রক্তের গ্রুপ",
+                    "আ্যাকশান",
+                  ].map((th, idx) => (
+                    <th key={idx} className="px-4 py-3 font-medium">
+                      {th}
+                    </th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {students.map((student, index) => (
+                  <tr
+                    key={student._id}
+                    className={index % 2 ? "bg-gray-50" : "bg-white"}
+                  >
+                    <td className="p-3">
+                      <input 
+                        type="checkbox" 
+                        checked={selectedStudents.includes(student._id)}
+                        onChange={() => handleSelectStudent(student._id)}
+                      />
+                    </td>
+
+                    <td className="p-3 font-semibold">{student._id}</td>
+                    <td className="p-3 font-semibold">{student.roll}</td>
+
+                    <td className="p-3 font-semibold">
+                      <div className="flex flex-col items-center gap-1">
+                        <span>{student.name}</span>
+                        <ResidenceStatusBadge status={student.residential} />
+                      </div>
+                    </td>
+
+                    <td className="p-3">
+                      <div className="flex flex-col items-center font-semibold">
+                        <span>{student.class}</span>
+                        <span className="text-xs">{student.section}</span>
+                      </div>
+                    </td>
+
+                    <td className="p-3">
+                      <div className="flex flex-col items-center gap-1 font-semibold">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              student.class === "Nazera" ? "bg-yellow-500" :
+                              student.class === "Hifz" ? "bg-pink-500" :
+                              student.class === "Nurani" ? "bg-orange-500" :
+                              student.class === "Kitab" ? "bg-red-500" :
+                              "bg-gray-500"
+                            }`}
+                          ></span>
+                          <span>{student.class}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              student.shift === "Morning" ? "bg-green-500" :
+                              student.shift === "Evening" ? "bg-blue-500" :
+                              "bg-gray-500"
+                            }`}
+                          ></span>
+                          <span>{student.shift}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="p-3">
+                      <div className="flex flex-col items-center">
+                        <span className="font-semibold">{student.gender}</span>
+                        <span className="text-xs font-semibold">
+                          {student.division}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="p-3 font-semibold">{student.bloodGroup}</td>
+
+                    <td className="p-3">
+                      <Link
+                        href={`/students/${student._id}`}
+                        className="text-[#006FAA] cursor-pointer underline font-semibold"
+                      >
+                        আরও
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>

@@ -3,9 +3,27 @@ import { MousePointerClick, Pencil, X } from "lucide-react";
 import Image from "next/image";
 import profileImage from "../../../../public/studentprofile.jpg";
 
-export default function StudentInfo() {
+export default function StudentInfo({ student }) {
   const [selectedAction, setSelectedAction] = useState("");
   const [showModal, setShowModal] = useState(false);
+
+  const calculateAge = (dob) => {
+    if (!dob) return "";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('bn-BD', options);
+  };
 
   return (
     <div>
@@ -16,7 +34,7 @@ export default function StudentInfo() {
             {/* Left Side - Profile Image */}
             <div className="relative">
               <Image
-                src={profileImage}
+                src={profileImage} // Assuming student object might have an imageUrl later
                 alt="Profile"
                 className="w-40 h-60 rounded-lg object-cover"
               />
@@ -52,27 +70,31 @@ export default function StudentInfo() {
                 <div className="grid grid-cols-3 gap-x-8 gap-y-4 mt-2">
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold   mb-1">নাম</p>
-                    <p className="text-[#424D47] font-semibold">মোঃ আরিফুল ইসলাম খান</p>
+                    <p className="text-[#424D47] font-semibold">{student?.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">জন্ম তারিখ</p>
-                    <p className="text-[#424D47] font-semibold">১৩ জানুয়ারি ২০২০ , ৫ বছর</p>
+                    <p className="text-[#424D47] font-semibold">
+                      {formatDate(student?.dob)} , {calculateAge(student?.dob)} বছর
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">জন্মসন/NID</p>
-                    <p className="text-[#424D47] font-semibold">৯৮৪৬৩৭৩৮৭৪৭৪০৯৮</p>
+                    <p className="text-[#424D47] font-semibold">
+                      {student?.birthCertificate || student?.nid}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">জেন্ডার</p>
-                    <p className="text-[#424D47] font-semibold">ছাত্র</p>
+                    <p className="text-[#424D47] font-semibold">{student?.gender}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#63736C] font-semibold mb-1">ছবি</p>
-                    <p className="text-[#424D47] font-semibold">O+</p>
+                    <p className="text-sm text-[#63736C] font-semibold mb-1">রক্তের গ্রুপ</p>
+                    <p className="text-[#424D47] font-semibold">{student?.bloodGroup}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">মোবাইল নম্বর</p>
-                    <p className="text-[#424D47] font-semibold">+৮৮০১৭৭৫৬৬৩০৩৬</p>
+                    <p className="text-[#424D47] font-semibold">{student?.phone}</p>
                   </div>
                 </div>
               </div>
@@ -88,38 +110,38 @@ export default function StudentInfo() {
                 <div className="grid grid-cols-3 gap-x-8 gap-y-4 mt-2">
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">আইডি</p>
-                    <p className="text-[#424D47] font-semibold">DUMS01</p>
+                    <p className="text-[#424D47] font-semibold">{student?._id}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#63736C] font-semibold mb-1">আবাসিক তরখা</p>
-                    <p className="text-[#424D47] font-semibold">আবাসিক</p>
+                    <p className="text-sm text-[#63736C] font-semibold mb-1">আবাসিক অবস্থা</p>
+                    <p className="text-[#424D47] font-semibold">{student?.residential}</p>
                   </div>
                   <div></div>
 
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">রোল নম্বর</p>
-                    <p className="text-[#424D47] font-semibold">২</p>
+                    <p className="text-[#424D47] font-semibold">{student?.roll}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">শ্রেণী</p>
-                    <p className="text-[#424D47] font-semibold">নার্সারি</p>
+                    <p className="text-[#424D47] font-semibold">{student?.class}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">শাখা</p>
-                    <p className="text-[#424D47] font-semibold">ক</p>
+                    <p className="text-[#424D47] font-semibold">{student?.section}</p>
                   </div>
 
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">শিফট</p>
-                    <p className="text-[#424D47] font-semibold">সকাল</p>
+                    <p className="text-[#424D47] font-semibold">{student?.shift}</p>
                   </div>
                   <div>
                     <p className="text-sm text-[#63736C] font-semibold mb-1">বিভাগ</p>
-                    <p className="text-[#424D47] font-semibold">স্বুরানী</p>
+                    <p className="text-[#424D47] font-semibold">{student?.division}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#63736C] font-semibold mb-1">সেসন</p>
-                    <p className="text-[#424D47] font-semibold">২৪ - ২৫</p>
+                    <p className="text-sm text-[#63736C] font-semibold mb-1">সেশন</p>
+                    <p className="text-[#424D47] font-semibold">{student?.session}</p>
                   </div>
                 </div>
               </div>
@@ -187,19 +209,23 @@ export default function StudentInfo() {
                   </label>
                   <input
                     type="text"
-                    defaultValue="মোঃ আরিফুল ইসলাম খান"
+                    defaultValue={student?.name}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
 
-                {/* আবাসিক তরখা */}
+                {/* আবাসিক অবস্থা */}
                 <div>
                   <label className="block text-sm text-gray-700 mb-2">
-                    আবাসিক তরখা
+                    আবাসিক অবস্থা
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-green-50 text-green-700">
-                    <option>আবাসিক</option>
-                    <option>অনাবাসিক</option>
+                  <select 
+                    defaultValue={student?.residential}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-green-50 text-green-700"
+                  >
+                    <option>Hostel</option>
+                    <option>DayScholar</option>
+                    <option>NonResidential</option>
                   </select>
                 </div>
 
@@ -211,10 +237,10 @@ export default function StudentInfo() {
                   <div className="flex items-center gap-2">
                     <input
                       type="date"
-                      defaultValue="2020-01-13"
+                      defaultValue={student?.dob ? new Date(student.dob).toISOString().split('T')[0] : ''}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
-                    <span className="text-sm text-gray-600">৫ বছর</span>
+                    <span className="text-sm text-gray-600">{calculateAge(student?.dob)} বছর</span>
                   </div>
                 </div>
 
@@ -223,19 +249,22 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2 flex items-center gap-2">
                     <input
                       type="checkbox"
-                      defaultChecked
+                      checked={!!student?.birthCertificate}
+                      readOnly
                       className="w-4 h-4 text-green-600"
                     />
                     জন্মসনদ
                     <input
                       type="checkbox"
+                      checked={!!student?.nid}
+                      readOnly
                       className="w-4 h-4 text-green-600 ml-4"
                     />
                     NID
                   </label>
                   <input
                     type="text"
-                    defaultValue="৯৮৪৬৩৭৩৮৭৪৭৪০৯৮"
+                    defaultValue={student?.birthCertificate || student?.nid}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -247,7 +276,7 @@ export default function StudentInfo() {
                   </label>
                   <input
                     type="text"
-                    defaultValue="২"
+                    defaultValue={student?.roll}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -257,10 +286,13 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     শ্রেণী
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>নার্সারি</option>
-                    <option>প্রথম</option>
-                    <option>দ্বিতীয়</option>
+                  <select 
+                    defaultValue={student?.class}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>Class One</option>
+                    <option>Class Two</option>
+                    <option>Class Seven</option>
                   </select>
                 </div>
 
@@ -277,10 +309,13 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     শাখা
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>ক</option>
-                    <option>খ</option>
-                    <option>গ</option>
+                  <select 
+                    defaultValue={student?.section}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>A</option>
+                    <option>B</option>
+                    <option>C</option>
                   </select>
                 </div>
 
@@ -289,9 +324,12 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     শিফট
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>সকাল</option>
-                    <option>দুপুর</option>
+                  <select 
+                    defaultValue={student?.shift}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>Morning</option>
+                    <option>Evening</option>
                   </select>
                 </div>
 
@@ -300,10 +338,12 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     বিভাগ
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>স্বুরানী</option>
-                    <option>বিজ্ঞান</option>
-                    <option>ব্যবসায়</option>
+                  <select 
+                    defaultValue={student?.division}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>Dhaka</option>
+                    <option>Chittagong</option>
                   </select>
                 </div>
 
@@ -312,20 +352,26 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     সেসন
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>২৪ - ২৫</option>
-                    <option>২৩ - ২৪</option>
+                  <select 
+                    defaultValue={student?.session}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>25-26</option>
+                    <option>24-25</option>
                   </select>
                 </div>
 
-                {/* জেলার */}
+                {/* জেলার (Gender) */}
                 <div>
                   <label className="block text-sm text-gray-700 mb-2">
-                    জেলার
+                    জেন্ডার
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>ছাত্র</option>
-                    <option>ছাত্রী</option>
+                  <select 
+                    defaultValue={student?.gender}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option>Male</option>
+                    <option>Female</option>
                   </select>
                 </div>
 
@@ -334,11 +380,18 @@ export default function StudentInfo() {
                   <label className="block text-sm text-gray-700 mb-2">
                     রক্তের গ্রুপ
                   </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <option>O+</option>
+                  <select 
+                    defaultValue={student?.bloodGroup}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
                     <option>A+</option>
+                    <option>A-</option>
                     <option>B+</option>
+                    <option>B-</option>
+                    <option>O+</option>
+                    <option>O-</option>
                     <option>AB+</option>
+                    <option>AB-</option>
                   </select>
                 </div>
               </div>
