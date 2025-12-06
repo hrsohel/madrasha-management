@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Papa from "papaparse";
+import { saveAs } from "file-saver";
 
 import ClientOnly from "@/app/components/ClientOnly";
 import { useSelector, useDispatch } from "react-redux";
@@ -142,6 +144,25 @@ export default function DashboardPage() {
     setIsDropdownOpen(false);
   };
 
+  const handleExportData = () => {
+    const dataToExport = students.map((student) => ({
+      ID: student._id,
+      Roll: student.roll,
+      Name: student.name,
+      Class: student.class,
+      Section: student.section,
+      Residential: student.residential,
+      Shift: student.shift,
+      Gender: student.gender,
+      Division: student.division,
+      "Blood Group": student.bloodGroup,
+    }));
+
+    const csv = Papa.unparse(dataToExport);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    saveAs(blob, "students.csv");
+  };
+  
   const handleSubmit = async () => {
     if (selectedStudents.length === 0) {
       alert("Please select students to update.");
@@ -327,6 +348,7 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             className="border-[#2B7752] py-5 text-[#246545] hover:text-[#246545] bg-[#E7FEF2] rounded-sm w-[150px] font-semibold hover:bg-[#E7FEF2]"
+            onClick={handleExportData}
           >
             ডাটা এক্সপোর্ট
           </Button>

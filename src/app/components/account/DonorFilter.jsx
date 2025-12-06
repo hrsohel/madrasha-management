@@ -1,59 +1,17 @@
+"use client"
 import { Filter, Search } from 'lucide-react'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllDonors } from '@/lib/features/accounts/accountSlice';
 
 export default function DonorFilter() {
-    const tableData = [
-        {
-            "দাতার নাম/প্রতিষ্ঠান": "মোঃ আব্দুল্লাহ রহমান খান\nবার্ষিক",
-            "ঠিকানা/মোবাইল": "+৮৮০১৭১২৩৪৫৬৭৮\nঢাকা, মিরপুর, ঢাকা",
-            "সময়কাল/শেষ তারিখ": "১ বছর, ২৫ মার্চ\n১২ জানুয়ারি ২০২৫",
-            "প্রতি মাসে": "৫০০৮",
-            "১২ মাসে": "৬০০০৮",
-            "আদায় হয়েছে": "৫০০৮",
-            "বাকি": "৫৫০০৮",
-            "আগামী মাস থেকে": "৫০০৮"
-        },
-        {
-            "দাতার নাম/প্রতিষ্ঠান": "মোঃ ইসমাইল হোসাইন ভূঁইয়া\nসাধারণ",
-            "ঠিকানা/মোবাইল": "+৮৮০১৭১২৩৪৫৬৭৮\nঢাকা, মোহাম্মদপুর, ঢাকা",
-            "সময়কাল/শেষ তারিখ": "১ বছর, ২৫ মার্চ\n১২ জানুয়ারি ২০২৫",
-            "প্রতি মাসে": "২০০৮",
-            "১২ মাসে": "২৪০০৮",
-            "আদায় হয়েছে": "২০০৮",
-            "বাকি": "২২০০৮",
-            "আগামী মাস থেকে": "২০০৮"
-        },
-        {
-            "দাতার নাম/প্রতিষ্ঠান": "মোঃ শফিকুল ইসলাম চৌধুরী\nসাধারণ",
-            "ঠিকানা/মোবাইল": "+৮৮০১৭১২৩৪৫৬৭৮\nঢাকা, উত্তরা, ঢাকা",
-            "সময়কাল/শেষ তারিখ": "১ বছর, ২৫ মার্চ\n১২ জানুয়ারি ২০২৫",
-            "প্রতি মাসে": "৩০০৮",
-            "১২ মাসে": "৩৬০০৮",
-            "আদায় হয়েছে": "৩০০৮",
-            "বাকি": "৩৩০০৮",
-            "আগামী মাস থেকে": "৩০০৮"
-        },
-        {
-            "দাতার নাম/প্রতিষ্ঠান": "মোঃ তানভীরুল ইসলাম বনি\nসাধারণ",
-            "ঠিকানা/মোবাইল": "+৮৮০১৭১২৩৪৫৬৭৮\nঢাকা, মিরপুর, ঢাকা",
-            "সময়কাল/শেষ তারিখ": "১ বছর, ২৫ মার্চ\n১২ জানুয়ারি ২০২৫",
-            "প্রতি মাসে": "৩০০৮",
-            "১২ মাসে": "৩৬০০৮",
-            "আদায় হয়েছে": "৩০০৮",
-            "বাকি": "৩৩০০৮",
-            "আগামী মাস থেকে": "৩০০৮"
-        },
-        {
-            "দাতার নাম/প্রতিষ্ঠান": "মোঃ মাহিদুল ইসলাম আলম\nসাধারণ",
-            "ঠিকানা/মোবাইল": "+৮৮০১৭১২৩৪৫৬৭৮\nঢাকা, মিরপুর, ঢাকা",
-            "সময়কাল/শেষ তারিখ": "১ বছর, ২৫ মার্চ\n১২ জানুয়ারি ২০২৫",
-            "প্রতি মাসে": "৩০০৮",
-            "১২ মাসে": "৩৬০০৮",
-            "আদায় হয়েছে": "৩০০৮",
-            "বাকি": "৩৩০০৮",
-            "আগামী মাস থেকে": "৩০০৮"
-        }
-    ]
+    const dispatch = useDispatch();
+    const { donors, loading, error } = useSelector((state) => state.accounts);
+
+    useEffect(() => {
+        dispatch(fetchAllDonors());
+    }, [dispatch]);
+
     return (
         <>
             <div className="bg-[#F7F7F7] rounded-sm p-6 shadow-sm border border-pink-100 mt-8">
@@ -115,20 +73,24 @@ export default function DonorFilter() {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            tableData.map((data, index) => (
+                        {loading ? (
+                            <tr><td colSpan="8" className="text-center py-4">Loading...</td></tr>
+                        ) : error ? (
+                            <tr><td colSpan="8" className="text-center py-4 text-red-500">Error: {error.message || 'Failed to fetch data'}</td></tr>
+                        ) : (
+                            donors?.map((data, index) => (
                                 <tr key={index} className='text-center'>
-                                    <td className='py-[24px]'>{data["দাতার নাম/প্রতিষ্ঠান"]}</td>
-                                    <td className='py-[24px]'>{data["ঠিকানা/মোবাইল"]}</td>
-                                    <td className='py-[24px]'>{data["সময়কাল/শেষ তারিখ"]}</td>
-                                    <td className='py-[24px]'>{data["প্রতি মাসে"]}</td>
-                                    <td className='py-[24px]'>{data["১২ মাসে"]}</td>
-                                    <td className='py-[24px]'>{data["আদায় হয়েছে"]}</td>
-                                    <td className='py-[24px]'>{data["বাকি"]}</td>
-                                    <td className='py-[24px]'>{data["আগামী মাস থেকে"]}</td>
+                                    <td className='py-[24px]'>{data.donorName}</td>
+                                    <td className='py-[24px]'>{data.address} <br /> {data.phone}</td>
+                                    <td className='py-[24px]'>N/A</td>
+                                    <td className='py-[24px]'>{data.amountPerStep}</td>
+                                    <td className='py-[24px]'>{data.amountPerStep * 12}</td>
+                                    <td className='py-[24px]'>N/A</td>
+                                    <td className='py-[24px]'>N/A</td>
+                                    <td className='py-[24px]'>N/A</td>
                                 </tr>
                             ))
-                        }
+                        )}
                     </tbody>
                 </table>
             </div>
