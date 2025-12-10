@@ -99,11 +99,9 @@ export default function StudentInfo({ student }) {
           <div className="flex gap-8">
             {/* Left Side - Profile Image */}
             <div className="relative">
-              <Image
+              <img
                 src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${student.profileImage}` : profileImage.src}
                 alt="Profile"
-                width={160} 
-                height={240} 
                 className="w-40 h-60 rounded-lg object-cover"
               />
               <button className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors">
