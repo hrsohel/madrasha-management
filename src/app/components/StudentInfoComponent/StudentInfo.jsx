@@ -1,11 +1,36 @@
 import { useState } from "react";
 import { MousePointerClick, Pencil, X } from "lucide-react";
-import Image from "next/image";
+import Image from "next/image"; // Import Next.js Image component
 import profileImage from "../../../../public/studentprofile.jpg";
+import { useDispatch } from "react-redux";
+import { updateStudent, fetchStudentById } from "@/lib/features/students/studentSlice";
 
 export default function StudentInfo({ student }) {
   const [selectedAction, setSelectedAction] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({});
+
+  const dispatch = useDispatch();
+
+  const handleEditClick = () => {
+    setFormData({
+      name: student.name || "",
+      dob: student.dob ? new Date(student.dob).toISOString().split('T')[0] : "",
+      nid: student.nid || "",
+      birthCertificate: student.birthCertificate || "",
+      gender: student.gender || "",
+      bloodGroup: student.bloodGroup || "",
+      phone: student.phone || "",
+      residential: student.residential || "",
+      roll: student.roll || "",
+      class: student.class || "",
+      shift: student.shift || "",
+      section: student.section || "",
+      division: student.division || "",
+      session: student.session || "",
+    });
+    setShowModal(true);
+  };
 
   const calculateAge = (dob) => {
     if (!dob) return "";
@@ -25,6 +50,47 @@ export default function StudentInfo({ student }) {
     return new Date(dateString).toLocaleDateString('bn-BD', options);
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    const studentId = student?._id;
+    if (!studentId) {
+      console.error("Student ID not found");
+      return;
+    }
+    
+    // Create a new object with only the fields that are in the schema
+    const dataToUpdate = {
+        name: formData.name,
+        dob: formData.dob,
+        nid: formData.nid,
+        birthCertificate: formData.birthCertificate,
+        gender: formData.gender,
+        bloodGroup: formData.bloodGroup,
+        phone: formData.phone,
+        residential: formData.residential,
+        roll: formData.roll,
+        class: formData.class,
+        shift: formData.shift,
+        section: formData.section,
+        division: formData.division,
+        session: formData.session,
+    }
+
+
+    try {
+        await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
+        dispatch(fetchStudentById(studentId)); // Refetch student data to update UI
+        setShowModal(false);
+    } catch (error) {
+        console.error("Failed to update student:", error);
+    }
+  };
+  
   return (
     <div>
       <div className=" mx-auto bg-[#F7F7F7] rounded-lg shadow-sm">
@@ -34,8 +100,10 @@ export default function StudentInfo({ student }) {
             {/* Left Side - Profile Image */}
             <div className="relative">
               <Image
-                src={profileImage} // Assuming student object might have an imageUrl later
+                src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${student.profileImage}` : profileImage.src}
                 alt="Profile"
+                width={160} 
+                height={240} 
                 className="w-40 h-60 rounded-lg object-cover"
               />
               <button className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors">
@@ -52,7 +120,7 @@ export default function StudentInfo({ student }) {
                     শিক্ষার্থীর তথ্য
                   </h2>
                   <button
-                    onClick={() => setShowModal(true)}
+                    onClick={handleEditClick}
                     className="flex items-center text-[#2B7752] font-semi-bold gap-2 px-4 py-[6px] border-[1px] bg-[#E7FEF2] border-[#2B7752] rounded-md hover:bg-[#E7FEF2] transition-colors"
                   >
                     <Pencil className="w-4 h-4" />
@@ -199,7 +267,7 @@ export default function StudentInfo({ student }) {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6">
+            <form onSubmit={handleUpdate} className="p-6">
               {/* Form Grid */}
               <div className="grid grid-cols-2 gap-4">
                 {/* নাম */}
@@ -209,7 +277,9 @@ export default function StudentInfo({ student }) {
                   </label>
                   <input
                     type="text"
-                    defaultValue={student?.name}
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -220,12 +290,14 @@ export default function StudentInfo({ student }) {
                     আবাসিক অবস্থা
                   </label>
                   <select 
-                    defaultValue={student?.residential}
+                    name="residential"
+                    value={formData.residential}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-green-50 text-green-700"
                   >
-                    <option>Hostel</option>
-                    <option>DayScholar</option>
-                    <option>NonResidential</option>
+                    <option value="Hostel">Hostel</option>
+                    <option value="DayScholar">DayScholar</option>
+                    <option value="NonResidential">NonResidential</option>
                   </select>
                 </div>
 
@@ -237,34 +309,25 @@ export default function StudentInfo({ student }) {
                   <div className="flex items-center gap-2">
                     <input
                       type="date"
-                      defaultValue={student?.dob ? new Date(student.dob).toISOString().split('T')[0] : ''}
+                      name="dob"
+                      value={formData.dob}
+                      onChange={handleChange}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
-                    <span className="text-sm text-gray-600">{calculateAge(student?.dob)} বছর</span>
+                    <span className="text-sm text-gray-600">{calculateAge(formData.dob)} বছর</span>
                   </div>
                 </div>
 
                 {/* জন্মসনদ/NID */}
                 <div>
-                  <label className="block text-sm text-gray-700 mb-2 flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={!!student?.birthCertificate}
-                      readOnly
-                      className="w-4 h-4 text-green-600"
-                    />
-                    জন্মসনদ
-                    <input
-                      type="checkbox"
-                      checked={!!student?.nid}
-                      readOnly
-                      className="w-4 h-4 text-green-600 ml-4"
-                    />
-                    NID
+                  <label className="block text-sm text-gray-700 mb-2">
+                    জন্মসনদ/NID
                   </label>
                   <input
                     type="text"
-                    defaultValue={student?.birthCertificate || student?.nid}
+                    name="birthCertificate"
+                    value={formData.birthCertificate || formData.nid}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -276,7 +339,9 @@ export default function StudentInfo({ student }) {
                   </label>
                   <input
                     type="text"
-                    defaultValue={student?.roll}
+                    name="roll"
+                    value={formData.roll}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
@@ -287,7 +352,9 @@ export default function StudentInfo({ student }) {
                     শ্রেণী
                   </label>
                   <select 
-                    defaultValue={student?.class}
+                    name="class"
+                    value={formData.class}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>Class One</option>
@@ -310,7 +377,9 @@ export default function StudentInfo({ student }) {
                     শাখা
                   </label>
                   <select 
-                    defaultValue={student?.section}
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>A</option>
@@ -325,7 +394,9 @@ export default function StudentInfo({ student }) {
                     শিফট
                   </label>
                   <select 
-                    defaultValue={student?.shift}
+                    name="shift"
+                    value={formData.shift}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>Morning</option>
@@ -339,7 +410,9 @@ export default function StudentInfo({ student }) {
                     বিভাগ
                   </label>
                   <select 
-                    defaultValue={student?.division}
+                    name="division"
+                    value={formData.division}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>Dhaka</option>
@@ -353,7 +426,9 @@ export default function StudentInfo({ student }) {
                     সেসন
                   </label>
                   <select 
-                    defaultValue={student?.session}
+                    name="session"
+                    value={formData.session}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>25-26</option>
@@ -367,7 +442,9 @@ export default function StudentInfo({ student }) {
                     জেন্ডার
                   </label>
                   <select 
-                    defaultValue={student?.gender}
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>Male</option>
@@ -381,7 +458,9 @@ export default function StudentInfo({ student }) {
                     রক্তের গ্রুপ
                   </label>
                   <select 
-                    defaultValue={student?.bloodGroup}
+                    name="bloodGroup"
+                    value={formData.bloodGroup}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option>A+</option>
@@ -398,22 +477,23 @@ export default function StudentInfo({ student }) {
 
               {/* Note */}
               <p className="text-sm text-gray-600 mt-4">
-                আপডেটকৃত তথ্য সংরক্ষণ করতে 'সেভ করুন' বাটনে ক্লিক করুন অথবা 'ক্যানসেল' করুন।
+                আপডেটকৃত তথ্য সংরক্ষণ করতে &apos;সেভ করুন&apos; বাটনে ক্লিক করুন অথবা &apos;ক্যানসেল&apos; করুন।
               </p>
 
               {/* Action Buttons */}
               <div className="flex gap-4 mt-6">
-                <button className="px-6 py-2 bg-[#2B7752] text-white rounded-md hover:bg-green-800 transition-colors">
+                <button type="submit" className="px-6 py-2 bg-[#2B7752] text-white rounded-md hover:bg-green-800 transition-colors">
                   সেভ করুন
                 </button>
                 <button
                   onClick={() => setShowModal(false)}
+                  type="button"
                   className="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors"
                 >
                   ক্যানসেল করুন
                 </button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       )}

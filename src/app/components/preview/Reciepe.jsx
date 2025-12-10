@@ -25,6 +25,8 @@ export default function Reciepe({ setNavigateToReciepe }) {
     }, [loading, error, success, dispatch]);
 
     const handleSubmit = async () => {
+
+        console.log(studentFormData)
         if (!studentFormData) {
             setLocalError("Student data is missing. Please go back and fill the form.");
             return;
@@ -140,8 +142,8 @@ export default function Reciepe({ setNavigateToReciepe }) {
                 <button onClick={handleSubmit} className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md" disabled={localLoading}>
                     {localLoading ? 'জমা হচ্ছে...' : 'ভর্তি কনফার্ম করুন'}
                 </button>
-                        </div>
-                        {localError && <p className="text-red-500 text-center mt-4">{localError}</p>}
-                    </div>
-                )
-                }
+            </div>
+            {localError && <p className="text-red-500 text-center mt-4">{localError}</p>}
+        </div>
+    )
+}

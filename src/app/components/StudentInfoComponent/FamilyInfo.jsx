@@ -1,8 +1,111 @@
-import { useState } from "react";
+"use client";
+import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateGuardian,
+  fetchGuardianById,
+} from "@/lib/features/guardians/guardianSlice";
 
 export default function FamilyInfo({ guardian }) {
   const [showModal, setShowModal] = useState(false);
+  const [formData, setFormData] = useState({});
+
+  const dispatch = useDispatch();
+  const {
+    selectedGuardian,
+    selectedGuardianLoading,
+    selectedGuardianError,
+    // isUpdating, // Commented out as not directly used in render logic
+    // updateError, // Commented out as not directly used in render logic
+    // updateSuccess, // Commented out as not directly used in render logic
+  } = useSelector((state) => state.guardians);
+
+  useEffect(() => {
+    // Fetch guardian data when the component mounts or guardian prop changes
+    if (guardian?._id) {
+      dispatch(fetchGuardianById(guardian._id));
+    }
+    // Cleanup function if needed, for now clearGuardianState is not dispatched on unmount
+  }, [dispatch, guardian?._id]);
+
+  useEffect(() => {
+    // Populate formData when selectedGuardian data is fetched or updated
+    if (selectedGuardian) {
+      setFormData({
+        fatherName: selectedGuardian.fatherName || "",
+        fatherNID: selectedGuardian.fatherNID || "",
+        fatherPhone: selectedGuardian.fatherPhone || "",
+        motherName: selectedGuardian.motherName || "",
+        motherNID: selectedGuardian.motherNID || "",
+        motherPhone: selectedGuardian.motherPhone || "",
+        guardianName: selectedGuardian.guardianName || "",
+        guardianNID: selectedGuardian.guardianNID || "",
+        guardianPhone: selectedGuardian.guardianPhone || "",
+        guardianRelation: selectedGuardian.guardianRelation || "",
+      });
+    }
+  }, [selectedGuardian]);
+
+  const handleEditClick = () => {
+    // Re-fetch data to ensure the modal displays the freshest version from the store
+    if (guardian?._id) {
+      dispatch(fetchGuardianById(guardian._id));
+    }
+    setShowModal(true);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    console.log("handleUpdate called");
+    const guardianId = guardian?._id;
+    console.log("Guardian ID:", guardianId);
+    if (!guardianId) {
+      console.error("Guardian ID not found, returning.");
+      return;
+    }
+
+    const dataToUpdate = {
+      fatherName: formData.fatherName,
+      fatherNID: formData.fatherNID,
+      fatherPhone: formData.fatherPhone,
+      motherName: formData.motherName,
+      motherNID: formData.motherNID,
+      motherPhone: formData.motherPhone,
+      guardianName: formData.guardianName,
+      guardianNID: formData.guardianNID,
+      guardianPhone: formData.guardianPhone,
+      guardianRelation: formData.guardianRelation,
+    };
+    console.log("Data to update:", dataToUpdate);
+
+    try {
+      console.log("Dispatching updateGuardian...");
+      await dispatch(
+        updateGuardian({ id: guardianId, data: dataToUpdate })
+      ).unwrap();
+      console.log("Update successful");
+      setShowModal(false);
+      // Re-fetch guardian data to update the displayed info on the main page
+      dispatch(fetchGuardianById(guardianId));
+    } catch (error) {
+      console.error("Failed to update guardian:", error);
+      // Optionally, show an error message to the user
+    }
+  };
+
+  if (selectedGuardianLoading) {
+    return <div>Loading Guardian Info...</div>;
+  }
+
+  if (selectedGuardianError) {
+    return <div>Error: {selectedGuardianError}</div>;
+  }
 
   return (
     <div className="   ">
@@ -26,7 +129,6 @@ export default function FamilyInfo({ guardian }) {
               ভর্তি পরীক্ষার সনদাংশ
             </li>
           </ul>
-
         </div>
 
         {/* Main Content */}
@@ -37,7 +139,7 @@ export default function FamilyInfo({ guardian }) {
               অভিভাবকের তথ্য
             </h1>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={handleEditClick}
               className="flex items-center text-[#2B7752] font-semi-bold gap-2 px-4 py-[6px] border-[1px] bg-[#E7FEF2] border-[#2B7752] rounded-md hover:bg-[#E7FEF2] transition-colors"
             >
               <Pencil className="w-4 h-4" />
@@ -53,18 +155,28 @@ export default function FamilyInfo({ guardian }) {
               </h3>
               <div className="grid grid-cols-3 gap-8">
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    নাম
+                  </p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {guardian?.fatherName}
+                    {selectedGuardian?.fatherName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.fatherPhone}</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    মোবাইল নম্বর
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.fatherPhone}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.fatherNID}</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    NID
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.fatherNID}
+                  </p>
                 </div>
               </div>
             </div>
@@ -76,18 +188,28 @@ export default function FamilyInfo({ guardian }) {
               </h3>
               <div className="grid grid-cols-3 gap-8">
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    নাম
+                  </p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {guardian?.motherName}
+                    {selectedGuardian?.motherName}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold  mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.motherPhone}</p>
+                  <p className="text-sm text-[#63736C] font-semibold  mb-1">
+                    মোবাইল নম্বর
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.motherPhone}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.motherNID}</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    NID
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.motherNID}
+                  </p>
                 </div>
               </div>
             </div>
@@ -99,22 +221,36 @@ export default function FamilyInfo({ guardian }) {
               </h3>
               <div className="grid grid-cols-4 gap-8">
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">সম্পর্ক</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianRelation}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">নাম</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    সম্পর্ক
+                  </p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {guardian?.guardianName}
+                    {selectedGuardian?.guardianRelation}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">মোবাইল নম্বর</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianPhone}</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    নাম
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.guardianName}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm text-[#63736C] font-semibold mb-1">NID</p>
-                  <p className="text-sm text-[#424D47] font-semibold">{guardian?.guardianNID}</p>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    মোবাইল নম্বর
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.guardianPhone}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-[#63736C] font-semibold mb-1">
+                    NID
+                  </p>
+                  <p className="text-sm text-[#424D47] font-semibold">
+                    {selectedGuardian?.guardianNID}
+                  </p>
                 </div>
               </div>
             </div>
@@ -143,42 +279,49 @@ export default function FamilyInfo({ guardian }) {
 
             {/* Modal Body */}
             <div className="p-6">
-              {/* পিতার তথ্য */}
-              <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
-                <h3 className="text-sm font-semibold text-[#63736C] mb-4">
-                  পিতার তথ্য
-                </h3>
+              <form onSubmit={handleUpdate}>
+                {/* পিতার তথ্য */}
+                <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
+                  <h3 className="text-sm font-semibold text-[#63736C] mb-4">
+                    পিতার তথ্য
+                  </h3>
 
-                <div className="grid grid-cols-2 gap-4 mb-3">
+                  <div className="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        নাম
+                      </label>
+                      <input
+                        type="text"
+                        name="fatherName"
+                        value={formData.fatherName || ""}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-700 mb-1">
+                        মোবাইল নম্বর
+                      </label>
+                      <input
+                        type="text"
+                        name="fatherPhone"
+                        value={formData.fatherPhone || ""}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <label className="block text-xs text-gray-700 mb-1">
-                      নাম
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={guardian?.fatherName}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-700 mb-1">
-                      মোবাইল নম্বর
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={guardian?.fatherPhone}
-                      className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs text-gray-700 mb-1">
                       NID
                     </label>
                     <input
                       type="text"
-                      defaultValue={guardian?.fatherNID}
+                      name="fatherNID"
+                      value={formData.fatherNID || ""}
+                      onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -186,7 +329,7 @@ export default function FamilyInfo({ guardian }) {
 
                 {/* মাতার তথ্য */}
                 <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  <h3 className="text-sm font-semibold text-[#63736C] mb-4">
                     মাতার তথ্য
                   </h3>
 
@@ -197,7 +340,9 @@ export default function FamilyInfo({ guardian }) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={guardian?.motherName}
+                        name="motherName"
+                        value={formData.motherName || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -207,7 +352,9 @@ export default function FamilyInfo({ guardian }) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={guardian?.motherPhone}
+                        name="motherPhone"
+                        value={formData.motherPhone || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -219,7 +366,9 @@ export default function FamilyInfo({ guardian }) {
                     </label>
                     <input
                       type="text"
-                      defaultValue={guardian?.motherNID}
+                      name="motherNID"
+                      value={formData.motherNID || ""}
+                      onChange={handleChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                     />
                   </div>
@@ -227,7 +376,7 @@ export default function FamilyInfo({ guardian }) {
 
                 {/* অভিভাবকের তথ্য */}
                 <div className="mb-6 border border-dashed border-gray-300 p-4 rounded">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-4">
+                  <h3 className="text-sm font-semibold text-[#63736C] mb-4">
                     অভিভাবকের তথ্য
                   </h3>
 
@@ -236,14 +385,19 @@ export default function FamilyInfo({ guardian }) {
                       <label className="block text-xs text-gray-700 mb-1">
                         সম্পর্ক
                       </label>
-                      <select 
-                        defaultValue={guardian?.guardianRelation}
+                      <select
+                        name="guardianRelation"
+                        value={formData.guardianRelation || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       >
-                        <option>Father</option>
-                        <option>Mother</option>
-                        <option>Brother</option>
-                        <option>Other</option>
+                        <option value="Father">Father</option>
+                        <option value="Mother">Mother</option>
+                        <option value="Uncle">Uncle</option>
+                        <option value="Aunt">Aunt</option>
+                        <option value="Grandfather">Grandfather</option>
+                        <option value="Grandmother">Grandmother</option>
+                        <option value="Other">Other</option>
                       </select>
                     </div>
                     <div>
@@ -252,7 +406,9 @@ export default function FamilyInfo({ guardian }) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={guardian?.guardianName}
+                        name="guardianName"
+                        value={formData.guardianName || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -265,7 +421,9 @@ export default function FamilyInfo({ guardian }) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={guardian?.guardianPhone}
+                        name="guardianPhone"
+                        value={formData.guardianPhone || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -275,7 +433,9 @@ export default function FamilyInfo({ guardian }) {
                       </label>
                       <input
                         type="text"
-                        defaultValue={guardian?.guardianNID}
+                        name="guardianNID"
+                        value={formData.guardianNID || ""}
+                        onChange={handleChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
@@ -284,26 +444,31 @@ export default function FamilyInfo({ guardian }) {
 
                 {/* Note */}
                 <p className="text-xs text-gray-600 mb-4 p-3 bg-gray-50 rounded border border-dashed border-gray-300">
-                  আপডেটকৃত তথ্য সংরক্ষণ করতে 'সেভ করুন' বাটনে ক্লিক করুন অথবা 'ক্যানসেল' করুন।
+                  আপডেটকৃত তথ্য সংরক্ষণ করতে &apos;সেভ করুন&apos; বাটনে ক্লিক
+                  করুন অথবা &apos;ক্যানসেল&apos; করুন।
                 </p>
 
                 {/* Action Buttons */}
                 <div className="flex gap-3">
-                  <button className="px-6 py-2 bg-[#246545] text-white rounded text-sm hover:bg-green-800 transition-colors">
+                  <button
+                    type="submit"
+                    className="px-6 py-2 bg-[#246545] text-white rounded text-sm hover:bg-green-800 transition-colors"
+                  >
                     সেভ করুন
                   </button>
                   <button
                     onClick={() => setShowModal(false)}
+                    type="button"
                     className="px-6 py-2 border border-gray-300 text-gray-700 rounded text-sm hover:bg-gray-50 transition-colors"
                   >
                     ক্যানসেল করুন
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
-        )}
-      </div>
-    );
-  }
-  
+        </div>
+      )}
+    </div>
+  );
+}

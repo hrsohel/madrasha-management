@@ -13,6 +13,7 @@ import Preview from '../components/preview/Preview';
 
 export default function AddStudentPage() {
   const [pagination, setPagination] = useState(1);
+  const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
 
 
   const dispatch = useDispatch();
@@ -20,20 +21,41 @@ export default function AddStudentPage() {
   const studentFormData = useSelector((state) => state.students.studentFormData);
 
   const handleFormDataChange = useCallback((section, data) => {
-    console.log(`AddStudentPage: handleFormDataChange - Section: ${section}, Incoming data:`, data);
-    const newSectionData = {
-      ...studentFormData[section],
-      ...data,
-    };
-    console.log(`AddStudentPage: handleFormDataChange - Merged section data for ${section}:`, newSectionData);
-    dispatch(setStudentFormData({
-      [section]: newSectionData,
-    }));
+    // Check if the data contains a profileImage file
+    if (section === 'student' && data.profileImage instanceof File) {
+      console.log(data.profileImage)
+      setLocalProfileImageFile(data.profileImage); // Store the actual File object locally
+      // Dispatch a serializable representation for Redux state (e.g., for preview)
+      dispatch(setStudentFormData({
+        [section]: {
+          ...studentFormData[section],
+          // profileImage: URL.createObjectURL(data.profileImage), // Store URL for preview
+          profileImage: data.profileImage, // Store URL for preview
+        },
+      }));
+    } else {
+      // For all other data, proceed as normal
+      const newSectionData = {
+        ...studentFormData[section],
+        ...data,
+      };
+      dispatch(setStudentFormData({
+        [section]: newSectionData,
+      }));
+    }
   }, [dispatch, studentFormData]);
 
   const handleSubmit = () => {
     console.log("Submitting form data:", studentFormData);
-    dispatch(addStudent(studentFormData));
+    // Combine Redux form data with the locally stored profile image file
+    const formDataForSubmission = {
+      ...studentFormData,
+      student: {
+        ...studentFormData.student,
+        profileImage: localProfileImageFile, // Attach the actual File object
+      },
+    };
+    dispatch(addStudent(formDataForSubmission));
   };
 
   useEffect(() => {

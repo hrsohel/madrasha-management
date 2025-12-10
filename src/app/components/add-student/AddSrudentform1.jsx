@@ -1,23 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import the Image component
 
 export default function AddSrudentform1({ setPagination, formData, onDataChange }) {
+  const [profileImagePreview, setProfileImagePreview] = useState(formData.profileImage || "/5bcd817eb9c739cb0855646f3940ffa81a6dc895.jpg");
+
+  // useEffect(() => {
+  //   if (formData.profileImage) {
+  //     setProfileImagePreview(formData.profileImage);
+  //   }
+  // }, [formData.profileImage]);
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    onDataChange({ [name]: value });
+    const { name, value, files } = e.target;
+    if (name === "profileImage" && files && files[0]) {
+      const file = files[0];
+      onDataChange({ [name]: file });
+      setProfileImagePreview(URL.createObjectURL(file));
+    } else {
+      onDataChange({ [name]: value });
+    }
+  };
+  
+  const handleImageClick = () => {
+    document.getElementById('profileImageInput').click();
   };
 
   return (
     <div className='flex items-start justify-center gap-4'>
       <div className="relative">
         <Image // Use the Image component
-          src="/5bcd817eb9c739cb0855646f3940ffa81a6dc895.jpg"
+          src={profileImagePreview}
           alt="Student"
           width={163} // Specify width
           height={210} // Specify height
           className="w-[163px] h-[210px] rounded-lg object-cover border-4 border-gray-200"
         />
-        <button className="absolute -bottom-8 -right-8 text-white p-3 rounded-full shadow-lgtransition cursor-pointer">
+        <input
+          id="profileImageInput"
+          type="file"
+          name="profileImage"
+          accept="image/*"
+          onChange={handleChange}
+          className="hidden"
+        />
+        <button onClick={handleImageClick} className="absolute -bottom-8 -right-8 text-white p-3 rounded-full shadow-lgtransition cursor-pointer">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g filter="url(#filter0_d_307_23591)">
               <path d="M4 4C4 1.79086 5.79086 0 8 0H32C34.2091 0 36 1.79086 36 4V28C36 30.2091 34.2091 32 32 32H8C5.79086 32 4 30.2091 4 28V4Z" fill="#E7FEF2" shapeRendering="crispEdges" />

@@ -48,7 +48,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
   }, 0);
 
   const finalAmount = totalFee - (formData.helpAmount || 0);
-
+  
   return (
     <div className="rounded-lg shadow-xl overflow-hidden w-[60%] mx-auto bg-[#F7F7F7]">
       <div className="text-[#246545] p-6">

@@ -5,14 +5,37 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 // Async Thunk for adding a student
 export const addStudent = createAsyncThunk(
   'students/addStudent',
-  async (studentData, { rejectWithValue }) => {
+  async (studentFormDataFromState, { rejectWithValue }) => {
     try {
+      const formData = new FormData();
+
+      // Append all parts of the studentFormDataFromState to the FormData object
+      // Assuming studentFormDataFromState has structure: { student: {}, address: {}, guardian: {}, madrasa: {}, fees: {} }
+      for (const section in studentFormDataFromState) {
+        if (studentFormDataFromState.hasOwnProperty(section)) {
+          const sectionData = studentFormDataFromState[section];
+          if (section === 'student' && sectionData.profileImage instanceof File) {
+            formData.append('profileImage', sectionData.profileImage);
+            // Append other student data fields, excluding profileImage
+            for (const key in sectionData) {
+              if (sectionData.hasOwnProperty(key) && key !== 'profileImage') {
+                formData.append(`student[${key}]`, sectionData[key]);
+              }
+            }
+          } else {
+            // Append other section data fields
+            for (const key in sectionData) {
+              if (sectionData.hasOwnProperty(key)) {
+                formData.append(`${section}[${key}]`, sectionData[key]);
+              }
+            }
+          }
+        }
+      }
+
       const response = await fetch(`${API_BASE_URL}/api/v1/students/add-student`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(studentData),
+        body: formData, // No 'Content-Type' header needed for FormData; browser sets it automatically
       });
       const data = await response.json();
       if (!response.ok) {
