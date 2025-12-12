@@ -29,7 +29,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
     if (apiField) {
       // Toggle a default fee amount or 0 if unchecked
       const currentAmount = formData[apiField] || 0;
-      onDataChange({ [apiField]: currentAmount > 0 ? 0 : 3000 }); // Assuming default fee 3000
+      onDataChange({ [apiField]: currentAmount > 0 ? 0 : 300 }); // Assuming default fee 3000
     }
   };
   
@@ -73,7 +73,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
                   type="checkbox"
                   name={item.apiField}
                   checked={!!formData[item.apiField]}
-                  onChange={(e) => onDataChange({ [item.apiField]: e.target.checked ? 3000 : 0 })} // Assume 3000 as default
+                  onChange={(e) => onDataChange({ [item.apiField]: e.target.checked ? 300 : 0 })} // Assume 3000 as default
                   className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
                 />
                 <span className="text-lg text-gray-800 font-bold">{item.label}</span>

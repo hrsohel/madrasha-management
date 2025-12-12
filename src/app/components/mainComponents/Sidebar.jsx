@@ -27,6 +27,7 @@ export default function Sidebar({ isOpen }) {
     { icon: DollarSign, label: "ফি ম্যানেজমেন্ট", href: "/FeeManagement" },
     { icon: Zap, label: "পরীক্ষা", href: "/examinations" },
     { icon: HelpCircle, label: "মার্কশীট", href: "/marksheets" },
+    { icon: HelpCircle, label: "সেটিংস", href: "/settings" },
   ];
 
   return (

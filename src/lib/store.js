@@ -3,6 +3,7 @@ import studentReducer from './features/students/studentSlice';
 import accountReducer from './features/accounts/accountSlice'; // Import accountReducer
 import settingsReducer from './features/settings/settingsSlice'; // Import settingsReducer
 import guardianReducer from './features/guardians/guardianSlice'; // Import guardianReducer
+import authReducer from './features/auth/authSlice'; // Import authReducer
 
 export const store = configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export const store = configureStore({
     accounts: accountReducer, // Add accountReducer
     settings: settingsReducer, // Add settingsReducer
     guardians: guardianReducer, // Add guardianReducer
+    auth: authReducer, // Add authReducer
   },
 });

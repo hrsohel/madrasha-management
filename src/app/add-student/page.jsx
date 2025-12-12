@@ -13,7 +13,7 @@ import Preview from '../components/preview/Preview';
 
 export default function AddStudentPage() {
   const [pagination, setPagination] = useState(1);
-  const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
+  // const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
 
 
   const dispatch = useDispatch();
@@ -23,8 +23,7 @@ export default function AddStudentPage() {
   const handleFormDataChange = useCallback((section, data) => {
     // Check if the data contains a profileImage file
     if (section === 'student' && data.profileImage instanceof File) {
-      console.log(data.profileImage)
-      setLocalProfileImageFile(data.profileImage); // Store the actual File object locally
+      // setLocalProfileImageFile(data.profileImage); // Store the actual File object locally
       // Dispatch a serializable representation for Redux state (e.g., for preview)
       dispatch(setStudentFormData({
         [section]: {

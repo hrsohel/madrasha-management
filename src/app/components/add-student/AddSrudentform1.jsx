@@ -24,7 +24,7 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
   const handleImageClick = () => {
     document.getElementById('profileImageInput').click();
   };
-
+  
   return (
     <div className='flex items-start justify-center gap-4'>
       <div className="relative">

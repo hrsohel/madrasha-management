@@ -29,7 +29,7 @@ export default function Page() {
                 contact: madrasaSettings.contact || { email: '', phone: '' },
                 logo: null,
             });
-            setLogoPreview(madrasaSettings.logo ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}` : '/Madrashalogo.png');
+            setLogoPreview(madrasaSettings.logo ? `${process.env.NEXT_PUBLIC_API_URL}${madrasaSettings.logo}` : '/Madrashalogo.png');
         }
     }, [madrasaSettings]);
 

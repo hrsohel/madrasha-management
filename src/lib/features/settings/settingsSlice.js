@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const fetchMadrasaSettings = createAsyncThunk(
   'settings/fetchMadrasaSettings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/madrasa-settings`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -43,7 +43,7 @@ export const updateMadrasaSettings = createAsyncThunk(
         formData.append('logo', settingsData.logo);
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/madrasa-settings`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`, {
         method: 'PATCH',
         body: formData,
       });
