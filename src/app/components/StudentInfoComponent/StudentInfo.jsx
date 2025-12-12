@@ -100,7 +100,7 @@ export default function StudentInfo({ student }) {
             {/* Left Side - Profile Image */}
             <div className="relative">
               <img
-                src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${student.profileImage}` : profileImage.src}
+                src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_URL}${student.profileImage}` : profileImage.src}
                 alt="Profile"
                 className="w-40 h-60 rounded-lg object-cover"
               />

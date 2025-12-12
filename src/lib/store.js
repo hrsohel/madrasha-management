@@ -13,4 +13,13 @@ export const store = configureStore({
     guardians: guardianReducer, // Add guardianReducer
     auth: authReducer, // Add authReducer
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        // Ignore these paths in the state
+        ignoredPaths: ['students.studentFormData.student.profileImage'],
+        // Ignore these paths in the action
+        ignoredActionPaths: ['payload.student.profileImage', 'meta.arg.student.profileImage'],
+      },
+    }),
 });
