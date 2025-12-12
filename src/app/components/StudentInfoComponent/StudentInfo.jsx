@@ -86,7 +86,7 @@ export default function StudentInfo({ student }) {
         await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
         dispatch(fetchStudentById(studentId)); // Refetch student data to update UI
         setShowModal(false);
-    } catch (error) {
+    } catch (error) { 
         console.error("Failed to update student:", error);
     }
   };
