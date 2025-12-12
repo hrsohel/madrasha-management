@@ -2,7 +2,9 @@
 
 import { Menu, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { logout } from "@/lib/features/auth/authSlice";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +15,13 @@ import ClientOnly from "../ClientOnly";
 
 export default function Header({ onMenuClick }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    router.push("/");
+  };
 
   // Map pathname to human-readable page names
   const pageNames = {
@@ -88,7 +97,7 @@ export default function Header({ onMenuClick }) {
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Logout</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </ClientOnly>
