@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import the Image component
+import { categoryData } from './categoryFile';
 
 export default function AddSrudentform1({ setPagination, formData, onDataChange }) {
   const [profileImagePreview, setProfileImagePreview] = useState(formData.profileImage || "/5bcd817eb9c739cb0855646f3940ffa81a6dc895.jpg");
@@ -20,11 +21,33 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
       onDataChange({ [name]: value });
     }
   };
-  
+
   const handleImageClick = () => {
     document.getElementById('profileImageInput').click();
   };
-  
+
+  // Helper to get values by category name
+  const getCategoryValues = (categoryName) => {
+    const category = categoryData.find(c => c.category === categoryName);
+    return category ? category.values : [];
+  };
+
+  // Division to Category mapping
+  const divisionToCategoryMap = {
+    "নাজেরা": "নাজেরা",
+    "হিফজ": "হিফজ",
+    "নূরানী": "নূরানী",
+    "কিতাব": "কিতাব"
+  };
+
+  // Determine class options based on selected division
+  const selectedCategoryName = formData.division ? divisionToCategoryMap[formData.division] : null;
+  const classOptions = selectedCategoryName ? getCategoryValues(selectedCategoryName) : [];
+
+  const sectionOptions = getCategoryValues("সেকশন");
+  const shiftOptions = getCategoryValues("শিফট");
+  const residentialOptions = getCategoryValues("আবাসিক");
+
   return (
     <div className='flex items-start justify-center gap-4'>
       <div className="relative">
@@ -117,7 +140,7 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                 />
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -185,15 +208,17 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                     className="w-full px-4 py-3 bg-gray-200 border border-gray-300 rounded-lg font-bold"
                     value={formData.uid || ''}
                     onChange={handleChange}
-                    
+                    readOnly
+
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">আবাসিক অবস্থা</label>
                   <select name="residential" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.residential || ''} onChange={handleChange}>
                     <option value="">নির্বাচন করুন</option>
-                    <option value="Hostel">আবাসিক</option>
-                    <option value="Day Scholar">অনাবাসিক</option>
+                    {residentialOptions.map((option, index) => (
+                      <option key={index} value={option}>{option}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -214,8 +239,9 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                   <label className="block text-sm font-bold text-gray-700 mb-2">শ্রেণি</label>
                   <select name="class" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.class || ''} onChange={handleChange}>
                     <option value="">নির্বাচন করুন</option>
-                    <option value="Class Seven">Class Seven</option>
-                    <option value="Nursery">নার্সারি</option>
+                    {classOptions.map((option, index) => (
+                      <option key={index} value={option}>{option}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -225,8 +251,9 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                   <label className="block text-sm font-bold text-gray-700 mb-2">শাখা</label>
                   <select name="section" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.section || ''} onChange={handleChange}>
                     <option value="">নির্বাচন করুন</option>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
+                    {sectionOptions.map((option, index) => (
+                      <option key={index} value={option}>{option}</option>
+                    ))}
                   </select>
                 </div>
 
@@ -234,8 +261,9 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                   <label className="block text-sm font-bold text-gray-700 mb-2">শিফট</label>
                   <select name="shift" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.shift || ''} onChange={handleChange}>
                     <option value="">নির্বাচন করুন</option>
-                    <option value="Morning">সকাল</option>
-                    <option value="Day">দিবা</option>
+                    {shiftOptions.map((option, index) => (
+                      <option key={index} value={option}>{option}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -244,8 +272,10 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                   <label className="block text-sm font-bold text-gray-700 mb-2">বিভাগ</label>
                   <select name="division" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.division || ''} onChange={handleChange}>
                     <option value="">নির্বাচন করুন</option>
-                    <option value="Dhaka">ঢাকা</option>
-                    <option value="Chittagong">চট্টগ্রাম</option>
+                    <option value="নাজেরা">নাজেরা</option>
+                    <option value="হিফজ">হিফজ</option>
+                    <option value="নূরানী">নূরানী</option>
+                    <option value="কিতাব">কিতাব</option>
                   </select>
                 </div>
 

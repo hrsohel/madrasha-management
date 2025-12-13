@@ -1,5 +1,8 @@
 "use client";
-import logo from "../../../../public/Madrashalogo.png";
+import logo from "../../../../public/Madrashalogo.png"; // Default logo
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchMadrasaSettings } from "@/lib/features/settings/settingsSlice";
 
 import {
   LayoutDashboard,
@@ -16,10 +19,25 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-
 export default function Sidebar({ isOpen }) {
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const { madrasaSettings } = useSelector((state) => state.settings);
 
+  useEffect(() => {
+    dispatch(fetchMadrasaSettings());
+  }, [dispatch]);
+
+  // Construct Logo URL
+  const logoSrc = madrasaSettings?.logo
+    ? `${process.env.NEXT_PUBLIC_API_URL}${madrasaSettings.logo}`
+    : "/WhatsApp Image 2025-12-12 at 7.37.35 AM.jpeg";
+
+  // Get Madrasa Name (Bangla)
+  const madrasaName = madrasaSettings?.name?.bangla || "দারুল উলুম মাইনুস সুন্নাহ";
+  // Get English Name for subtitle
+  const madrasaSubtitle = madrasaSettings?.name?.english || "darululummoinussunnah...";
+  console.log(madrasaSettings?.logo);
   const menuItems = [
     { icon: LayoutDashboard, label: "ডেশবোর্ড", href: "/dashboard" },
     { icon: GraduationCap, label: "সকল ছাত্র", href: "/all-students" },
@@ -29,7 +47,6 @@ export default function Sidebar({ isOpen }) {
     { icon: HelpCircle, label: "মার্কশীট", href: "/marksheets" },
     { icon: HelpCircle, label: "সেটিংস", href: "/settings" },
   ];
-
   return (
     <aside
       className={cn(
@@ -41,9 +58,9 @@ export default function Sidebar({ isOpen }) {
       <div className="p-6">
         <div className="flex items-center gap-2">
           <div className="rounded-full">
-            <Image
-              className="rounded-full"
-              src={logo}
+            <img
+              className="rounded-full object-cover w-[55px] h-[55px]"
+              src={logoSrc}
               alt="Logo"
               width={55}
               height={55}
@@ -51,10 +68,10 @@ export default function Sidebar({ isOpen }) {
           </div>
           <div>
             <p className="text-md font-bold text-[#424D47]">
-              দারুল উলুম মাইনুস সুন্নাহ
+              {madrasaName}
             </p>
-            <p className="text-sm font-semibold text-[#424D47]">
-              darululummoinussunnah...
+            <p className="text-sm font-semibold text-[#424D47] truncate w-40">
+              {madrasaSubtitle}
             </p>
           </div>
         </div>

@@ -23,7 +23,7 @@ export const updateMadrasaSettings = createAsyncThunk(
   async (settingsData, { rejectWithValue }) => {
     try {
       const formData = new FormData();
-      
+
       // Append nested name fields
       formData.append('name[bangla]', settingsData.name.bangla);
       formData.append('name[english]', settingsData.name.english);
@@ -95,7 +95,7 @@ const settingsSlice = createSlice({
       })
       .addCase(updateMadrasaSettings.fulfilled, (state, action) => {
         state.loading = false;
-        state.madrasaSettings = action.payload.data;
+        state.madrasaSettings = action.payload.data || action.payload;
         state.success = true;
       })
       .addCase(updateMadrasaSettings.rejected, (state, action) => {

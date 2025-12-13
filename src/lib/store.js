@@ -19,7 +19,7 @@ export const store = configureStore({
         // Ignore these paths in the state
         ignoredPaths: ['students.studentFormData.student.profileImage'],
         // Ignore these paths in the action
-        ignoredActionPaths: ['payload.student.profileImage', 'meta.arg.student.profileImage'],
+        ignoredActionPaths: ['payload.student.profileImage', 'meta.arg.student.profileImage', 'meta.arg.logo', 'payload.logo'],
       },
     }),
 });

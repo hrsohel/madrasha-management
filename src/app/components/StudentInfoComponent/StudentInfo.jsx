@@ -104,7 +104,7 @@ export default function StudentInfo({ student }) {
                 alt="Profile"
                 className="w-40 h-60 rounded-lg object-cover"
               />
-              <button className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors">
+              <button className="absolute bottom-60 -right-4 bg-white rounded-full p-2 shadow-md hover:bg-gray-50 transition-colors">
                 <Pencil className="w-4 h-4 text-gray-600" />
               </button>
             </div>
