@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import { divisionDistrictUpazila } from './divisionZilla';
 
 export default function AddStudentform3({ setPagination, formData, onDataChange }) {
   const [isSameAsPresent, setIsSameAsPresent] = useState(formData.isSameAsPresent || true);
 
+  // Helpers to get list of items based on selection
+  const getDistricts = (divisionName) => {
+    const division = divisionDistrictUpazila.find(d => d.division === divisionName);
+    return division ? division.districts : [];
+  };
 
+  const getUpazilas = (divisionName, districtName) => {
+    const division = divisionDistrictUpazila.find(d => d.division === divisionName);
+    if (!division) return [];
+
+    const district = division.districts.find(d => d.district === districtName);
+    return district ? district.upazilas : [];
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -12,20 +25,65 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
 
   const handlePresentAddressChange = (e) => {
     const { name, value } = e.target;
-    console.log(`AddStudentform3: Present Address Change - Name: ${name}, Value: ${value}`);
-    onDataChange({ [name]: value });
-    if (isSameAsPresent) {
-      const permanentFieldName = name.replace('present', 'permanent');
-      console.log(`AddStudentform3: Mirroring to Permanent - Name: ${permanentFieldName}, Value: ${value}`);
-      onDataChange({ [permanentFieldName]: value });
+
+    // Create update object
+    let updates = { [name]: value };
+
+    // Reset dependent fields if parent changes
+    if (name === 'presentDivision') {
+      updates.presentDistrict = '';
+      updates.presentUpazila = '';
+    } else if (name === 'presentDistrict') {
+      updates.presentUpazila = '';
     }
+
+    // Handle "Same as Present" logic
+    if (isSameAsPresent) {
+      if (name === 'presentDivision') {
+        updates.permanentDivision = value;
+        updates.permanentDistrict = '';
+        updates.permanentUpazila = '';
+      } else if (name === 'presentDistrict') {
+        updates.permanentDistrict = value;
+        updates.permanentUpazila = '';
+      } else {
+        const permanentFieldName = name.replace('present', 'permanent');
+        updates[permanentFieldName] = value;
+      }
+    }
+
+    onDataChange(updates);
   };
 
   const handlePermanentAddressChange = (e) => {
     const { name, value } = e.target;
-    console.log(`AddStudentform3: Permanent Address Change - Name: ${name}, Value: ${value}`);
-    onDataChange({ [name]: value });
+
+    let updates = { [name]: value };
+
+    if (name === 'permanentDivision') {
+      updates.permanentDistrict = '';
+      updates.permanentUpazila = '';
+    } else if (name === 'permanentDistrict') {
+      updates.permanentUpazila = '';
+    }
+
+    onDataChange(updates);
   };
+
+  // Logic to handle "Same as Present" toggle
+  useEffect(() => {
+    if (isSameAsPresent) {
+      onDataChange({
+        permanentDivision: formData.presentDivision,
+        permanentDistrict: formData.presentDistrict,
+        permanentUpazila: formData.presentUpazila,
+        permanentUnion: formData.presentUnion,
+        permanentVillage: formData.presentVillage,
+        permanentOthers: formData.presentOthers
+      });
+    }
+  }, [isSameAsPresent, formData.presentDivision, formData.presentDistrict, formData.presentUpazila, formData.presentUnion, formData.presentVillage, formData.presentOthers]);
+
 
   return (
     <div className="bg-[#F7F7F7] rounded-lg shadow-xl overflow-hidden w-[60%] mx-auto">
@@ -43,37 +101,62 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">বিভাগ</label>
-              <select name="presentDivision" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" value={formData.presentDivision || ''} onChange={handlePresentAddressChange}>
+              <select
+                name="presentDivision"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                value={formData.presentDivision || ''}
+                onChange={handlePresentAddressChange}
+              >
                 <option value="">নির্বাচন করুন</option>
-                <option value="Dhaka">ঢাকা</option>
-                <option value="Chittagong">চট্টগ্রাম</option>
+                {divisionDistrictUpazila.map((div, idx) => (
+                  <option key={idx} value={div.division}>{div.division}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">জেলা</label>
-              <select name="presentDistrict" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.presentDistrict || ''} onChange={handlePresentAddressChange}>
+              <select
+                name="presentDistrict"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                value={formData.presentDistrict || ''}
+                onChange={handlePresentAddressChange}
+                disabled={!formData.presentDivision}
+              >
                 <option value="">নির্বাচন করুন</option>
-                <option value="Dhaka">ঢাকা</option>
-                <option value="Chittagong">চট্টগ্রাম</option>
+                {getDistricts(formData.presentDivision).map((dist, idx) => (
+                  <option key={idx} value={dist.district}>{dist.district}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">উপজেলা/থানা</label>
-              <input
-                type="text"
+              <select
                 name="presentUpazila"
-                placeholder="মিরপুর"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                defaultValue={formData.presentUpazila || ''}
+                value={formData.presentUpazila || ''}
                 onChange={handlePresentAddressChange}
-              />
+                disabled={!formData.presentDistrict}
+              >
+                <option value="">নির্বাচন করুন</option>
+                {getUpazilas(formData.presentDivision, formData.presentDistrict).map((upazila, idx) => (
+                  <option key={idx} value={upazila}>{upazila}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">ইউনিয়ন</label>
-              <select name="presentUnion" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.presentUnion || ''} onChange={handlePresentAddressChange}>
+              {/* <select name="presentUnion" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.presentUnion || ''} onChange={handlePresentAddressChange}>
                 <option value="">নির্বাচন করুন</option>
                 <option value="Ward No 10">Ward No 10</option>
-              </select>
+              </select> */}
+              <input
+                type="text"
+                name="presentUnion"
+                placeholder="ইউনিয়ন"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                defaultValue={formData.presentUnion || ''}
+                onChange={handlePresentAddressChange}
+              />
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">গ্রাম</label>
@@ -122,31 +205,51 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
           <div className={`mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 ${isSameAsPresent ? 'opacity-50 pointer-events-none' : ''}`}>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">বিভাগ</label>
-              <select name="permanentDivision" className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" value={isSameAsPresent ? formData.presentDivision : formData.permanentDivision || ''} onChange={handlePermanentAddressChange} disabled={isSameAsPresent}>
+              <select
+                name="permanentDivision"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100"
+                value={isSameAsPresent ? formData.presentDivision : formData.permanentDivision || ''}
+                onChange={handlePermanentAddressChange}
+                disabled={isSameAsPresent}
+              >
                 <option value="">নির্বাচন করুন</option>
-                <option value="Dhaka">ঢাকা</option>
-                <option value="Chittagong">চট্টগ্রাম</option>
+                {divisionDistrictUpazila.map((div, idx) => (
+                  <option key={idx} value={div.division}>{div.division}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">জেলা</label>
-              <select name="permanentDistrict" className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100" value={isSameAsPresent ? formData.presentDistrict : formData.permanentDistrict || ''} onChange={handlePermanentAddressChange} disabled={isSameAsPresent}>
+              <select
+                name="permanentDistrict"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100"
+                value={isSameAsPresent ? formData.presentDistrict : formData.permanentDistrict || ''}
+                onChange={handlePermanentAddressChange}
+                disabled={isSameAsPresent || (!isSameAsPresent && !formData.permanentDivision)}
+              >
                 <option value="">নির্বাচন করুন</option>
-                <option value="Dhaka">ঢাকা</option>
-                <option value="Chittagong">চট্টগ্রাম</option>
+                {getDistricts(isSameAsPresent ? formData.presentDivision : formData.permanentDivision).map((dist, idx) => (
+                  <option key={idx} value={dist.district}>{dist.district}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">উপজেলা/থানা</label>
-              <input
-                type="text"
+              <select
                 name="permanentUpazila"
-                placeholder="মিরপুর"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100"
-                defaultValue={isSameAsPresent ? formData.presentUpazila : formData.permanentUpazila || ''}
+                value={isSameAsPresent ? formData.presentUpazila : formData.permanentUpazila || ''}
                 onChange={handlePermanentAddressChange}
-                disabled={isSameAsPresent}
-              />
+                disabled={isSameAsPresent || (!isSameAsPresent && !formData.permanentDistrict)}
+              >
+                <option value="">নির্বাচন করুন</option>
+                {getUpazilas(
+                  isSameAsPresent ? formData.presentDivision : formData.permanentDivision,
+                  isSameAsPresent ? formData.presentDistrict : formData.permanentDistrict
+                ).map((upazila, idx) => (
+                  <option key={idx} value={upazila}>{upazila}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">ইউনিয়ন</label>

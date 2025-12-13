@@ -32,7 +32,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
       onDataChange({ [apiField]: currentAmount > 0 ? 0 : 300 }); // Assuming default fee 3000
     }
   };
-  
+
   const handleHelpTypeChange = (e) => {
     onDataChange({ helpType: e.target.value });
   };
@@ -42,13 +42,15 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
   };
 
   const isHelpSelected = formData.helpType && formData.helpType !== '';
+  // Calculate total fee, treating non-numeric or empty values as 0 for sum
   const totalFee = Object.keys(feeMapping).reduce((sum, uiKey) => {
     const apiField = feeMapping[uiKey];
-    return sum + (formData[apiField] || 0);
+    const val = Number(formData[apiField]);
+    return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
   const finalAmount = totalFee - (formData.helpAmount || 0);
-  
+
   return (
     <div className="rounded-lg shadow-xl overflow-hidden w-[60%] mx-auto bg-[#F7F7F7]">
       <div className="text-[#246545] p-6">
@@ -66,26 +68,41 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
             { uiKey: 'library', label: 'লাইব্রেরী ফি', apiField: 'libraryFee' },
             { uiKey: 'kafela', label: 'কাফেলা ফি', apiField: 'kafelaFee' },
             { uiKey: 'confirm', label: 'কনফার্মেশন ফি', apiField: 'confirmFee' },
-          ].map((item) => (
-            <div key={item.uiKey} className="flex items-center justify-start gap-8 py-3">
-              <label className="flex items-center gap-4 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  name={item.apiField}
-                  checked={!!formData[item.apiField]}
-                  onChange={(e) => onDataChange({ [item.apiField]: e.target.checked ? 300 : 0 })} // Assume 3000 as default
-                  className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                />
-                <span className="text-lg text-gray-800 font-bold">{item.label}</span>
-              </label>
-              <div className='flex items-center justify-center gap-3'>
-                <span> = </span>
-                <span className="text-lg font-bold text-gray-700">
-                  {(formData[item.apiField] || 0).toLocaleString('bn-BD')} ৳
-                </span>
+          ].map((item) => {
+            // Checkbox is checked if value exists and is not 0 (but keep checked if empty string for editing)
+            const val = formData[item.apiField];
+            const isChecked = val !== 0 && val !== undefined && val !== null;
+
+            return (
+              <div key={item.uiKey} className="flex items-center justify-start gap-8 py-3">
+                <label className="flex items-center gap-4 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    name={item.apiField}
+                    checked={isChecked}
+                    onChange={(e) => onDataChange({ [item.apiField]: e.target.checked ? 300 : 0 })}
+                    className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                  />
+                  <span className="text-lg text-gray-800 font-bold">{item.label}</span>
+                </label>
+                <div className='flex items-center justify-center gap-3'>
+                  <span> = </span>
+                  <input
+                    type="number"
+                    value={val === 0 ? '' : (val ?? '')}
+                    disabled={!isChecked}
+                    onChange={(e) => {
+                      const inputVal = e.target.value;
+                      // Store as string if empty (to keep focus/checked), number otherwise
+                      onDataChange({ [item.apiField]: inputVal === '' ? '' : Number(inputVal) });
+                    }}
+                    className="text-lg font-bold text-gray-700 w-32 px-2 py-1 border border-gray-300 rounded disabled:bg-gray-200 disabled:opacity-50"
+                  />
+                  <span className="text-lg font-bold text-gray-700">৳</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <hr />
         {/* Total Fee */}
@@ -117,9 +134,9 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
                 <label className="block text-sm font-bold text-gray-700 mb-2">ধরন</label>
                 <select name="helpType" className="w-full px-4 py-3 border border-gray-300 rounded-lg text-lg" value={formData.helpType || ''} onChange={handleHelpTypeChange}>
                   <option value="">নির্বাচন করুন</option>
-                  <option value="Orphan">অনাথ</option>
-                  <option value="Scholarship">স্কলারশিপ</option>
-                  <option value="Half Free">হাফ ফ্রি</option>
+                  <option value="Orphan">যাকাত</option>
+                  <option value="Scholarship">ফিতরা</option>
+                  <option value="Half Free">সদকা</option>
                 </select>
               </div>
               <div>

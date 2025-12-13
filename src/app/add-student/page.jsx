@@ -13,6 +13,7 @@ import Preview from '../components/preview/Preview';
 
 export default function AddStudentPage() {
   const [pagination, setPagination] = useState(1);
+  const [isInitialized, setIsInitialized] = useState(false);
   // const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
 
 
@@ -51,11 +52,17 @@ export default function AddStudentPage() {
       ...studentFormData,
       student: {
         ...studentFormData.student,
-        profileImage: localProfileImageFile, // Attach the actual File object
+        // profileImage: localProfileImageFile, // Attach the actual File object
       },
     };
     dispatch(addStudent(formDataForSubmission));
   };
+
+  // Clear form data when component mounts to ensure fresh state
+  useEffect(() => {
+    dispatch(clearStudentFormData());
+    setIsInitialized(true);
+  }, [dispatch]);
 
   useEffect(() => {
     if (success) {
@@ -72,22 +79,26 @@ export default function AddStudentPage() {
     }
   }, [success, error, dispatch]);
 
+  if (!isInitialized) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="">
         <TopPagination pagination={pagination} />
         {
           pagination === 1 ? <AddSrudentform1 setPagination={setPagination} formData={studentFormData.student} onDataChange={(data) => handleFormDataChange('student', data)} /> :
-          pagination === 2 ? <AddSrudentform2 setPagination={setPagination} formData={studentFormData.guardian} onDataChange={(data) => handleFormDataChange('guardian', data)} /> :
-          pagination === 3 ? <AddStudentform3 setPagination={setPagination} formData={studentFormData.address} onDataChange={(data) => handleFormDataChange('address', data)} /> :
-          pagination === 4 ? <AddStudentform4 setPagination={setPagination} formData={studentFormData.madrasa} onDataChange={(data) => handleFormDataChange('madrasa', data)} /> :
-          pagination === 5 ? (
-            <AddStudentForm5
-              setPagination={setPagination}
-              formData={studentFormData.fees}
-              onDataChange={(data) => handleFormDataChange('fees', data)}
-            />
-          ) : <></>
+            pagination === 2 ? <AddSrudentform2 setPagination={setPagination} formData={studentFormData.guardian} onDataChange={(data) => handleFormDataChange('guardian', data)} /> :
+              pagination === 3 ? <AddStudentform3 setPagination={setPagination} formData={studentFormData.address} onDataChange={(data) => handleFormDataChange('address', data)} /> :
+                pagination === 4 ? <AddStudentform4 setPagination={setPagination} formData={studentFormData.madrasa} onDataChange={(data) => handleFormDataChange('madrasa', data)} /> :
+                  pagination === 5 ? (
+                    <AddStudentForm5
+                      setPagination={setPagination}
+                      formData={studentFormData.fees}
+                      onDataChange={(data) => handleFormDataChange('fees', data)}
+                    />
+                  ) : <></>
         }
 
         {loading && <p>Loading...</p>}

@@ -1,15 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import the Image component
+import axios from 'axios';
 import { categoryData } from './categoryFile';
 
 export default function AddSrudentform1({ setPagination, formData, onDataChange }) {
-  const [profileImagePreview, setProfileImagePreview] = useState(formData.profileImage || "/5bcd817eb9c739cb0855646f3940ffa81a6dc895.jpg");
+  const [profileImagePreview, setProfileImagePreview] = useState(formData.profileImage || "/placeholder-2-1.webp");
 
-  // useEffect(() => {
-  //   if (formData.profileImage) {
-  //     setProfileImagePreview(formData.profileImage);
-  //   }
-  // }, [formData.profileImage]);
+  useEffect(() => {
+    const fetchStudentId = async () => {
+      // Always fetch if UID is missing
+      if (!formData.uid) {
+        try {
+          // Add timestamp to prevent caching
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/students/get-id?t=${new Date().getTime()}`, {
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache',
+              'Expires': '0',
+            }
+          });
+          if (response.data.success) {
+            const { id, seq } = response.data.data;
+            const formattedId = `${id}-${seq}`;
+            onDataChange({ uid: formattedId });
+          }
+        } catch (error) {
+          console.error("Error fetching student ID:", error);
+        }
+      }
+    };
+
+    fetchStudentId();
+  }, []); // Run once on mount
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
