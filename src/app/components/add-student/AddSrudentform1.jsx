@@ -12,7 +12,7 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
       if (!formData.uid) {
         try {
           // Add timestamp to prevent caching
-          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/students/get-id?t=${new Date().getTime()}`, {
+          const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/students/get-id?t=${new Date().getTime()}`, {
             headers: {
               'Cache-Control': 'no-cache',
               'Pragma': 'no-cache',

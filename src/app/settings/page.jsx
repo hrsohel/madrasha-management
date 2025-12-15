@@ -29,7 +29,7 @@ export default function Page() {
                 contact: madrasaSettings.contact || { email: '', phone: '' },
                 logo: null,
             });
-            setLogoPreview(madrasaSettings.logo ? `${process.env.NEXT_PUBLIC_API_URL}${madrasaSettings.logo}` : '/Madrashalogo.png');
+            setLogoPreview(madrasaSettings.logo ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}` : '/Madrashalogo.png');
         }
     }, [madrasaSettings]);
 
@@ -78,7 +78,7 @@ export default function Page() {
             <div className="flex items-center justify-start gap-4 mt-8">
                 <div>
                     {/* <Image src={logoPreview || '/Madrashalogo.png'} className="w-[120px] h-[120px] rounded-full border border-[#424D47] object-cover" width={120} height={120} alt={logoPreview}/> */}
-                    <img src={logoPreview || '/Madrashalogo.png'} className="w-[120px] h-[120px] rounded-full border border-[#424D47] object-cover" width={120} height={120} alt={logoPreview}/>
+                    <img src={logoPreview || '/Madrashalogo.png'} className="w-[120px] h-[120px] rounded-full border border-[#424D47] object-cover" width={120} height={120} alt={logoPreview} />
                 </div>
                 <div>
                     <label htmlFor="image" className="bg-[#E7FEF2] px-[16px] py-[8px] text-[#2B7752] text-[18px] font-[500] cursor-pointer">নতুন লোগো উপলোড </label>

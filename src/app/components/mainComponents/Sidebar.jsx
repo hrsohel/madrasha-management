@@ -30,7 +30,7 @@ export default function Sidebar({ isOpen }) {
 
   // Construct Logo URL
   const logoSrc = madrasaSettings?.logo
-    ? `${process.env.NEXT_PUBLIC_API_URL}${madrasaSettings.logo}`
+    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}`
     : "/WhatsApp Image 2025-12-12 at 7.37.35 AM.jpeg";
 
   // Get Madrasa Name (Bangla)

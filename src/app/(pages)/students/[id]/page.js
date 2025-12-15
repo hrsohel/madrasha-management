@@ -12,6 +12,7 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStudentById, clearSelectedStudent } from "@/lib/features/students/studentSlice";
+import { fetchMadrasaSettings } from "@/lib/features/settings/settingsSlice";
 
 export default function StudentDetailsPage() {
   const { id } = useParams();
@@ -19,8 +20,10 @@ export default function StudentDetailsPage() {
   const { selectedStudent, selectedStudentLoading, selectedStudentError } = useSelector(
     (state) => state.students
   );
+  const { madrasaSettings } = useSelector((state) => state.settings);
 
   useEffect(() => {
+    dispatch(fetchMadrasaSettings());
     if (id) {
       dispatch(fetchStudentById(id));
     }
@@ -61,10 +64,10 @@ export default function StudentDetailsPage() {
       <StudentInfo student={studentData} />
       {studentData.guardian && <FamilyInfo guardian={studentData.guardian} />}
       {studentData.address && <AddressInfo address={studentData.address} />}
-      {studentData.guardian && <GuardianInfo guardian={studentData.guardian} />}
-      {studentData.admissionExamInfo && <AcademicYearInfo oldMadrasaInfo={studentData.admissionExamInfo} />} 
+      {studentData.admissionExamInfo && <GuardianInfo oldMadrasaInfo={studentData.admissionExamInfo} />}
+      {studentData.admissionExamInfo && <AcademicYearInfo oldMadrasaInfo={studentData.admissionExamInfo} />}
       {studentData.admissionExamInfo && <AdmissionExamInfo admissionExamInfo={studentData.admissionExamInfo} />}
-      {studentData.fees && <StudentAdmissionReceipt fees={studentData.fees} />}
+      {studentData.fees && <StudentAdmissionReceipt fees={studentData.fees} student={studentData} madrasaSettings={madrasaSettings} />}
     </div>
   );
 }

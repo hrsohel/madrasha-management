@@ -1,4 +1,5 @@
 import React from 'react'
+import { translateToBangla } from '../../../lib/utils'
 
 export default function PersonalInfo({ studentData }) {
     return (
@@ -36,11 +37,11 @@ export default function PersonalInfo({ studentData }) {
             <div className='flex items-center justify-start gap-8'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>জেন্ডার</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.gender}</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{translateToBangla(studentData.gender)}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>রক্তের গ্রুপ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.bloodGroup}</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{translateToBangla(studentData.bloodGroup)}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>মোবাইল নম্বর</p>
@@ -59,7 +60,7 @@ export default function PersonalInfo({ studentData }) {
                 </div>
                 <div className='w-1/2'>
                     <p className='text-[16px] text-[#63736C]'>আবাসিক অবস্থা</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.residential}</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{translateToBangla(studentData.residential)}</p>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8'>
@@ -69,25 +70,25 @@ export default function PersonalInfo({ studentData }) {
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শ্রেণী</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.class}</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{translateToBangla(studentData.class)}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শাখা</p>
-                    <p className='text-[16px] text-[#424D47]'>{studentData.section}</p>
+                    <p className='text-[16px] text-[#424D47]'>{translateToBangla(studentData.section)}</p>
                 </div>
             </div>
             <div className='flex items-center justify-start gap-8'>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>শিফট</p>
-                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{studentData.shift}</p>
+                    <p className='text-[16px] text-[#424D47] mt-[14px]'>{translateToBangla(studentData.shift)}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>বিভাগ</p>
-                    <p className='text-[16px] text-[#424D47] my-[14px]'>{studentData.division}</p>
+                    <p className='text-[16px] text-[#424D47] my-[14px]'>{translateToBangla(studentData.division)}</p>
                 </div>
                 <div className='w-full'>
                     <p className='text-[16px] text-[#63736C]'>সেশন</p>
-                    <p className='text-[16px] text-[#424D47]'>{studentData.session}</p>
+                    <p className='text-[16px] text-[#424D47]'>{translateToBangla(studentData.session)}</p>
                 </div>
             </div>
         </div>

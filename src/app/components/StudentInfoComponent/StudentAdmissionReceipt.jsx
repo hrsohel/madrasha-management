@@ -1,11 +1,13 @@
-export default function StudentAdmissionReceipt({ fees }) {
+import { translateToBangla } from "@/lib/utils";
+
+export default function StudentAdmissionReceipt({ fees, student, madrasaSettings }) {
   const totalFees = (fees?.admissionFee || 0) +
-                    (fees?.libraryFee || 0) +
-                    (fees?.confirmFee || 0) +
-                    (fees?.ITFee || 0) +
-                    (fees?.IDCardFee || 0) +
-                    (fees?.kafelaFee || 0) +
-                    (fees?.booksFee || 0);
+    (fees?.libraryFee || 0) +
+    (fees?.confirmFee || 0) +
+    (fees?.ITFee || 0) +
+    (fees?.IDCardFee || 0) +
+    (fees?.kafelaFee || 0) +
+    (fees?.booksFee || 0);
   const payableAmount = totalFees - (fees?.helpAmount || 0);
 
   // Placeholder for converting number to words (requires a proper library or implementation)
@@ -28,18 +30,26 @@ export default function StudentAdmissionReceipt({ fees }) {
         <div className="flex items-center justify-between mb-6 pb-4 border-b-2 border-gray-300">
           {/* Logo and Bangla Name */}
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center border-4 border-blue-700">
-              <div className="text-white text-center">
-                <div className="text-xs font-bold">DUMS</div>
-                <div className="text-2xl">🕌</div>
+            {madrasaSettings?.logo ? (
+              <img
+                src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}`}
+                alt="Madrasa Logo"
+                className="w-20 h-20 bg-white rounded-full object-cover border-4 border-blue-700"
+              />
+            ) : (
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center border-4 border-blue-700">
+                <div className="text-white text-center">
+                  <div className="text-xs font-bold">DUMS</div>
+                  <div className="text-2xl">🕌</div>
+                </div>
               </div>
-            </div>
+            )}
             <div>
               <h2 className="text-2xl font-bold text-gray-800">
-                দারুল উলুম মুঈনুস সুন্নাহ, শ্রীমঙ্গল
+                {madrasaSettings?.name?.bangla || "দারুল উলুম মুঈনুস সুন্নাহ, শ্রীমঙ্গল"}
               </h2>
               <p className="text-sm text-gray-600">
-                জগন্নাথ রোড , ব্রেল চৌ, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট
+                {madrasaSettings?.location?.bangla || "জগন্নাথ রোড , ব্রেল চৌ, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট"}
               </p>
             </div>
           </div>
@@ -47,10 +57,10 @@ export default function StudentAdmissionReceipt({ fees }) {
           {/* English Name and Contact */}
           <div className="text-right">
             <h2 className="text-2xl font-bold text-gray-800">
-              Darul Ulum Muinus Sunnah Sreemangal
+              {madrasaSettings?.name?.english || "Darul Ulum Muinus Sunnah Sreemangal"}
             </h2>
             <p className="text-sm text-gray-600">
-              darululummuinussunnah@gmail.com || +880 1611-109960
+              {madrasaSettings?.contact?.email || "darululummuinussunnah@gmail.com"} || {madrasaSettings?.contact?.phone || "+880 1611-109960"}
             </p>
           </div>
         </div>
@@ -78,24 +88,24 @@ export default function StudentAdmissionReceipt({ fees }) {
           </h3>
         </div>
 
-        {/* Student Information Grid - Static for now, as student prop is not passed */}
+        {/* Student Information Grid */}
         <div className="grid grid-cols-3 gap-x-8 gap-y-4 mb-6">
           {/* Column 1 */}
           <div className="space-y-3">
             <div className="flex">
               <span className="font-semibold w-32">নাম</span>
               <span className="mr-2">:</span>
-              <span>মোহ আবিছুর রহমান খান</span> {/* Static */}
+              <span>{student?.name}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">রোল</span>
               <span className="mr-2">:</span>
-              <span>২</span> {/* Static */}
+              <span>{student?.roll}</span>
             </div>
             <div className="flex">
-              <span className="font-semibold w-32">শিক্ষট</span>
+              <span className="font-semibold w-32">শিফট</span>
               <span className="mr-2">:</span>
-              <span>সকল</span> {/* Static */}
+              <span>{translateToBangla(student?.shift)}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">প্রদেয় ফিস</span>
@@ -114,19 +124,19 @@ export default function StudentAdmissionReceipt({ fees }) {
             <div className="flex">
               <span className="font-semibold w-32">আইডি</span>
               <span className="mr-2">:</span>
-              <span>DUMS01</span> {/* Static */}
+              <span>{student?.uid}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">শ্রেণী</span>
               <span className="mr-2">:</span>
-              <span>নাসারি</span> {/* Static */}
+              <span>{translateToBangla(student?.class)}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">বিভাগ</span>
               <span className="mr-2">:</span>
-              <span>নূরানী</span> {/* Static */}
+              <span>{translateToBangla(student?.division)}</span>
             </div>
-             <div className="flex">
+            <div className="flex">
               <span className="font-semibold w-32">ভর্তি ফিস</span>
               <span className="mr-2">:</span>
               <span>{fees?.admissionFee || 0}</span>
@@ -143,17 +153,17 @@ export default function StudentAdmissionReceipt({ fees }) {
             <div className="flex">
               <span className="font-semibold w-32">আবাসিক অবস্থা</span>
               <span className="mr-2">:</span>
-              <span className="text-green-600 font-semibold">আবাসিক</span> {/* Static */}
+              <span className="text-green-600 font-semibold">{translateToBangla(student?.residential)}</span>
             </div>
             <div className="flex">
-              <span className="font-semibold w-32">সাথা</span>
+              <span className="font-semibold w-32">শাখা</span>
               <span className="mr-2">:</span>
-              <span>ক</span> {/* Static */}
+              <span>{translateToBangla(student?.section)}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">সেশন</span>
               <span className="mr-2">:</span>
-              <span>২৪ - ২৫</span> {/* Static */}
+              <span>{translateToBangla(student?.session)}</span>
             </div>
             <div className="flex">
               <span className="font-semibold w-32">বইপত্র ফিস</span>
@@ -181,7 +191,7 @@ export default function StudentAdmissionReceipt({ fees }) {
               <span>{numberToWords(payableAmount)}</span>
             </div>
           </div>
-           <div className="space-y-3">
+          <div className="space-y-3">
             <div className="flex">
               <span className="font-semibold w-32">কাফেলা ফিস</span>
               <span className="mr-2">:</span>

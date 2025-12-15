@@ -62,35 +62,35 @@ export default function StudentInfo({ student }) {
       console.error("Student ID not found");
       return;
     }
-    
+
     // Create a new object with only the fields that are in the schema
     const dataToUpdate = {
-        name: formData.name,
-        dob: formData.dob,
-        nid: formData.nid,
-        birthCertificate: formData.birthCertificate,
-        gender: formData.gender,
-        bloodGroup: formData.bloodGroup,
-        phone: formData.phone,
-        residential: formData.residential,
-        roll: formData.roll,
-        class: formData.class,
-        shift: formData.shift,
-        section: formData.section,
-        division: formData.division,
-        session: formData.session,
+      name: formData.name,
+      dob: formData.dob,
+      nid: formData.nid,
+      birthCertificate: formData.birthCertificate,
+      gender: formData.gender,
+      bloodGroup: formData.bloodGroup,
+      phone: formData.phone,
+      residential: formData.residential,
+      roll: formData.roll,
+      class: formData.class,
+      shift: formData.shift,
+      section: formData.section,
+      division: formData.division,
+      session: formData.session,
     }
 
 
     try {
-        await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
-        dispatch(fetchStudentById(studentId)); // Refetch student data to update UI
-        setShowModal(false);
-    } catch (error) { 
-        console.error("Failed to update student:", error);
+      await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
+      dispatch(fetchStudentById(studentId)); // Refetch student data to update UI
+      setShowModal(false);
+    } catch (error) {
+      console.error("Failed to update student:", error);
     }
   };
-  
+
   return (
     <div>
       <div className=" mx-auto bg-[#F7F7F7] rounded-lg shadow-sm">
@@ -100,7 +100,7 @@ export default function StudentInfo({ student }) {
             {/* Left Side - Profile Image */}
             <div className="relative">
               <img
-                src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_URL}${student.profileImage}` : profileImage.src}
+                src={student.profileImage ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${student.profileImage}` : profileImage.src}
                 alt="Profile"
                 className="w-40 h-60 rounded-lg object-cover"
               />
@@ -287,7 +287,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     আবাসিক অবস্থা
                   </label>
-                  <select 
+                  <select
                     name="residential"
                     value={formData.residential}
                     onChange={handleChange}
@@ -349,7 +349,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     শ্রেণী
                   </label>
-                  <select 
+                  <select
                     name="class"
                     value={formData.class}
                     onChange={handleChange}
@@ -374,7 +374,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     শাখা
                   </label>
-                  <select 
+                  <select
                     name="section"
                     value={formData.section}
                     onChange={handleChange}
@@ -391,7 +391,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     শিফট
                   </label>
-                  <select 
+                  <select
                     name="shift"
                     value={formData.shift}
                     onChange={handleChange}
@@ -407,7 +407,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     বিভাগ
                   </label>
-                  <select 
+                  <select
                     name="division"
                     value={formData.division}
                     onChange={handleChange}
@@ -423,7 +423,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     সেসন
                   </label>
-                  <select 
+                  <select
                     name="session"
                     value={formData.session}
                     onChange={handleChange}
@@ -439,7 +439,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     জেন্ডার
                   </label>
-                  <select 
+                  <select
                     name="gender"
                     value={formData.gender}
                     onChange={handleChange}
@@ -455,7 +455,7 @@ export default function StudentInfo({ student }) {
                   <label className="block text-sm text-gray-700 mb-2">
                     রক্তের গ্রুপ
                   </label>
-                  <select 
+                  <select
                     name="bloodGroup"
                     value={formData.bloodGroup}
                     onChange={handleChange}

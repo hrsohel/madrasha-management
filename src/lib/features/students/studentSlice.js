@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+const NEXT_PUBLIC_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Async Thunk for adding a student
 export const addStudent = createAsyncThunk(
@@ -33,7 +33,7 @@ export const addStudent = createAsyncThunk(
         }
       }
 
-      const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/v1/students/students/add-student`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/add-student`, {
         method: 'POST',
         body: formData, // No 'Content-Type' header needed for FormData; browser sets it automatically
       });
@@ -53,7 +53,7 @@ export const fetchAllStudents = createAsyncThunk(
   'students/fetchAllStudents',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/v1/students/students/get-all-students`);
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get-all-students`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -70,7 +70,7 @@ export const fetchStudentById = createAsyncThunk(
   'students/fetchStudentById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/v1/students/students/get_student_with_guardian_address/${id}`);
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get_student_with_guardian_address/${id}`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -87,7 +87,7 @@ export const updateStudent = createAsyncThunk(
   'students/updateStudent',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_URL}/api/v1/students/students/update-student/${id}`, {
+      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/update-student/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
