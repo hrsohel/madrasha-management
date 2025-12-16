@@ -1,17 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { divisions, getDistrictsByDivision, getUpazilasByDistrict, getUnionsByUpazila } from './locationData';
 
+// Helper to find ID by bn_name
+const getIdFromBnName = (dataArray, bnName) => {
+  const foundItem = dataArray.find(item => item.bn_name === bnName);
+  return foundItem ? foundItem.id : '';
+};
+
+// Helper to find bn_name by ID
+const getBnNameFromId = (dataArray, id) => {
+    const foundItem = dataArray.find(item => item.id === id);
+    return foundItem ? foundItem.bn_name : '';
+};
+
 export default function AddStudentform3({ setPagination, formData, onDataChange }) {
   const [isSameAsPresent, setIsSameAsPresent] = useState(formData.isSameAsPresent || true);
 
-  // State for location selections
-  const [presentDivisionId, setPresentDivisionId] = useState('');
-  const [presentDistrictId, setPresentDistrictId] = useState('');
-  const [presentUpazilaId, setPresentUpazilaId] = useState('');
+  const [presentDivisionId, setPresentDivisionId] = useState(() => getIdFromBnName(divisions, formData.presentDivision));
+  const [presentDistrictId, setPresentDistrictId] = useState(() => getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.presentDivision)), formData.presentDistrict));
+  const [presentUpazilaId, setPresentUpazilaId] = useState(() => getIdFromBnName(getUpazilasByDistrict(getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.presentDivision)), formData.presentDistrict)), formData.presentUpazila));
 
-  const [permanentDivisionId, setPermanentDivisionId] = useState('');
-  const [permanentDistrictId, setPermanentDistrictId] = useState('');
-  const [permanentUpazilaId, setPermanentUpazilaId] = useState('');
+  const [permanentDivisionId, setPermanentDivisionId] = useState(() => getIdFromBnName(divisions, formData.permanentDivision));
+  const [permanentDistrictId, setPermanentDistrictId] = useState(() => getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.permanentDivision)), formData.permanentDistrict));
+  const [permanentUpazilaId, setPermanentUpazilaId] = useState(() => getIdFromBnName(getUpazilasByDistrict(getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.permanentDivision)), formData.permanentDistrict)), formData.permanentUpazila));
 
   // Get filtered data
   const presentDistricts = presentDivisionId ? getDistrictsByDivision(presentDivisionId) : [];
@@ -28,52 +39,70 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
   };
 
   const handlePresentAddressChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value: bnName } = e.target; // value is now bn_name
 
-    // Create update object
-    let updates = { [name]: value };
+    let selectedId = '';
 
-    // Handle ID state updates
+    // Determine the ID from the selected bnName for internal state management
     if (name === 'presentDivision') {
-      setPresentDivisionId(value);
+      selectedId = getIdFromBnName(divisions, bnName);
+      setPresentDivisionId(selectedId);
       setPresentDistrictId('');
       setPresentUpazilaId('');
+    } else if (name === 'presentDistrict') {
+      const currentDistricts = getDistrictsByDivision(presentDivisionId);
+      selectedId = getIdFromBnName(currentDistricts, bnName);
+      setPresentDistrictId(selectedId);
+      setPresentUpazilaId('');
+    } else if (name === 'presentUpazila') {
+      const currentUpazilas = getUpazilasByDistrict(presentDistrictId);
+      selectedId = getIdFromBnName(currentUpazilas, bnName);
+      setPresentUpazilaId(selectedId);
+    } else if (name === 'presentUnion') {
+      const currentUnions = getUnionsByUpazila(presentUpazilaId);
+      selectedId = getIdFromBnName(currentUnions, bnName);
+    }
+
+    // Create update object for formData (stores bnName)
+    let updates = { [name]: bnName };
+
+    // Reset dependent fields in formData if higher level changes
+    if (name === 'presentDivision') {
       updates.presentDistrict = '';
       updates.presentUpazila = '';
       updates.presentUnion = '';
     } else if (name === 'presentDistrict') {
-      setPresentDistrictId(value);
-      setPresentUpazilaId('');
       updates.presentUpazila = '';
       updates.presentUnion = '';
     } else if (name === 'presentUpazila') {
-      setPresentUpazilaId(value);
       updates.presentUnion = '';
     }
 
     // Handle "Same as Present" logic
     if (isSameAsPresent) {
       if (name === 'presentDivision') {
-        setPermanentDivisionId(value);
+        setPermanentDivisionId(selectedId);
         setPermanentDistrictId('');
         setPermanentUpazilaId('');
-        updates.permanentDivision = value;
+        updates.permanentDivision = bnName;
         updates.permanentDistrict = '';
         updates.permanentUpazila = '';
         updates.permanentUnion = '';
       } else if (name === 'presentDistrict') {
-        setPermanentDistrictId(value);
+        setPermanentDistrictId(selectedId);
         setPermanentUpazilaId('');
-        updates.permanentDistrict = value;
+        updates.permanentDistrict = bnName;
         updates.permanentUpazila = '';
         updates.permanentUnion = '';
       } else if (name === 'presentUpazila') {
-        setPermanentUpazilaId(value);
-        updates.permanentUpazila = value;
+        setPermanentUpazilaId(selectedId);
+        updates.permanentUpazila = bnName;
         updates.permanentUnion = '';
+      } else if (name === 'presentUnion') {
+        updates.permanentUnion = bnName;
       } else {
         const permanentFieldName = name.replace('present', 'permanent');
-        updates[permanentFieldName] = value;
+        updates[permanentFieldName] = bnName;
       }
     }
 
@@ -81,24 +110,42 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
   };
 
   const handlePermanentAddressChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value: bnName } = e.target; // value is now bn_name
 
-    let updates = { [name]: value };
+    let selectedId = '';
 
+    // Determine the ID from the selected bnName for internal state management
     if (name === 'permanentDivision') {
-      setPermanentDivisionId(value);
+      selectedId = getIdFromBnName(divisions, bnName);
+      setPermanentDivisionId(selectedId);
       setPermanentDistrictId('');
       setPermanentUpazilaId('');
+    } else if (name === 'permanentDistrict') {
+      const currentDistricts = getDistrictsByDivision(permanentDivisionId);
+      selectedId = getIdFromBnName(currentDistricts, bnName);
+      setPermanentDistrictId(selectedId);
+      setPermanentUpazilaId('');
+    } else if (name === 'permanentUpazila') {
+      const currentUpazilas = getUpazilasByDistrict(permanentDistrictId);
+      selectedId = getIdFromBnName(currentUpazilas, bnName);
+      setPermanentUpazilaId(selectedId);
+    } else if (name === 'permanentUnion') {
+      const currentUnions = getUnionsByUpazila(permanentUpazilaId);
+      selectedId = getIdFromBnName(currentUnions, bnName);
+    }
+
+    // Create update object for formData (stores bnName)
+    let updates = { [name]: bnName };
+
+    // Reset dependent fields in formData if higher level changes
+    if (name === 'permanentDivision') {
       updates.permanentDistrict = '';
       updates.permanentUpazila = '';
       updates.permanentUnion = '';
     } else if (name === 'permanentDistrict') {
-      setPermanentDistrictId(value);
-      setPermanentUpazilaId('');
       updates.permanentUpazila = '';
       updates.permanentUnion = '';
     } else if (name === 'permanentUpazila') {
-      setPermanentUpazilaId(value);
       updates.permanentUnion = '';
     }
 
@@ -108,9 +155,10 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
   // Logic to handle "Same as Present" toggle
   useEffect(() => {
     if (isSameAsPresent) {
-      setPermanentDivisionId(presentDivisionId);
-      setPermanentDistrictId(presentDistrictId);
-      setPermanentUpazilaId(presentUpazilaId);
+      // Set the permanent address IDs for filtering
+      setPermanentDivisionId(getIdFromBnName(divisions, formData.presentDivision));
+      setPermanentDistrictId(getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.presentDivision)), formData.presentDistrict));
+      setPermanentUpazilaId(getIdFromBnName(getUpazilasByDistrict(getIdFromBnName(getDistrictsByDivision(getIdFromBnName(divisions, formData.presentDivision)), formData.presentDistrict)), formData.presentUpazila));
 
       onDataChange({
         permanentDivision: formData.presentDivision,
@@ -148,7 +196,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {divisions.map((div) => (
-                  <option key={div.id} value={div.id}>{div.bn_name}</option>
+                  <option key={div.id} value={div.bn_name}>{div.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -163,7 +211,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {presentDistricts.map((dist) => (
-                  <option key={dist.id} value={dist.id}>{dist.bn_name}</option>
+                  <option key={dist.id} value={dist.bn_name}>{dist.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -178,7 +226,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {presentUpazilas.map((upazila) => (
-                  <option key={upazila.id} value={upazila.id}>{upazila.bn_name}</option>
+                  <option key={upazila.id} value={upazila.bn_name}>{upazila.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -193,7 +241,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {presentUnions.map((union) => (
-                  <option key={union.id} value={union.id}>{union.bn_name}</option>
+                  <option key={union.id} value={union.bn_name}>{union.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -253,7 +301,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {divisions.map((div) => (
-                  <option key={div.id} value={div.id}>{div.bn_name}</option>
+                  <option key={div.id} value={div.bn_name}>{div.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -268,7 +316,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {permanentDistricts.map((dist) => (
-                  <option key={dist.id} value={dist.id}>{dist.bn_name}</option>
+                  <option key={dist.id} value={dist.bn_name}>{dist.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -283,7 +331,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {permanentUpazilas.map((upazila) => (
-                  <option key={upazila.id} value={upazila.id}>{upazila.bn_name}</option>
+                  <option key={upazila.id} value={upazila.bn_name}>{upazila.bn_name}</option>
                 ))}
               </select>
             </div>
@@ -298,7 +346,7 @@ export default function AddStudentform3({ setPagination, formData, onDataChange 
               >
                 <option value="">নির্বাচন করুন</option>
                 {permanentUnions.map((union) => (
-                  <option key={union.id} value={union.id}>{union.bn_name}</option>
+                  <option key={union.id} value={union.bn_name}>{union.bn_name}</option>
                 ))}
               </select>
             </div>

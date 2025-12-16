@@ -44,6 +44,17 @@ export default function Reciepe({ setNavigateToReciepe }) {
             setLocalLoading(false);
         }
     };
+    // Calculate total fee from selected fees (excluding help amounts)
+    const allFees = madrasaSettings?.fees || {};
+    const feeEntries = Object.entries(allFees);
+
+    const calculatedTotalFee = feeEntries.reduce((sum, [feeName, defaultAmount]) => {
+        const val = Number(studentFormData.fees[feeName]);
+        return sum + (isNaN(val) ? 0 : val);
+    }, 0);
+
+    const calculatedFinalAmount = calculatedTotalFee - (studentFormData.fees.helpAmount || 0);
+
     return (
         <div
 
@@ -123,8 +134,8 @@ export default function Reciepe({ setNavigateToReciepe }) {
             </div>
             <div className='flex items-center justify-between px-10 mt-6'>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
-                    <p className='flex items-center justify-start gap-2'><span>সর্বমোট </span> <span>:</span> <span>{(['admissionFee', 'booksFee', 'ITFee', 'IDCardFee', 'libraryFee', 'kafelaFee', 'confirmFee'].reduce((sum, key) => sum + (Number(studentFormData.fees[key]) || 0), 0)).toLocaleString('bn-BD')}৳</span></p>
-                    <p className='flex items-center justify-start gap-2'><span>প্রদেয় পরিমাণ</span> <span>:</span> <span>{((['admissionFee', 'booksFee', 'ITFee', 'IDCardFee', 'libraryFee', 'kafelaFee', 'confirmFee'].reduce((sum, key) => sum + (Number(studentFormData.fees[key]) || 0), 0)) - (studentFormData.fees.helpAmount || 0)).toLocaleString('bn-BD')}৳</span></p>
+                    <p className='flex items-center justify-start gap-2'><span>সর্বমোট </span> <span>:</span> <span>{calculatedTotalFee.toLocaleString('bn-BD')}৳</span></p>
+                    <p className='flex items-center justify-start gap-2'><span>প্রদেয় পরিমাণ</span> <span>:</span> <span>{calculatedFinalAmount.toLocaleString('bn-BD')}৳</span></p>
                 </div>
                 <div className=' w-full text-[#424D47] font-[500] text-[16px]'>
                     <p className='flex items-center justify-start gap-2'><span>সাহায্য </span> <span>:</span> <span>{(studentFormData.fees.helpAmount || 0).toLocaleString('bn-BD')}</span></p>

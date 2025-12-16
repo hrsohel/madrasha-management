@@ -20,6 +20,34 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
     dispatch(fetchMadrasaSettings());
   }, [dispatch]);
 
+  // Synchronize formData with fetched settings to remove stale fees
+  useEffect(() => {
+    if (madrasaSettings?.fees && formData) {
+      const actualFeeNames = Object.keys(madrasaSettings.fees);
+      const currentFeeNames = Object.keys(formData);
+      
+      const feesToUpdate = {};
+      let needsSync = false;
+
+      // Find stale fees in formData that have a value but are no longer in settings
+      const fieldsToIgnore = ['helpType', 'helpAmount'];
+      for (const feeName of currentFeeNames) {
+        if (fieldsToIgnore.includes(feeName)) {
+          continue;
+        }
+        if (!actualFeeNames.includes(feeName) && formData[feeName] !== undefined) {
+          feesToUpdate[feeName] = undefined; // Mark for deletion
+          needsSync = true;
+        }
+      }
+
+      if (needsSync) {
+        onDataChange(feesToUpdate);
+      }
+    }
+  }, [madrasaSettings, formData, onDataChange]);
+
+
   // Get default fee amount from backend settings
   const getDefaultFee = (feeName) => {
     if (madrasaSettings?.fees && madrasaSettings.fees[feeName] !== undefined) {
@@ -79,7 +107,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
             feeEntries.map(([feeName, defaultAmount]) => {
               // Checkbox is checked if value exists and is not 0
               const val = formData[feeName];
-              const isChecked = val !== 0 && val !== undefined && val !== null;
+              const isChecked = Number(val) > 0;
 
               return (
                 <div key={feeName} className="flex items-center justify-start gap-8 py-3">
