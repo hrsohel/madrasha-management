@@ -29,9 +29,9 @@ export default function RootLayout({ children }) {
               <main className="w-full h-full">{children}</main>
             ) : (
               <>
-                <Sidebar isOpen={sidebarOpen} />
+                <Sidebar isOpen={sidebarOpen} className="no-print" />
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+                  <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} className="no-print" />
                   <main className="flex-1 overflow-auto px-5  py-2  ">{children}</main>
                 </div>
               </>

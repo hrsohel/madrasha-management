@@ -13,6 +13,7 @@ import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStudentById, clearSelectedStudent } from "@/lib/features/students/studentSlice";
 import { fetchMadrasaSettings } from "@/lib/features/settings/settingsSlice";
+import { Printer } from "lucide-react";
 
 export default function StudentDetailsPage() {
   const { id } = useParams();
@@ -31,6 +32,10 @@ export default function StudentDetailsPage() {
       dispatch(clearSelectedStudent()); // Clean up when component unmounts
     };
   }, [id, dispatch]);
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (selectedStudentLoading) {
     return <div className="text-center p-6">Loading student details...</div>;
@@ -60,7 +65,18 @@ export default function StudentDetailsPage() {
 
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen printable-content">
+      {/* Print Button */}
+      <div className="mb-6 flex justify-end print-button">
+        <button
+          onClick={handlePrint}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2"
+        >
+          <Printer className="w-5 h-5" />
+          প্রিন্ট করুন
+        </button>
+      </div>
+
       <StudentInfo student={studentData} />
       {studentData.guardian && <FamilyInfo guardian={studentData.guardian} />}
       {studentData.address && <AddressInfo address={studentData.address} />}

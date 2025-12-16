@@ -135,40 +135,34 @@
 
 @media print {
 
-  /* Hide typical layout elements explicitly */
+  /* Hide specific elements that shouldn't print */
   body aside,
   body header,
   body nav,
   .sidebar,
-  .header {
+  .header,
+  .no-print,
+  .print-button {
     display: none !important;
   }
 
-  /* Reset body layout to allow flow */
+  /* Reset body and ensure white background */
   body {
-    visibility: hidden;
-    overflow: visible !important;
-    height: auto !important;
-    display: block !important;
-    /* Override flex */
-  }
-
-  /* Ensure print section is visible and positioned correctly */
-  #print-section {
-    visibility: visible !important;
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
     background-color: white !important;
-    z-index: 2147483647 !important;
-    /* Highest possible z-index */
+    overflow: visible !important;
   }
 
-  /* Make children visible too */
-  #print-section * {
-    visibility: visible !important;
+  /* Make main content full width */
+  main,
+  .printable-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+
+  /* Remove page breaks in unwanted places */
+  .printable-content>* {
+    page-break-inside: avoid;
   }
 }

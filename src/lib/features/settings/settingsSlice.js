@@ -59,6 +59,48 @@ export const updateMadrasaSettings = createAsyncThunk(
   }
 );
 
+export const addOrUpdateFee = createAsyncThunk(
+  'settings/addOrUpdateFee',
+  async ({ feeName, amount }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ feeName, amount }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data);
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const removeFee = createAsyncThunk(
+  'settings/removeFee',
+  async (feeName, { rejectWithValue }) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees/${feeName}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data);
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const settingsSlice = createSlice({
   name: 'settings',
   initialState: {
@@ -99,6 +141,36 @@ const settingsSlice = createSlice({
         state.success = true;
       })
       .addCase(updateMadrasaSettings.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(addOrUpdateFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(addOrUpdateFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.madrasaSettings = action.payload.data || action.payload;
+        state.success = true;
+      })
+      .addCase(addOrUpdateFee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(removeFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(removeFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.madrasaSettings = action.payload.data || action.payload;
+        state.success = true;
+      })
+      .addCase(removeFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.success = false;

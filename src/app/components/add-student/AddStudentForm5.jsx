@@ -1,22 +1,31 @@
 "use client"
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchMadrasaSettings } from '@/lib/features/settings/settingsSlice';
+
+// Convert English numbers to Bangla
+const toBanglaNumber = (num) => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/\d/g, digit => banglaDigits[digit]);
+};
 
 export default function AddStudentForm5({ setPagination, formData, onDataChange }) {
   const router = useRouter();
+  const dispatch = useDispatch();
+  const { madrasaSettings, loading } = useSelector((state) => state.settings);
 
-  // Mapping from UI keys to API keys for fees
-  const feeMapping = {
-    admission: 'admissionFee',
-    books: 'booksFee',
-    IT: 'ITFee', // Mapped from 'laptop' in original UI to 'ITFee' in API
-    IDCard: 'IDCardFee', // Mapped from 'idCard' in original UI to 'IDCardFee' in API
-    library: 'libraryFee', // Mapped from 'mess' in original UI to 'libraryFee' in API
-    // The original UI also had 'uniform' and 'otherCharges' which are not directly in API 'fees' body.
-    // Assuming they are not needed for API, or handled differently.
-    // For now, we'll only collect what's directly mappable to API.
-    kafela: 'kafelaFee', // Adding kafelaFee from API schema
-    confirm: 'confirmFee', // Adding confirmFee from API schema
+  // Fetch madrasa settings on component mount
+  useEffect(() => {
+    dispatch(fetchMadrasaSettings());
+  }, [dispatch]);
+
+  // Get default fee amount from backend settings
+  const getDefaultFee = (feeName) => {
+    if (madrasaSettings?.fees && madrasaSettings.fees[feeName] !== undefined) {
+      return madrasaSettings.fees[feeName];
+    }
+    return 0; // Fallback to 0 if not available
   };
 
   const handleFeeChange = (e) => {
@@ -41,11 +50,15 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
     onDataChange({ helpAmount: parseInt(e.target.value) || 0 });
   };
 
-  const isHelpSelected = formData.helpType && formData.helpType !== '';
-  // Calculate total fee, treating non-numeric or empty values as 0 for sum
-  const totalFee = Object.keys(feeMapping).reduce((sum, uiKey) => {
-    const apiField = feeMapping[uiKey];
-    const val = Number(formData[apiField]);
+  const isHelpSelected = Boolean(formData.helpType && formData.helpType !== '');
+
+  // Get all fees dynamically from backend
+  const allFees = madrasaSettings?.fees || {};
+  const feeEntries = Object.entries(allFees);
+
+  // Calculate total fee from selected fees
+  const totalFee = feeEntries.reduce((sum, [feeName, defaultAmount]) => {
+    const val = Number(formData[feeName]);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
@@ -60,49 +73,45 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
       <div className="p-8 space-y-8">
         {/* Fee Items List */}
         <div>
-          {[
-            { uiKey: 'admission', label: 'ভর্তি ফি', apiField: 'admissionFee' },
-            { uiKey: 'books', label: 'বই ফি', apiField: 'booksFee' },
-            { uiKey: 'IT', label: 'আইটি ফি', apiField: 'ITFee' },
-            { uiKey: 'IDCard', label: 'আইডি কার্ড ফি', apiField: 'IDCardFee' },
-            { uiKey: 'library', label: 'লাইব্রেরী ফি', apiField: 'libraryFee' },
-            { uiKey: 'kafela', label: 'কাফেলা ফি', apiField: 'kafelaFee' },
-            { uiKey: 'confirm', label: 'কনফার্মেশন ফি', apiField: 'confirmFee' },
-          ].map((item) => {
-            // Checkbox is checked if value exists and is not 0 (but keep checked if empty string for editing)
-            const val = formData[item.apiField];
-            const isChecked = val !== 0 && val !== undefined && val !== null;
+          {feeEntries.length === 0 ? (
+            <p className="text-gray-500 text-center py-4">কোন ফি যোগ করা হয়নি। ফি ম্যানেজমেন্ট থেকে ফি যোগ করুন।</p>
+          ) : (
+            feeEntries.map(([feeName, defaultAmount]) => {
+              // Checkbox is checked if value exists and is not 0
+              const val = formData[feeName];
+              const isChecked = val !== 0 && val !== undefined && val !== null;
 
-            return (
-              <div key={item.uiKey} className="flex items-center justify-start gap-8 py-3">
-                <label className="flex items-center gap-4 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    name={item.apiField}
-                    checked={isChecked}
-                    onChange={(e) => onDataChange({ [item.apiField]: e.target.checked ? 300 : 0 })}
-                    className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
-                  />
-                  <span className="text-lg text-gray-800 font-bold">{item.label}</span>
-                </label>
-                <div className='flex items-center justify-center gap-3'>
-                  <span> = </span>
-                  <input
-                    type="number"
-                    value={val === 0 ? '' : (val ?? '')}
-                    disabled={!isChecked}
-                    onChange={(e) => {
-                      const inputVal = e.target.value;
-                      // Store as string if empty (to keep focus/checked), number otherwise
-                      onDataChange({ [item.apiField]: inputVal === '' ? '' : Number(inputVal) });
-                    }}
-                    className="text-lg font-bold text-gray-700 w-32 px-2 py-1 border border-gray-300 rounded disabled:bg-gray-200 disabled:opacity-50"
-                  />
-                  <span className="text-lg font-bold text-gray-700">৳</span>
+              return (
+                <div key={feeName} className="flex items-center justify-start gap-8 py-3">
+                  <label className="flex items-center gap-4 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      name={feeName}
+                      checked={isChecked}
+                      onChange={(e) => onDataChange({ [feeName]: e.target.checked ? getDefaultFee(feeName) : 0 })}
+                      className="w-6 h-6 text-blue-600 rounded focus:ring-blue-500 border-gray-300"
+                    />
+                    <span className="text-lg text-gray-800 font-bold">{feeName}</span>
+                  </label>
+                  <div className='flex items-center justify-center gap-3'>
+                    <span>= </span>
+                    <input
+                      type="number"
+                      value={val === 0 ? '' : (val ?? '')}
+                      disabled={!isChecked}
+                      onChange={(e) => {
+                        const inputVal = e.target.value;
+                        // Store as string if empty (to keep focus/checked), number otherwise
+                        onDataChange({ [feeName]: inputVal === '' ? '' : Number(inputVal) });
+                      }}
+                      className="text-lg font-bold text-gray-700 w-32 px-2 py-1 border border-gray-300 rounded disabled:bg-gray-200 disabled:opacity-50"
+                    />
+                    <span className="text-lg font-bold text-gray-700">৳</span>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
         <hr />
         {/* Total Fee */}
@@ -110,7 +119,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
           <span>সর্বমোট টাকা</span>
           <div className='flex items-center justify-center gap-3'>
             <span> = </span>
-            <span>{totalFee.toLocaleString('bn-BD')} ৳</span>
+            <span>{toBanglaNumber(totalFee)} ৳</span>
           </div>
         </div>
 
@@ -160,7 +169,7 @@ export default function AddStudentForm5({ setPagination, formData, onDataChange 
         {/* Final Amount */}
         <div className="text-lg font-bold text-[#EC221F] flex justify-between items-center">
           <span>সহযোগিতা পর সর্বমোট টাকা </span>
-          <span>{finalAmount.toLocaleString('bn-BD')} ৳</span>
+          <span>{toBanglaNumber(finalAmount)} ৳</span>
         </div>
       </div>
 
