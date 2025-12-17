@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addExpense, resetExpenseStatus } from '@/lib/features/accounts/accountSlice';
+import toast from 'react-hot-toast';
 
-const NewExpenseform = ({setShowAddForm}) => {
+const NewExpenseform = ({ setShowAddForm }) => {
   const dispatch = useDispatch();
   const { loading, success, error } = useSelector((state) => state.accounts);
 
@@ -18,7 +19,7 @@ const NewExpenseform = ({setShowAddForm}) => {
 
   useEffect(() => {
     if (success) {
-      alert('Expense added successfully!');
+      toast.success('Expense added successfully!');
       setFormData({
         roshidNo: '',
         expenseHead: '',
@@ -32,7 +33,7 @@ const NewExpenseform = ({setShowAddForm}) => {
       setShowAddForm(false);
     }
     if (error) {
-      alert(`Failed to add expense: ${error.message || JSON.stringify(error)}`);
+      toast.error(`Failed to add expense: ${error.message || JSON.stringify(error)}`);
       dispatch(resetExpenseStatus());
     }
   }, [success, error, dispatch, setShowAddForm]);

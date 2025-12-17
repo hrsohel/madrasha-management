@@ -96,8 +96,8 @@ export default function StudentDetailsPage() {
       </div>
 
       <StudentInfo student={studentData} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />
-      {studentData.guardian && <FamilyInfo guardian={studentData.guardian} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
       {studentData.address && <AddressInfo address={studentData.address} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
+      {studentData.guardian && <FamilyInfo guardian={Array.isArray(studentData.guardian) ? studentData.guardian[0] : studentData.guardian} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
       {studentData.admissionExamInfo && <GuardianInfo oldMadrasaInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
       {studentData.admissionExamInfo && <AcademicYearInfo oldMadrasaInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
       {studentData.admissionExamInfo && <AdmissionExamInfo admissionExamInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={handleUpdateSuccess} />}
