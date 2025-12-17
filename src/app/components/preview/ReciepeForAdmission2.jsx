@@ -1,27 +1,46 @@
 import Image from 'next/image'
 import React from 'react'
+import { translateToBangla } from '../../../lib/utils'
 
-export default function ReciepeForAdmission2() {
+export default function ReciepeForAdmission2({ studentData: rawStudentData, guardianData: rawGuardianData, addressData: rawAddressData, madrasaData: rawMadrasaData, feesData: rawFeesData, madrasaSettings, addedStudent }) {
+    // Prefer server data if available to show official saved IDs
+    const savedData = addedStudent?.data || {};
+
+    const studentData = savedData.name ? savedData : rawStudentData;
+    const guardianData = savedData.guardian?.[0] || rawGuardianData;
+    const addressData = savedData.addresse?.[0] || rawAddressData;
+    const madrasaData = savedData.oldMadrasaInfo?.[0] || rawMadrasaData;
+    const feesData = savedData.fees?.[0] || rawFeesData;
+
+    const today = new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' });
+
     return (
         <>
             <div className='border'>
                 <div
-
-                    className=' mt-4 py-2 relative'
+                    className='py-2 relative'
                 >
                     <div
                         style={{
-                            backgroundImage: `url("/802422a1353a261fc2a0056a2430a594a0d6f235.png")`,
+                            backgroundImage: madrasaSettings?.logo ? `url("${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}")` : `url("/802422a1353a261fc2a0056a2430a594a0d6f235.png")`,
                             backgroundSize: "1200px 1200px"
                         }}
                         className='absolute top-0 left-0 right-0 w-full h-full -z-10 bg-no-repeat bg-center opacity-20 bg-cover'></div>
-                    <h1 className='text-[30px] font-normal text-center'>دارالعلوم معين السنة سريمنغل</h1>
+                    <h1 className='text-[30px] font-normal text-center'>{madrasaSettings?.name?.arabic || "دارالعلوم معين السنة سريمنغل"}</h1>
                     <div className='flex items-center justify-around'>
                         <div className='flex items-center justify-center gap-4'>
-                            <Image src="/802422a1353a261fc2a0056a2430a594a0d6f235.png" className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover' width={1000} height={1000} alt='public\802422a1353a261fc2a0056a2430a594a0d6f235.png' />
+                            {madrasaSettings?.logo ? (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}`}
+                                    className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover'
+                                    alt='Madrasa Logo'
+                                />
+                            ) : (
+                                <Image src="/802422a1353a261fc2a0056a2430a594a0d6f235.png" className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover' width={1000} height={1000} alt='Default Logo' />
+                            )}
                             <div>
-                                <h1 className='text-[21px] font-[500] text-[#424D47]'>দারুল উলুম মূঈনুস সুন্নাহ, শ্রীমঙ্গল</h1>
-                                <h3 className='text-[15px] font-[400] text-[#424D47]'>ভানুগাছ রোড , রেল গেট, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট </h3>
+                                <h1 className='text-[21px] font-[500] text-[#424D47]'>{madrasaSettings?.name?.bangla || "দারুল উলুম মূঈনুস সুন্নাহ, শ্রীমঙ্গল"}</h1>
+                                <h3 className='text-[15px] font-[400] text-[#424D47]'>{madrasaSettings?.location?.bangla || "ভানুগাছ রোড , রেল গেট, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট"}</h3>
                             </div>
                         </div>
                         <div>
@@ -31,19 +50,19 @@ export default function ReciepeForAdmission2() {
                             </svg>
                         </div>
                         <div>
-                            <h1 className='text-[21px] font-[500] text-[#424D47]'>Darul Ulum Muinus Sunnah Sreemangal</h1>
-                            <h3 className='text-[15px] font-[400] text-[#424D47]'>darululummuinussunnah@gmail.com || +880 1611-109960</h3>
+                            <h1 className='text-[21px] font-[500] text-[#424D47]'>{madrasaSettings?.name?.english || "Darul Ulum Muinus Sunnah Sreemangal"}</h1>
+                            <h3 className='text-[15px] font-[400] text-[#424D47]'>{madrasaSettings?.contact?.email || "darululummuinussunnah@gmail.com"} || {madrasaSettings?.contact?.phone || "+880 1611-109960"}</h3>
                         </div>
                     </div>
                     <div className='flex items-center justify-evenly w-full px-24'>
                         <div className=' w-full'>
-                            <p className='flex items-center justify-start gap-6'><span>ফরম নং</span> <span>:</span> <span>75</span></p>
+                            <p className='flex items-center justify-start gap-6'><span>ফরম নং</span> <span>:</span> <span>{studentData?.formNo || "৭৫"}</span></p>
                         </div>
                         <div className='bg-[#2B7752] p-2 w-[300px] text-center'>
                             <p className='text-white'>ভর্তি ফরম </p>
                         </div>
                         <div className=' w-full'>
-                            <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>১২ নভেম্বর ২০২৫</span></p>
+                            <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>{today}</span></p>
                         </div>
                     </div>
                     <div className='pl-6 mt-6'>
@@ -58,30 +77,30 @@ export default function ReciepeForAdmission2() {
                             </div>
                             <div>
                                 <p>নাম</p>
-                                <p>মোঃ আরিফুর রহমান খান</p>
+                                <p>{studentData?.name}</p>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>জন্ম তারিখ</p>
-                                    <p>২০ জানুয়ারি ২০২০ , ৫ বছর</p>
+                                    <p>{studentData?.dob ? new Date(studentData.dob).toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' }) : "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>জন্মসনদ/NID </p>
-                                    <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                                    <p>{studentData?.nid || "N/A"}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>জেন্ডার</p>
-                                    <p>ছাত্র</p>
+                                    <p>{translateToBangla(studentData?.gender)}</p>
                                 </div>
                                 <div>
                                     <p>রক্তের গ্রুপ</p>
-                                    <p>O+</p>
+                                    <p>{studentData?.bloodGroup || "N/A"}</p>
                                 </div>
                                 <div>
-                                    <p>মোবাইল নম্বর</p>
-                                    <p>+৮৮০১৭৭৫৬২৩২৬</p>
+                                    <p>মো바일 নম্বর</p>
+                                    <p>{studentData?.phone || "N/A"}</p>
                                 </div>
                             </div>
                         </div>
@@ -94,39 +113,39 @@ export default function ReciepeForAdmission2() {
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>আইডি</p>
-                                    <p>DUMS01</p>
+                                    <p>{studentData?.uid || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>আবাসিক অবস্থা</p>
-                                    <p>আবাসিক</p>
+                                    <p>{translateToBangla(studentData?.residential)}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>রোল নম্বর</p>
-                                    <p>২</p>
+                                    <p>{studentData?.roll?.toLocaleString('bn-BD') || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>শ্রেণী</p>
-                                    <p>নার্সারি</p>
+                                    <p>{translateToBangla(studentData?.class)}</p>
                                 </div>
                                 <div>
                                     <p>শাখা</p>
-                                    <p>ক</p>
+                                    <p>{translateToBangla(studentData?.section)}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>শিফট</p>
-                                    <p>সকাল</p>
+                                    <p>{translateToBangla(studentData?.shift)}</p>
                                 </div>
                                 <div>
                                     <p>বিভাগ</p>
-                                    <p>নুরানী</p>
+                                    <p>{translateToBangla(studentData?.division)}</p>
                                 </div>
                                 <div>
                                     <p>সেশন</p>
-                                    <p>২৪ - ২৫</p>
+                                    <p>{translateToBangla(studentData?.session)}</p>
                                 </div>
                             </div>
                         </div>
@@ -145,19 +164,19 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>গ্রাম</p>
-                                        <p>শাহজালাল </p>
+                                        <p>{addressData?.present?.village}</p>
                                     </div>
                                     <div>
                                         <p>উপজেলা/থানা </p>
-                                        <p>সুরমা </p>
+                                        <p>{addressData?.present?.upazila}</p>
                                     </div>
                                     <div>
                                         <p>জেলা </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.present?.district}</p>
                                     </div>
                                     <div>
                                         <p>বিভাগ </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.present?.division}</p>
                                     </div>
                                 </div>
                             </div>
@@ -170,19 +189,19 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>গ্রাম</p>
-                                        <p>শাহজালাল </p>
+                                        <p>{addressData?.permanent?.village}</p>
                                     </div>
                                     <div>
                                         <p>উপজেলা/থানা </p>
-                                        <p>সুরমা </p>
+                                        <p>{addressData?.permanent?.upazila}</p>
                                     </div>
                                     <div>
                                         <p>জেলা </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.permanent?.district}</p>
                                     </div>
                                     <div>
                                         <p>বিভাগ </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.permanent?.division}</p>
                                     </div>
                                 </div>
                             </div>
@@ -202,15 +221,15 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.fatherName}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.fatherPhone}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.fatherNid || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -223,15 +242,15 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.motherName}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.motherPhone}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.motherNid || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -244,19 +263,19 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>সম্পর্ক </p>
-                                        <p>পিতা</p>
+                                        <p>{guardianData?.guardianRelation}</p>
                                     </div>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.guardianName}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.guardianPhone}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.guardianNid || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -271,15 +290,15 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>দারুল উলুম মূঈনুস সুন্নাহ</p>
+                                        <p>{madrasaData?.name || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>সর্বশেষ উত্তীর্ণ ক্লাস</p>
-                                        <p>নাজেরা </p>
+                                        <p>{madrasaData?.lastClass || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>সর্বশেষ উত্তীর্ণ রেজাল্ট </p>
-                                        <p>মুমতাজ  </p>
+                                        <p>{madrasaData?.lastResult || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -294,19 +313,19 @@ export default function ReciepeForAdmission2() {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>হযরতের নাম </p>
-                                        <p>মোঃ আরিফুর রহমান খান</p>
+                                        <p>{madrasaData?.localGuardianName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>হযরতের মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{madrasaData?.localGuardianPhone || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>পরীক্ষকের নাম/ সুপারিশ করি </p>
-                                        <p>মোঃ আরিফুর রহমান খান  </p>
+                                        <p>{madrasaData?.recommenderName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>ফলাফল</p>
-                                        <p>মুমতাজ </p>
+                                        <p>{madrasaData?.testResult || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>

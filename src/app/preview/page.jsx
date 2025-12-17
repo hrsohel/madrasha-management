@@ -15,6 +15,8 @@ import ReciepeForAdmission2 from '../components/preview/ReciepeForAdmission2'
 export default function page() {
   const [navigateToFormReciepe, setNavigateToReciepe] = useState(1)
   const studentFormData = useSelector((state) => state.students.studentFormData);
+  const { student: addedStudent } = useSelector((state) => state.students);
+  const { madrasaSettings } = useSelector((state) => state.settings);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -33,13 +35,18 @@ export default function page() {
           /* Page setup */
           @page {
             size: A4;
-            margin: 8mm;
+            margin: 0mm;
           }
 
-          /* Reduce spacing in print section */
-          #print-section * {
+          /* General Reset for Print */
+          body {
             margin: 0 !important;
-            padding: 1px 2px !important;
+            padding: 0 !important;
+          }
+
+          #print-section {
+            margin: 0 !important;
+            padding: 8mm !important; /* Internal margin for the content */
           }
 
           /* Reduce font sizes */
@@ -112,7 +119,18 @@ export default function page() {
                 <Reciepe setNavigateToReciepe={setNavigateToReciepe} studentFormData={studentFormData} />
               </> :
                 navigateToFormReciepe === 2 ? <Admissionfrom setNavigateToReciepe={setNavigateToReciepe} /> :
-                  navigateToFormReciepe === 3 ? <ReciepeForAdmission2 setNavigateToReciepe={setNavigateToReciepe} /> : <></>
+                  navigateToFormReciepe === 3 ? (
+                    <ReciepeForAdmission2
+                      setNavigateToReciepe={setNavigateToReciepe}
+                      studentData={studentFormData.student}
+                      guardianData={studentFormData.guardian}
+                      addressData={studentFormData.address}
+                      madrasaData={studentFormData.madrasa}
+                      feesData={studentFormData.fees}
+                      madrasaSettings={madrasaSettings}
+                      addedStudent={addedStudent}
+                    />
+                  ) : <></>
             }
           </div>
 

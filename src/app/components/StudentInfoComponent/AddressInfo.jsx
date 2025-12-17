@@ -1,47 +1,184 @@
 import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
+import { updateStudentFullDetails } from "@/services/studentService";
+import { divisions, getDistrictsByDivision, getUpazilasByDistrict, getUnionsByUpazila } from "../add-student/locationData";
+import toast from "react-hot-toast";
+import ConfirmationModal from "@/app/components/ConfirmationModal";
 
-export default function AddressInfo({ address }) {
+// Helper to find ID by bn_name
+const getIdFromBnName = (dataArray, bnName) => {
+  const foundItem = dataArray.find(item => item.bn_name === bnName);
+  return foundItem ? foundItem.id : '';
+};
+
+export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isSameAddress, setIsSameAddress] = useState(address?.isSameAsPresent || false);
 
-  const [currentAddress, setCurrentAddress] = useState({
-    division: address?.presentDivision || "",
-    district: address?.presentDistrict || "",
-    upazila: address?.presentUpazila || "",
-    union: address?.presentUnion || "",
-    village: address?.presentVillage || "",
-    additionalInfo: address?.presentOthers || "",
+  // Form State
+  const [formData, setFormData] = useState({
+    presentDivision: address?.presentDivision || "",
+    presentDistrict: address?.presentDistrict || "",
+    presentUpazila: address?.presentUpazila || "",
+    presentUnion: address?.presentUnion || "",
+    presentVillage: address?.presentVillage || "",
+    presentOthers: address?.presentOthers || "",
+    permanentDivision: address?.permanentDivision || "",
+    permanentDistrict: address?.permanentDistrict || "",
+    permanentUpazila: address?.permanentUpazila || "",
+    permanentUnion: address?.permanentUnion || "",
+    permanentVillage: address?.permanentVillage || "",
+    permanentOthers: address?.permanentOthers || "",
   });
 
-  const [permanentAddress, setPermanentAddress] = useState({
-    division: address?.permanentDivision || "",
-    district: address?.permanentDistrict || "",
-    upazila: address?.permanentUpazila || "",
-    union: address?.permanentUnion || "",
-    village: address?.permanentVillage || "",
-    additionalInfo: address?.permanentOthers || "",
-  });
+
+  // Location IDs state for cascading
+  const [presentDivisionId, setPresentDivisionId] = useState("");
+  const [presentDistrictId, setPresentDistrictId] = useState("");
+  const [presentUpazilaId, setPresentUpazilaId] = useState("");
+
+  const [permanentDivisionId, setPermanentDivisionId] = useState("");
+  const [permanentDistrictId, setPermanentDistrictId] = useState("");
+  const [permanentUpazilaId, setPermanentUpazilaId] = useState("");
+
 
   useEffect(() => {
+    // Initialize form data from props
+    setFormData({
+      presentDivision: address?.presentDivision || "",
+      presentDistrict: address?.presentDistrict || "",
+      presentUpazila: address?.presentUpazila || "",
+      presentUnion: address?.presentUnion || "",
+      presentVillage: address?.presentVillage || "",
+      presentOthers: address?.presentOthers || "",
+      permanentDivision: address?.permanentDivision || "",
+      permanentDistrict: address?.permanentDistrict || "",
+      permanentUpazila: address?.permanentUpazila || "",
+      permanentUnion: address?.permanentUnion || "",
+      permanentVillage: address?.permanentVillage || "",
+      permanentOthers: address?.permanentOthers || "",
+    });
     setIsSameAddress(address?.isSameAsPresent || false);
-    setCurrentAddress({
-      division: address?.presentDivision || "",
-      district: address?.presentDistrict || "",
-      upazila: address?.presentUpazila || "",
-      union: address?.presentUnion || "",
-      village: address?.presentVillage || "",
-      additionalInfo: address?.presentOthers || "",
-    });
-    setPermanentAddress({
-      division: address?.permanentDivision || "",
-      district: address?.permanentDistrict || "",
-      upazila: address?.permanentUpazila || "",
-      union: address?.permanentUnion || "",
-      village: address?.permanentVillage || "",
-      additionalInfo: address?.permanentOthers || "",
-    });
+
+    // Initialize IDs
+    if (address?.presentDivision) setPresentDivisionId(getIdFromBnName(divisions, address.presentDivision));
+    if (address?.permanentDivision) setPermanentDivisionId(getIdFromBnName(divisions, address.permanentDivision));
+    // Note: Deep initialization of District/Upazila IDs is tricky without chaining, 
+    // but the dropdowns will rely on IDs. For simplicity, we re-calculate IDs if needed or let user re-select.
+    // Better to calculate them if possible.
+    if (address?.presentDivision) {
+      const divId = getIdFromBnName(divisions, address.presentDivision);
+      setPresentDivisionId(divId);
+      if (address?.presentDistrict) {
+        const dists = getDistrictsByDivision(divId);
+        const distId = getIdFromBnName(dists, address.presentDistrict);
+        setPresentDistrictId(distId);
+        if (address?.presentUpazila) {
+          const upzs = getUpazilasByDistrict(distId);
+          const upzId = getIdFromBnName(upzs, address.presentUpazila);
+          setPresentUpazilaId(upzId);
+        }
+      }
+    }
+    if (address?.permanentDivision) {
+      const divId = getIdFromBnName(divisions, address.permanentDivision);
+      setPermanentDivisionId(divId);
+      if (address?.permanentDistrict) {
+        const dists = getDistrictsByDivision(divId);
+        const distId = getIdFromBnName(dists, address.permanentDistrict);
+        setPermanentDistrictId(distId);
+        if (address?.permanentUpazila) {
+          const upzs = getUpazilasByDistrict(distId);
+          const upzId = getIdFromBnName(upzs, address.permanentUpazila);
+          setPermanentUpazilaId(upzId);
+        }
+      }
+    }
+
   }, [address]);
+
+
+  // Derived lists
+  const presentDistricts = presentDivisionId ? getDistrictsByDivision(presentDivisionId) : [];
+  const presentUpazilas = presentDistrictId ? getUpazilasByDistrict(presentDistrictId) : [];
+  const presentUnions = presentUpazilaId ? getUnionsByUpazila(presentUpazilaId) : [];
+
+  const permanentDistricts = permanentDivisionId ? getDistrictsByDivision(permanentDivisionId) : [];
+  const permanentUpazilas = permanentDistrictId ? getUpazilasByDistrict(permanentDistrictId) : [];
+  const permanentUnions = permanentUpazilaId ? getUnionsByUpazila(permanentUpazilaId) : [];
+
+
+  const handleAddressChange = (type, field, value) => {
+    // type: 'present' or 'permanent', field: 'Division', 'District', etc.
+    const fullFieldName = `${type}${field}`;
+
+    let selectedId = '';
+    if (field === 'Division') selectedId = getIdFromBnName(divisions, value);
+    else if (field === 'District') selectedId = getIdFromBnName(getDistrictsByDivision(type === 'present' ? presentDivisionId : permanentDivisionId), value);
+    else if (field === 'Upazila') selectedId = getIdFromBnName(getUpazilasByDistrict(type === 'present' ? presentDistrictId : permanentDistrictId), value);
+
+
+    if (type === 'present') {
+      if (field === 'Division') { setPresentDivisionId(selectedId); setPresentDistrictId(''); setPresentUpazilaId(''); }
+      else if (field === 'District') { setPresentDistrictId(selectedId); setPresentUpazilaId(''); }
+      else if (field === 'Upazila') { setPresentUpazilaId(selectedId); }
+    } else {
+      if (field === 'Division') { setPermanentDivisionId(selectedId); setPermanentDistrictId(''); setPermanentUpazilaId(''); }
+      else if (field === 'District') { setPermanentDistrictId(selectedId); setPermanentUpazilaId(''); }
+      else if (field === 'Upazila') { setPermanentUpazilaId(selectedId); }
+    }
+
+    // Update Form Data
+    setFormData(prev => {
+      const newAddress = { ...prev, [fullFieldName]: value };
+      // Reset children
+      if (field === 'Division') {
+        newAddress[`${type}District`] = '';
+        newAddress[`${type}Upazila`] = '';
+        newAddress[`${type}Union`] = '';
+      } else if (field === 'District') {
+        newAddress[`${type}Upazila`] = '';
+        newAddress[`${type}Union`] = '';
+      } else if (field === 'Upazila') {
+        newAddress[`${type}Union`] = '';
+      }
+      return newAddress;
+    });
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const confirmUpdate = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        addresse: [{
+          ...formData,
+          isSameAsPresent: isSameAddress
+        }]
+      };
+
+      await updateStudentFullDetails(studentId, payload);
+      toast.success("ঠিকানা সফলভাবে আপডেট করা হয়েছে!");
+      if (onUpdateSuccess) onUpdateSuccess();
+      setIsModalOpen(false);
+      setIsConfirmOpen(false);
+    } catch (error) {
+      console.error("Address update failed:", error);
+      toast.error("আপডেট ব্যর্থ হয়েছে।");
+      setIsConfirmOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
@@ -71,25 +208,25 @@ export default function AddressInfo({ address }) {
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">গ্রাম</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {currentAddress.village}
+                    {formData.presentVillage}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">উপজেলা/থানা</p>
                   <p className="text-sm text-[#424D47] font-semibold ">
-                    {currentAddress.upazila}
+                    {formData.presentUpazila}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">জেলা</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {currentAddress.district}
+                    {formData.presentDistrict}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">বিভাগ</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {currentAddress.division}
+                    {formData.presentDivision}
                   </p>
                 </div>
               </div>
@@ -104,25 +241,25 @@ export default function AddressInfo({ address }) {
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">গ্রাম</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {permanentAddress.village}
+                    {formData.permanentVillage}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">উপজেলা/থানা</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {permanentAddress.upazila}
+                    {formData.permanentUpazila}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">জেলা</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {permanentAddress.district}
+                    {formData.permanentDistrict}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-[#63736C] font-semibold mb-1">বিভাগ</p>
                   <p className="text-sm text-[#424D47] font-semibold">
-                    {permanentAddress.division}
+                    {formData.permanentDivision}
                   </p>
                 </div>
               </div>
@@ -133,20 +270,20 @@ export default function AddressInfo({ address }) {
 
       {/* Edit Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
-              <h2 className="text-xl font-semibold text-[#246545]">ঠিকানা</h2>
+              <h2 className="text-xl font-semibold text-[#246545]">ঠিকানা সম্পাদনা</h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-8">
               {/* বর্তমান ঠিকানা Section */}
               <div className="mb-6 pb-6 border-b border-dashed border-gray-300">
                 <h3 className="text-base font-semibold text-gray-700 mb-4">
@@ -155,79 +292,74 @@ export default function AddressInfo({ address }) {
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      বিভাগ
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">বিভাগ</label>
                     <select
-                      defaultValue={currentAddress.division}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentDivision}
+                      onChange={(e) => handleAddressChange('present', 'Division', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     >
-                      <option>Dhaka</option>
-                      <option>Chittagong</option>
-                      <option>Sylhet</option>
+                      <option value="">নির্বাচন করুন</option>
+                      {divisions.map((div, i) => <option key={i} value={div.bn_name}>{div.bn_name}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      জেলা
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">জেলা</label>
                     <select
-                      defaultValue={currentAddress.district}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentDistrict}
+                      onChange={(e) => handleAddressChange('present', 'District', e.target.value)}
+                      disabled={!formData.presentDivision}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
                     >
-                      <option>Dhaka</option>
-                      <option>Sylhet</option>
+                      <option value="">নির্বাচন করুন</option>
+                      {presentDistricts.map((d, i) => <option key={i} value={d.bn_name}>{d.bn_name}</option>)}
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      উপজেলা/থানা
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">উপজেলা/থানা</label>
                     <select
-                      defaultValue={currentAddress.upazila}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentUpazila}
+                      onChange={(e) => handleAddressChange('present', 'Upazila', e.target.value)}
+                      disabled={!formData.presentDistrict}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
                     >
-                      <option>h</option>
-                      <option>Surma</option>
+                      <option value="">নির্বাচন করুন</option>
+                      {presentUpazilas.map((u, i) => <option key={i} value={u.bn_name}>{u.bn_name}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      ইউনিয়ন
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">ইউনিয়ন</label>
                     <select
-                      defaultValue={currentAddress.union}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentUnion}
+                      onChange={(e) => handleAddressChange('present', 'Union', e.target.value)}
+                      disabled={!formData.presentUpazila}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
                     >
-                      <option>Ward No 10</option>
-                      <option>Shahjalal</option>
+                      <option value="">নির্বাচন করুন</option>
+                      {presentUnions.map((u, i) => <option key={i} value={u.bn_name}>{u.bn_name}</option>)}
                     </select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      গ্রাম
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">গ্রাম</label>
                     <input
                       type="text"
-                      defaultValue={currentAddress.village}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentVillage}
+                      onChange={(e) => handleInputChange('presentVillage', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      অন্যান্য তথ্য
-                    </label>
+                    <label className="block text-sm text-gray-700 mb-1">অন্যান্য তথ্য</label>
                     <input
                       type="text"
-                      defaultValue={currentAddress.additionalInfo}
-                      placeholder="ঠিকানা সম্পর্কিত অন্য কোনো তথ্য"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      value={formData.presentOthers}
+                      onChange={(e) => handleInputChange('presentOthers', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
                     />
                   </div>
                 </div>
@@ -243,114 +375,95 @@ export default function AddressInfo({ address }) {
                     onChange={(e) => setIsSameAddress(e.target.checked)}
                     className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                   />
-                  <label
-                    htmlFor="sameAddress"
-                    className="text-sm text-gray-700"
-                  >
-                    বর্তমান ঠিকানার মতো
-                  </label>
+                  <label htmlFor="sameAddress" className="text-sm text-gray-700">বর্তমান ঠিকানার মতো</label>
                 </div>
 
-                <h3 className="text-base font-semibold text-gray-700 mb-4">
-                  স্থায়ী ঠিকানা
-                </h3>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      বিভাগ
-                    </label>
-                    <select
-                      defaultValue={permanentAddress.division}
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    >
-                      <option>Dhaka</option>
-                      <option>Chittagong</option>
-                      <option>Sylhet</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      জেলা
-                    </label>
-                    <select
-                      defaultValue={permanentAddress.district}
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    >
-                      <option>Dhaka</option>
-                      <option>Sylhet</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      উপজেলা/থানা
-                    </label>
-                    <select
-                      defaultValue={permanentAddress.upazila}
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    >
-                      <option>hjhjhjh</option>
-                      <option>Surma</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      ইউনিয়ন
-                    </label>
-                    <select
-                      defaultValue={permanentAddress.union}
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    >
-                      <option>Ward No 10</option>
-                      <option>Shahjalal</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      গ্রাম
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={permanentAddress.village}
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm text-gray-700 mb-1">
-                      অন্যান্য তথ্য
-                    </label>
-                    <input
-                      type="text"
-                      defaultValue={permanentAddress.additionalInfo}
-                      placeholder="ঠিকানা সম্পর্কিত অন্য কোনো তথ্য"
-                      disabled={isSameAddress}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 disabled:bg-gray-100"
-                    />
-                  </div>
-                </div>
+                {!isSameAddress && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">বিভাগ</label>
+                        <select
+                          value={formData.permanentDivision}
+                          onChange={(e) => handleAddressChange('permanent', 'Division', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">নির্বাচন করুন</option>
+                          {divisions.map((div, i) => <option key={i} value={div.bn_name}>{div.bn_name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">জেলা</label>
+                        <select
+                          value={formData.permanentDistrict}
+                          onChange={(e) => handleAddressChange('permanent', 'District', e.target.value)}
+                          disabled={!formData.permanentDivision}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
+                        >
+                          <option value="">নির্বাচন করুন</option>
+                          {permanentDistricts.map((d, i) => <option key={i} value={d.bn_name}>{d.bn_name}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">উপজেলা/থানা</label>
+                        <select
+                          value={formData.permanentUpazila}
+                          onChange={(e) => handleAddressChange('permanent', 'Upazila', e.target.value)}
+                          disabled={!formData.permanentDistrict}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
+                        >
+                          <option value="">নির্বাচন করুন</option>
+                          {permanentUpazilas.map((u, i) => <option key={i} value={u.bn_name}>{u.bn_name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">ইউনিয়ন</label>
+                        <select
+                          value={formData.permanentUnion}
+                          onChange={(e) => handleAddressChange('permanent', 'Union', e.target.value)}
+                          disabled={!formData.permanentUpazila}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md disabled:bg-gray-100"
+                        >
+                          <option value="">নির্বাচন করুন</option>
+                          {permanentUnions.map((u, i) => <option key={i} value={u.bn_name}>{u.bn_name}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">গ্রাম</label>
+                        <input
+                          type="text"
+                          value={formData.permanentVillage}
+                          onChange={(e) => handleInputChange('permanentVillage', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">অন্যান্য তথ্য</label>
+                        <input
+                          type="text"
+                          value={formData.permanentOthers}
+                          onChange={(e) => handleInputChange('permanentOthers', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Note */}
               <p className="text-xs text-gray-600 mt-6 mb-4">
-                আপাতত্তকক তথ্য সংরক্ষন করলে 'সেভ করুন' বাটনে ক্লিক করুন অথবা
-                'ক্যানসেল করুন'
+                আপডেটকৃত তথ্য সংরক্ষন করলে 'সেভ করুন' বাটনে ক্লিক করুন অথবা 'ক্যানসেল করুন'
               </p>
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <button className="px-6 py-2 bg-[#246545] text-white rounded-md hover:bg-green-700 transition-colors">
-                  সেভ করুন
+                <button onClick={handleSave} disabled={loading} className="px-6 py-2 bg-[#246545] text-white rounded-md hover:bg-green-700 transition-colors shadow">
+                  {loading ? 'সংরক্ষণ হচ্ছে...' : 'সেভ করুন'}
                 </button>
                 <button
                   onClick={() => setIsModalOpen(false)}
@@ -363,6 +476,14 @@ export default function AddressInfo({ address }) {
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmUpdate}
+        title="ঠিকানা হালনাগাদ নিশ্চিতকরণ"
+        message="আপনি কি নিশ্চিত যে আপনি এই ঠিকানা আপডেট করতে চান?"
+        loading={loading}
+      />
     </div>
   );
 }

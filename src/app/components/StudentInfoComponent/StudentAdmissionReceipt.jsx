@@ -1,20 +1,30 @@
 import { translateToBangla } from "@/lib/utils";
 
+// Convert English numbers to Bangla
+const toBanglaNumber = (num) => {
+  const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  return String(num).replace(/\d/g, digit => banglaDigits[digit]);
+};
+
 export default function StudentAdmissionReceipt({ fees, student, madrasaSettings }) {
-  const totalFees = (fees?.admissionFee || 0) +
-    (fees?.libraryFee || 0) +
-    (fees?.confirmFee || 0) +
-    (fees?.ITFee || 0) +
-    (fees?.IDCardFee || 0) +
-    (fees?.kafelaFee || 0) +
-    (fees?.booksFee || 0);
+  // Get all fees dynamically from settings
+  const allFeeDefinitions = madrasaSettings?.fees || {};
+  const feeEntries = Object.entries(allFeeDefinitions);
+
+  // Calculate total fees dynamically
+  const totalFees = feeEntries.reduce((sum, [feeName]) => {
+    const val = Number(fees?.[feeName] || 0);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
+
   const payableAmount = totalFees - (fees?.helpAmount || 0);
 
   // Placeholder for converting number to words (requires a proper library or implementation)
   const numberToWords = (num) => {
     // This is a simplified placeholder. A real implementation would be complex.
     if (typeof num !== 'number') return '';
-    return `টাকা ${num} মাত্র`;
+    const banglaNum = toBanglaNumber(num);
+    return `টাকা ${banglaNum} মাত্র`;
   };
 
   const formatDate = (dateString) => {
@@ -49,7 +59,7 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
                 {madrasaSettings?.name?.bangla || "দারুল উলুম মুঈনুস সুন্নাহ, শ্রীমঙ্গল"}
               </h2>
               <p className="text-sm text-gray-600">
-                {madrasaSettings?.location?.bangla || "জগন্নাথ রোড , ব্রেল চৌ, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট"}
+                {madrasaSettings?.location?.bangla || "ভানুগাছ রোড , রেল গেট, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট"}
               </p>
             </div>
           </div>
@@ -88,7 +98,7 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
           </h3>
         </div>
 
-        {/* Student Information Grid */}
+        {/* Student Information Grid (Restored 3-column layout) */}
         <div className="grid grid-cols-3 gap-x-8 gap-y-4 mb-6">
           {/* Column 1 */}
           <div className="space-y-3">
@@ -107,15 +117,15 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <span className="mr-2">:</span>
               <span>{translateToBangla(student?.shift)}</span>
             </div>
-            <div className="flex">
-              <span className="font-semibold w-32">প্রদেয় ফিস</span>
+            <div className="flex text-blue-800 font-bold border-t border-gray-100 pt-2">
+              <span className="w-32">সর্বমোট ফিস</span>
               <span className="mr-2">:</span>
-              <span>{totalFees}</span>
+              <span>{toBanglaNumber(totalFees)} ৳</span>
             </div>
-            <div className="flex">
-              <span className="font-semibold w-32">ছাড়</span>
+            <div className="flex text-red-600 italic">
+              <span className="w-32">ছাড় ({fees?.helpType || "সব"})</span>
               <span className="mr-2">:</span>
-              <span>{fees?.helpAmount || 0} ({fees?.helpType})</span>
+              <span>{toBanglaNumber(fees?.helpAmount || 0)} ৳</span>
             </div>
           </div>
 
@@ -136,16 +146,14 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <span className="mr-2">:</span>
               <span>{translateToBangla(student?.division)}</span>
             </div>
-            <div className="flex">
-              <span className="font-semibold w-32">ভর্তি ফিস</span>
-              <span className="mr-2">:</span>
-              <span>{fees?.admissionFee || 0}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-32">লাইব্রেরী ফিস</span>
-              <span className="mr-2">:</span>
-              <span>{fees?.libraryFee || 0}</span>
-            </div>
+            {/* Dynamic Fees for Column 2 (Sample) */}
+            {feeEntries.slice(0, 2).map(([feeName]) => (
+              <div key={feeName} className="flex">
+                <span className="font-semibold w-32">{feeName}</span>
+                <span className="mr-2">:</span>
+                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+              </div>
+            ))}
           </div>
 
           {/* Column 3 */}
@@ -165,55 +173,54 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <span className="mr-2">:</span>
               <span>{translateToBangla(student?.session)}</span>
             </div>
-            <div className="flex">
-              <span className="font-semibold w-32">বইপত্র ফিস</span>
-              <span className="mr-2">:</span>
-              <span>{fees?.booksFee || 0}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-32">ID কার্ড ফিস</span>
-              <span className="mr-2">:</span>
-              <span>{fees?.IDCardFee || 0}</span>
-            </div>
+            {/* Dynamic Fees for Column 3 (Sample) */}
+            {feeEntries.slice(2, 4).map(([feeName]) => (
+              <div key={feeName} className="flex">
+                <span className="font-semibold w-32">{feeName}</span>
+                <span className="mr-2">:</span>
+                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
-          <div className="space-y-3">
-            <div className="flex">
-              <span className="font-semibold w-32">মোট প্রদেয়</span>
-              <span className="mr-2">:</span>
-              <span>{payableAmount}</span>
-            </div>
-            <div className="flex">
-              <span className="font-semibold w-32">কথায়</span>
-              <span className="mr-2">:</span>
-              <span>{numberToWords(payableAmount)}</span>
-            </div>
+        {/* Additional Fees Grid (Remaining Fees) */}
+        {feeEntries.length > 4 && (
+          <div className="grid grid-cols-3 gap-x-8 gap-y-4 mb-6 pt-4 border-t border-gray-100">
+            {feeEntries.slice(4).map(([feeName]) => (
+              <div key={feeName} className="flex">
+                <span className="font-semibold w-32">{feeName}</span>
+                <span className="mr-2">:</span>
+                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+              </div>
+            ))}
           </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6 border-t border-gray-200 pt-4">
           <div className="space-y-3">
-            <div className="flex">
-              <span className="font-semibold w-32">কাফেলা ফিস</span>
+            <div className="flex text-xl font-extrabold text-[#2B7752]">
+              <span className="w-32">মোট প্রদেয়</span>
               <span className="mr-2">:</span>
-              <span>{fees?.kafelaFee || 0}</span>
+              <span>{toBanglaNumber(payableAmount)} ৳</span>
             </div>
-            <div className="flex">
-              <span className="font-semibold w-32">অন্যান্য ফিস</span>
+            <div className="flex text-lg italic">
+              <span className="font-bold text-gray-700 w-32">কথায়</span>
               <span className="mr-2">:</span>
-              <span>{fees?.confirmFee || 0 + (fees?.ITFee || 0)}</span> {/* Assuming confirmFee and ITFee might be "other" */}
+              <span className="text-[#2B7752] font-semibold">{numberToWords(payableAmount)}</span>
             </div>
           </div>
         </div>
 
         {/* Signature Section */}
-        <div className="flex justify-between items-end pt-6 mt-6 border-t-2 border-gray-300">
+        <div className="flex justify-between items-end pt-12 mt-12 border-t-2 border-gray-300">
           <div className="text-center">
             <div className="border-t-2 border-gray-800 w-48 mx-auto mb-2"></div>
-            <p className="font-semibold">মুত্তালিমের স্বাক্ষর</p>
+            <p className="font-semibold">মুহতামিমের স্বাক্ষর</p>
           </div>
           <div className="text-center">
             <div className="border-t-2 border-gray-800 w-48 mx-auto mb-2"></div>
-            <p className="font-semibold">কিয়ার রক্ষকের স্বাক্ষর</p>
+            <p className="font-semibold">হিসাব রক্ষকের স্বাক্ষর</p>
           </div>
         </div>
       </div>

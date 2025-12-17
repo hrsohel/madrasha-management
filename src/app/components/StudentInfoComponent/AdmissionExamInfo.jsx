@@ -1,22 +1,59 @@
 import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
+import { updateStudentFullDetails } from "@/services/studentService";
+import toast from "react-hot-toast";
+import ConfirmationModal from "@/app/components/ConfirmationModal";
 
-export default function AdmissionExamInfo({ admissionExamInfo }) {
+export default function AdmissionExamInfo({ admissionExamInfo, studentId, onUpdateSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [examInfo, setExamInfo] = useState({
-    examinerName: admissionExamInfo?.admissionExaminer || "",
-    examResult: admissionExamInfo?.admissionResult || "",
+    admissionExaminer: admissionExamInfo?.admissionExaminer || "",
+    admissionResult: admissionExamInfo?.admissionResult || "",
     notes: admissionExamInfo?.notes || "",
   });
 
   useEffect(() => {
     setExamInfo({
-      examinerName: admissionExamInfo?.admissionExaminer || "",
-      examResult: admissionExamInfo?.admissionResult || "",
+      admissionExaminer: admissionExamInfo?.admissionExaminer || "",
+      admissionResult: admissionExamInfo?.admissionResult || "",
       notes: admissionExamInfo?.notes || "",
     });
   }, [admissionExamInfo]);
+
+  const handleChange = (field, value) => {
+    setExamInfo(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    setIsConfirmOpen(true);
+  };
+
+  const confirmUpdate = async () => {
+    setLoading(true);
+    try {
+      const payload = {
+        oldMadrasaInfo: [{
+          ...admissionExamInfo,
+          ...examInfo
+        }]
+      };
+
+      await updateStudentFullDetails(studentId, payload);
+      toast.success("তথ্য সফলভাবে আপডেট করা হয়েছে!");
+      if (onUpdateSuccess) onUpdateSuccess();
+      setIsModalOpen(false);
+      setIsConfirmOpen(false);
+    } catch (error) {
+      console.error("Update failed:", error);
+      toast.error("আপডেট ব্যর্থ হয়েছে।");
+      setIsConfirmOpen(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className=" bg-[#F7F7F7] mt-10">
@@ -45,7 +82,7 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
                   পরীক্ষকের নাম / মূল্যায়ন কারী
                 </p>
                 <p className="text-sm text-[#424D47] font-semibold">
-                  {examInfo.examinerName}
+                  {examInfo.admissionExaminer}
                 </p>
               </div>
 
@@ -53,7 +90,7 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
               <div>
                 <p className="text-sm text-[#63736C] mb-2">ফলাফল</p>
                 <p className="text-sm text-[#424D47] font-semibold">
-                  {examInfo.examResult}
+                  {examInfo.admissionResult}
                 </p>
               </div>
               {/* Notes */}
@@ -96,7 +133,8 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue={examInfo.examinerName}
+                  value={examInfo.admissionExaminer}
+                  onChange={(e) => handleChange('admissionExaminer', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -108,7 +146,8 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue={examInfo.examResult}
+                  value={examInfo.admissionResult}
+                  onChange={(e) => handleChange('admissionResult', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -120,7 +159,8 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
                 </label>
                 <input
                   type="text"
-                  defaultValue={examInfo.notes}
+                  value={examInfo.notes}
+                  onChange={(e) => handleChange('notes', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-700"
                 />
               </div>
@@ -133,8 +173,12 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <button className="flex-1 px-6 py-3 bg-[#2B7752] text-white rounded-md hover:bg-[#246545] transition-colors font-medium">
-                  সেভ করুন
+                <button
+                  onClick={handleSave}
+                  disabled={loading}
+                  className="flex-1 px-6 py-3 bg-[#2B7752] text-white rounded-md hover:bg-[#246545] transition-colors font-medium"
+                >
+                  {loading ? 'সংরক্ষণ হচ্ছে...' : 'সেভ করুন'}
                 </button>
 
                 <button
@@ -149,6 +193,14 @@ export default function AdmissionExamInfo({ admissionExamInfo }) {
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmUpdate}
+        title="তথ্য হালনাগাদ নিশ্চিতকরণ"
+        message="আপনি কি নিশ্চিত যে আপনি এই তথ্য আপডেট করতে চান?"
+        loading={loading}
+      />
     </div>
   );
 }

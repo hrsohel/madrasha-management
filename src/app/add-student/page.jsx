@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { addStudent, resetAddStudentStatus, setStudentFormData, clearStudentFormData } from '@/lib/features/students/studentSlice';
 
@@ -66,7 +67,7 @@ export default function AddStudentPage() {
 
   useEffect(() => {
     if (success) {
-      alert("Student added successfully!");
+      toast.success("Student added successfully!");
       dispatch(resetAddStudentStatus());
       dispatch(clearStudentFormData()); // Clear form data from Redux
       // Optionally reset form or navigate
@@ -75,7 +76,7 @@ export default function AddStudentPage() {
       }, 0);
     }
     if (error) {
-      alert(`Error: ${error.message || error.field || JSON.stringify(error)}`);
+      toast.error(`Error: ${error.message || error.field || JSON.stringify(error)}`);
     }
   }, [success, error, dispatch]);
 

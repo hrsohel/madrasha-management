@@ -14,20 +14,35 @@ export const addStudent = createAsyncThunk(
       // Assuming studentFormDataFromState has structure: { student: {}, address: {}, guardian: {}, madrasa: {}, fees: {} }
       for (const section in studentFormDataFromState) {
         if (studentFormDataFromState.hasOwnProperty(section)) {
-          const sectionData = studentFormDataFromState[section];
-          if (section === 'student' && sectionData.profileImage instanceof File) {
+          let sectionData = studentFormDataFromState[section];
+
+          // If sectionData is an array (common in drafts), take the first element
+          // to ensure we send standard object fields like section[key]
+          if (Array.isArray(sectionData) && sectionData.length > 0) {
+            sectionData = sectionData[0];
+          }
+
+          if (section === 'student' && sectionData?.profileImage instanceof File) {
             formData.append('profileImage', sectionData.profileImage);
             // Append other student data fields, excluding profileImage
             for (const key in sectionData) {
               if (sectionData.hasOwnProperty(key) && key !== 'profileImage') {
-                formData.append(`student[${key}]`, sectionData[key]);
+                if (sectionData[key] !== null && sectionData[key] !== undefined) {
+                  formData.append(`student[${key}]`, sectionData[key]);
+                }
               }
             }
-          } else {
+          } else if (sectionData && typeof sectionData === 'object') {
             // Append other section data fields
             for (const key in sectionData) {
               if (sectionData.hasOwnProperty(key)) {
-                formData.append(`${section}[${key}]`, sectionData[key]);
+                const value = sectionData[key];
+                // Only append if value is not null/undefined
+                if (value !== null && value !== undefined) {
+                  // If value is an object (except for specific cases), it might need stringification
+                  // but for this API, most fields are simple values or handled by nested keys
+                  formData.append(`${section}[${key}]`, value);
+                }
               }
             }
           }
@@ -120,7 +135,14 @@ export const updateStudent = createAsyncThunk(
       if (!response.ok) {
         return rejectWithValue(responseData);
       }
-      return responseData.data;
+      // Safety check: if responseData.data is missing, return the updated fields from state
+      // to avoid 'action.payload is undefined' in the reducer.
+      // STRIP non-serializable File/Blob objects
+      const resultData = responseData.data || { _id: id, ...data };
+      if (resultData.profileImage && typeof resultData.profileImage !== 'string') {
+        delete resultData.profileImage;
+      }
+      return resultData;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -230,9 +252,14 @@ const studentSlice = createSlice({
       })
       .addCase(updateStudent.fulfilled, (state, action) => {
         state.isUpdating = false;
-        const index = state.students.findIndex(student => student._id === action.payload._id);
-        if (index !== -1) {
-          state.students[index] = action.payload;
+        if (action.payload && action.payload._id) {
+          const index = state.students.findIndex(student => student._id === action.payload._id);
+          if (index !== -1) {
+            state.students[index] = {
+              ...state.students[index],
+              ...action.payload,
+            };
+          }
         }
       })
       .addCase(updateStudent.rejected, (state, action) => {

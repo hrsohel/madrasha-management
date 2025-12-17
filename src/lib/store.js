@@ -11,15 +11,17 @@ export const store = configureStore({
     accounts: accountReducer, // Add accountReducer
     settings: settingsReducer, // Add settingsReducer
     guardians: guardianReducer, // Add guardianReducer
-    auth: authReducer, // Add authReducer
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these paths in the state
-        ignoredPaths: ['students.studentFormData.student.profileImage'],
+        ignoredPaths: [
+          'students.studentFormData.student.profileImage',
+          /^students\.students\.\d+\.profileImage$/
+        ],
         // Ignore these paths in the action
-        ignoredActionPaths: ['payload.student.profileImage', 'meta.arg.student.profileImage', 'meta.arg.logo', 'payload.logo'],
+        ignoredActionPaths: ['payload.student.profileImage', 'meta.arg.student.profileImage', 'meta.arg.data.profileImage', 'payload.profileImage', 'meta.arg.logo', 'payload.logo'],
       },
     }),
 });

@@ -8,6 +8,7 @@ import Sidebar from "./components/mainComponents/Sidebar";
 import Header from "./components/mainComponents/Header";
 import { ReduxProvider } from "./components/ReduxProvider"; // Import ReduxProvider
 import AuthGuard from "./components/auth/AuthGuard";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -25,6 +26,7 @@ export default function RootLayout({ children }) {
       <body className="flex h-screen bg-background">
         <ReduxProvider> {/* Wrap the content with ReduxProvider */}
           <AuthGuard>
+            <Toaster position="top-center" reverseOrder={false} />
             {isLoginPage ? (
               <main className="w-full h-full">{children}</main>
             ) : (
