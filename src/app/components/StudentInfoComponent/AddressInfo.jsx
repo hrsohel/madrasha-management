@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import { updateStudentFullDetails } from "@/services/studentService";
 import { divisions, getDistrictsByDivision, getUpazilasByDistrict, getUnionsByUpazila } from "../add-student/locationData";
+import toast from "react-hot-toast";
+import ConfirmationModal from "@/app/components/ConfirmationModal";
 
 // Helper to find ID by bn_name
 const getIdFromBnName = (dataArray, bnName) => {
@@ -11,6 +13,7 @@ const getIdFromBnName = (dataArray, bnName) => {
 
 export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSameAddress, setIsSameAddress] = useState(address?.isSameAsPresent || false);
 
@@ -149,9 +152,11 @@ export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    if (!confirm("আপনি কি নিশ্চিত যে আপনি এই ঠিকানা আপডেট করতে চান?")) return;
+  const handleSave = () => {
+    setIsConfirmOpen(true);
+  };
 
+  const confirmUpdate = async () => {
     setLoading(true);
     try {
       const payload = {
@@ -162,12 +167,14 @@ export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
       };
 
       await updateStudentFullDetails(studentId, payload);
-      alert("ঠিকানা সফলভাবে আপডেট করা হয়েছে!");
+      toast.success("ঠিকানা সফলভাবে আপডেট করা হয়েছে!");
       if (onUpdateSuccess) onUpdateSuccess();
       setIsModalOpen(false);
+      setIsConfirmOpen(false);
     } catch (error) {
       console.error("Address update failed:", error);
-      alert("আপডেট ব্যর্থ হয়েছে।");
+      toast.error("আপডেট ব্যর্থ হয়েছে।");
+      setIsConfirmOpen(false);
     } finally {
       setLoading(false);
     }
@@ -469,6 +476,14 @@ export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmUpdate}
+        title="ঠিকানা হালনাগাদ নিশ্চিতকরণ"
+        message="আপনি কি নিশ্চিত যে আপনি এই ঠিকানা আপডেট করতে চান?"
+        loading={loading}
+      />
     </div>
   );
 }
