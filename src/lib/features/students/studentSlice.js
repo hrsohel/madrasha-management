@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authFetch } from '../../utils';
 
 const NEXT_PUBLIC_API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -33,7 +34,7 @@ export const addStudent = createAsyncThunk(
         }
       }
 
-      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/add-student`, {
+      const response = await authFetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/add-student`, {
         method: 'POST',
         body: formData, // No 'Content-Type' header needed for FormData; browser sets it automatically
       });
@@ -53,7 +54,7 @@ export const fetchAllStudents = createAsyncThunk(
   'students/fetchAllStudents',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get-all-students`);
+      const response = await authFetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get-all-students`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -70,7 +71,7 @@ export const fetchStudentById = createAsyncThunk(
   'students/fetchStudentById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get_student_with_guardian_address/${id}`);
+      const response = await authFetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/get_student_with_guardian_address/${id}`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -87,12 +88,33 @@ export const updateStudent = createAsyncThunk(
   'students/updateStudent',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/update-student/${id}`, {
+      const isFormData = data instanceof FormData;
+      let body = data;
+      let headers = {};
+
+      if (!isFormData) {
+        // Check if any field is a File object, if so, convert to FormData
+        const hasFile = Object.values(data).some(value => value instanceof File);
+
+        if (hasFile) {
+          const formData = new FormData();
+          for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+              formData.append(key, data[key]);
+            }
+          }
+          body = formData;
+          // headers should be empty for FormData to let browser set boundary
+        } else {
+          headers['Content-Type'] = 'application/json';
+          body = JSON.stringify(data);
+        }
+      }
+
+      const response = await authFetch(`${NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/update-student/${id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        headers: headers,
+        body: body,
       });
       const responseData = await response.json();
       if (!response.ok) {

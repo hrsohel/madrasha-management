@@ -1,10 +1,19 @@
-import React from 'react';
+import { categoryData } from './categoryFile';
 
 export default function AddStudentform4({ setPagination, formData, onDataChange }) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     onDataChange({ [name]: value });
   };
+
+  // Helper to get values by category name
+  const getCategoryValues = (categoryName) => {
+    const category = categoryData.find(c => c.category === categoryName);
+    return category ? category.values : [];
+  };
+
+  const oldMadrasaClassOptions = formData.oldMadrasaDivision ? getCategoryValues(formData.oldMadrasaDivision) : [];
+
 
   return (
     <div className="shadow-xl overflow-hidden w-[60%] mx-auto">
@@ -32,12 +41,26 @@ export default function AddStudentform4({ setPagination, formData, onDataChange 
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">
+                বিভাগ
+              </label>
+              <select name="oldMadrasaDivision" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.oldMadrasaDivision || ''} onChange={handleChange}>
+                <option value="">নির্বাচন করুন</option>
+                <option value="নাজেরা">নাজেরা</option>
+                <option value="হিফজ">হিফজ</option>
+                <option value="নূরানী">নূরানী</option>
+                <option value="কিতাব">কিতাব</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2">
                 সর্বশেষ উত্তীর্ণ ক্লাস
               </label>
               <select name="oldMadrasaClass" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.oldMadrasaClass || ''} onChange={handleChange}>
                 <option value="">নির্বাচন করুন</option>
-                <option value="Hifz Completed">হিফজ সম্পন্ন</option>
-                <option value="Nazera Completed">নাজেরা সম্পন্ন</option>
+                {oldMadrasaClassOptions.map((option, index) => (
+                  <option key={index} value={option}>{option}</option>
+                ))}
               </select>
             </div>
 

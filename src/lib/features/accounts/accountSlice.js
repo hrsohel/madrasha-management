@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authFetch } from '../../utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -6,7 +7,7 @@ export const addIncome = createAsyncThunk(
   'accounts/addIncome',
   async (incomeData, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/add-income`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/add-income`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -28,7 +29,7 @@ export const fetchAllIncomes = createAsyncThunk(
   'accounts/fetchAllIncomes',
   async (page = 1, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/get-all-incomes?page=${page}`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/get-all-incomes?page=${page}`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -44,7 +45,7 @@ export const addExpense = createAsyncThunk(
   'accounts/addExpense',
   async (expenseData, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/add-expense`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/add-expense`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +71,7 @@ export const fetchAllExpenses = createAsyncThunk(
 
     try {
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/get-all-expenses?page=${page}`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/get-all-expenses?page=${page}`);
 
       const data = await response.json();
 
@@ -114,7 +115,7 @@ export const addDonor = createAsyncThunk(
 
 
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/add-donor`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/add-donor`, {
 
 
 
@@ -202,7 +203,7 @@ export const fetchAllDonors = createAsyncThunk(
 
 
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/accounts/get-all-donors`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/accounts/get-all-donors`);
 
 
 
@@ -270,7 +271,7 @@ export const fetchFinancialSummary = createAsyncThunk(
 
 
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/financials/summary?year=${year}`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/financials/summary?year=${year}`);
 
 
 

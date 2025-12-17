@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authFetch } from '../../utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -7,7 +8,7 @@ export const fetchGuardianById = createAsyncThunk(
   'guardians/fetchGuardianById',
   async (id, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/guardians/get-single-guardian/${id}`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/guardians/get-single-guardian/${id}`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -24,7 +25,7 @@ export const updateGuardian = createAsyncThunk(
   'guardians/updateGuardian',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/guardians/update-guardian/${id}`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/guardians/update-guardian/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

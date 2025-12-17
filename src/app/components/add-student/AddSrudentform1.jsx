@@ -12,12 +12,18 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
       if (!formData.uid) {
         try {
           // Add timestamp to prevent caching
+          const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+          const headers = {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+          };
+          if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+          }
+
           const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/students/get-id?t=${new Date().getTime()}`, {
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache',
-              'Expires': '0',
-            }
+            headers: headers
           });
           if (response.data.success) {
             const { id, seq } = response.data.data;

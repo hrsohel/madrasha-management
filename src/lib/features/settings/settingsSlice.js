@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { authFetch } from '../../utils';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -6,7 +7,7 @@ export const fetchMadrasaSettings = createAsyncThunk(
   'settings/fetchMadrasaSettings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`);
+      const response = await authFetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`);
       const data = await response.json();
       if (!response.ok) {
         return rejectWithValue(data);
@@ -43,7 +44,7 @@ export const updateMadrasaSettings = createAsyncThunk(
         formData.append('logo', settingsData.logo);
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/students/madrasa-settings`, {
         method: 'PATCH',
         body: formData,
       });
@@ -63,7 +64,7 @@ export const addOrUpdateFee = createAsyncThunk(
   'settings/addOrUpdateFee',
   async ({ feeName, amount }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export const removeFee = createAsyncThunk(
   'settings/removeFee',
   async (feeName, { rejectWithValue }) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees/${feeName}`, {
+      const response = await authFetch(`${API_BASE_URL}/api/v1/students/madrasa-settings/fees/${feeName}`, {
         method: 'DELETE',
       });
 

@@ -79,3 +79,28 @@ export function translateToBangla(value) {
   // Return original if no translation found
   return value;
 }
+
+export function getAuthToken() {
+  if (typeof window !== 'undefined') {
+    return localStorage.getItem('token');
+  }
+  return null;
+}
+
+export async function authFetch(url, options = {}) {
+  const token = getAuthToken();
+  const headers = {
+    ...options.headers,
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const config = {
+    ...options,
+    headers,
+  };
+
+  return fetch(url, config);
+}

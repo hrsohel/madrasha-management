@@ -6,6 +6,46 @@ export default function AddStudentForm2({ setPagination, formData, onDataChange 
     onDataChange({ [name]: value });
   };
 
+  // Determine initial active relation based on existing data
+  const getInitialRelation = () => {
+    const rel = formData.guardianRelation;
+    if (['Father', 'Mother'].includes(rel)) return rel;
+    if (rel && rel.length > 0) return 'Other';
+    return '';
+  };
+
+  const [activeRelation, setActiveRelation] = React.useState(getInitialRelation);
+
+  const handleRelationChange = (e) => {
+    const value = e.target.value;
+    setActiveRelation(value);
+
+    if (value === 'Father') {
+      onDataChange({
+        guardianRelation: 'Father',
+        guardianName: formData.fatherName,
+        guardianPhone: formData.fatherPhone,
+        guardianNID: formData.fatherNID
+      });
+    } else if (value === 'Mother') {
+      onDataChange({
+        guardianRelation: 'Mother',
+        guardianName: formData.motherName,
+        guardianPhone: formData.motherPhone,
+        guardianNID: formData.motherNID
+      });
+    } else if (value === 'Other') {
+      onDataChange({
+        guardianRelation: '', // Clear to let user type
+        guardianName: '',
+        guardianPhone: '',
+        guardianNID: ''
+      });
+    } else {
+      onDataChange({ guardianRelation: value });
+    }
+  };
+
   return (
     <div className="bg-[#F7F7F7] rounded-lg shadow-xl overflow-hidden w-[60%] mx-auto">
       <div className="text-white p-6">
@@ -99,12 +139,29 @@ export default function AddStudentForm2({ setPagination, formData, onDataChange 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">সম্পর্ক</label>
-              <select name="guardianRelation" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.guardianRelation || ''} onChange={handleChange}>
-                <option value="">নির্বাচন করুন</option>
-                <option value="Father">পিতা</option>
-                <option value="Mother">মাতা</option>
-                <option value="Other">অন্যান্য</option>
-              </select>
+              <div className="space-y-2">
+                <select
+                  name="guardianRelationSelect"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                  value={activeRelation}
+                  onChange={handleRelationChange}
+                >
+                  <option value="">নির্বাচন করুন</option>
+                  <option value="Father">পিতা</option>
+                  <option value="Mother">মাতা</option>
+                  <option value="Other">অন্যান্য</option>
+                </select>
+                {activeRelation === 'Other' && (
+                  <input
+                    type="text"
+                    name="guardianRelation"
+                    placeholder="সম্পর্ক লিখুন (যেমন: চাচা)"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg animate-in fade-in slide-in-from-top-2"
+                    value={formData.guardianRelation || ''}
+                    onChange={handleChange}
+                  />
+                )}
+              </div>
             </div>
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">নাম</label>

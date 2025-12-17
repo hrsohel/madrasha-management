@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { authFetch } from "../../utils";
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -22,6 +23,31 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (passwordData, { rejectWithValue }) => {
+    try {
+      const response = await authFetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/users/change-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(passwordData),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        return rejectWithValue(data);
+      }
+      return data;
+    } catch (error) {
+      return rejectWithValue({ message: error.message });
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
@@ -29,6 +55,8 @@ const authSlice = createSlice({
     token: null,
     loading: false,
     error: null,
+    passwordChangeSuccess: false,
+    passwordChangeError: null,
   },
   reducers: {
     logout: (state) => {
@@ -48,6 +76,10 @@ const authSlice = createSlice({
           state.user = user;
         }
       }
+    },
+    resetPasswordChangeStatus: (state) => {
+      state.passwordChangeSuccess = false;
+      state.passwordChangeError = null;
     },
   },
   extraReducers: (builder) => {
@@ -69,9 +101,24 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload.message;
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true;
+        state.passwordChangeError = null;
+        state.passwordChangeSuccess = false;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.passwordChangeSuccess = true;
+        state.passwordChangeError = null;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.passwordChangeError = action.payload?.message || "Password change failed";
+        state.passwordChangeSuccess = false;
       });
   },
 });
 
-export const { logout, checkAuth } = authSlice.actions;
+export const { logout, checkAuth, resetPasswordChangeStatus } = authSlice.actions;
 export default authSlice.reducer;

@@ -51,8 +51,12 @@ export default function StudentInfo({ student }) {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === "profileImage") {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleUpdate = async (e) => {
@@ -79,6 +83,10 @@ export default function StudentInfo({ student }) {
       section: formData.section,
       division: formData.division,
       session: formData.session,
+    }
+
+    if (formData.profileImage) {
+      dataToUpdate.profileImage = formData.profileImage;
     }
 
 
@@ -279,6 +287,20 @@ export default function StudentInfo({ student }) {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                </div>
+
+                {/* প্রোফাইল ইমেজ Upload */}
+                <div>
+                  <label className="block text-sm text-gray-700 mb-2">
+                    প্রোফাইল ইমেজ
+                  </label>
+                  <input
+                    type="file"
+                    name="profileImage"
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    accept="image/*"
                   />
                 </div>
 
