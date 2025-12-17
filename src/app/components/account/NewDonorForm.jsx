@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDonor, resetDonorStatus } from '@/lib/features/accounts/accountSlice'; // Assuming alias is configured
+import toast from 'react-hot-toast';
 
 const NewDonorForm = ({ setShowAddForm }) => {
   const [donorName, setDonorName] = useState('');
@@ -14,7 +15,7 @@ const NewDonorForm = ({ setShowAddForm }) => {
 
   useEffect(() => {
     if (success) {
-      alert('Donor added successfully!'); // Or use a more sophisticated toast notification
+      toast.success('Donor added successfully!');
       setDonorName('');
       setAmountPerStep('');
       setPhone('');
@@ -23,7 +24,7 @@ const NewDonorForm = ({ setShowAddForm }) => {
       setShowAddForm(false);
     }
     if (error) {
-      alert(`Error: ${error.message || error}`); // Or use a more sophisticated toast notification
+      toast.error(`Error: ${error.message || error}`);
       dispatch(resetDonorStatus());
     }
   }, [success, error, dispatch, setShowAddForm]);

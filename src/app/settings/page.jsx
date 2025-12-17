@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMadrasaSettings, updateMadrasaSettings, resetSettingsStatus } from '@/lib/features/settings/settingsSlice';
+import toast from 'react-hot-toast';
 
 export default function Page() {
     const dispatch = useDispatch();
@@ -35,11 +36,11 @@ export default function Page() {
 
     useEffect(() => {
         if (success) {
-            alert('Settings updated successfully!');
+            toast.success('Settings updated successfully!');
             dispatch(resetSettingsStatus());
         }
         if (error) {
-            alert(`Error: ${error.message || 'Failed to update settings'}`);
+            toast.error(`Error: ${error.message || 'Failed to update settings'}`);
             dispatch(resetSettingsStatus());
         }
     }, [success, error, dispatch]);

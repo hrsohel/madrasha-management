@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
 import { updateStudentFullDetails } from "@/services/studentService";
+import toast from "react-hot-toast";
+import ConfirmationModal from "@/app/components/ConfirmationModal";
 
 export default function GuardianInfo({ oldMadrasaInfo, studentId, onUpdateSuccess }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [guardianInfo, setGuardianInfo] = useState({
@@ -22,9 +25,11 @@ export default function GuardianInfo({ oldMadrasaInfo, studentId, onUpdateSucces
     setGuardianInfo(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = async () => {
-    if (!confirm("আপনি কি নিশ্চিত যে আপনি এই তথ্য আপডেট করতে চান?")) return;
+  const handleSave = () => {
+    setIsConfirmOpen(true);
+  };
 
+  const confirmUpdate = async () => {
     setLoading(true);
     try {
       const payload = {
@@ -35,12 +40,14 @@ export default function GuardianInfo({ oldMadrasaInfo, studentId, onUpdateSucces
       };
 
       await updateStudentFullDetails(studentId, payload);
-      alert("তথ্য সফলভাবে আপডেট করা হয়েছে!");
+      toast.success("তথ্য সফলভাবে আপডেট করা হয়েছে!");
       if (onUpdateSuccess) onUpdateSuccess();
       setIsModalOpen(false);
+      setIsConfirmOpen(false);
     } catch (error) {
       console.error("Update failed:", error);
-      alert("আপডেট ব্যর্থ হয়েছে।");
+      toast.error("আপডেট ব্যর্থ হয়েছে।");
+      setIsConfirmOpen(false);
     } finally {
       setLoading(false);
     }
@@ -158,6 +165,14 @@ export default function GuardianInfo({ oldMadrasaInfo, studentId, onUpdateSucces
           </div>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmUpdate}
+        title="তথ্য হালনাগাদ নিশ্চিতকরণ"
+        message="আপনি কি নিশ্চিত যে আপনি এই তথ্য আপডেট করতে চান?"
+        loading={loading}
+      />
     </div>
   );
 }

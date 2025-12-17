@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import React, { useState, useEffect } from 'react'
+import toast from 'react-hot-toast'
 import { useSelector, useDispatch } from 'react-redux'
 import { addStudent, resetAddStudentStatus, clearStudentFormData } from '../../../lib/features/students/studentSlice'
 import { translateToBangla } from '../../../lib/utils'
@@ -40,6 +41,39 @@ export default function Reciepe({ setNavigateToReciepe }) {
             setNavigateToReciepe(2); // Navigate on successful API call
         } catch (err) {
             setLocalError(err.message || JSON.stringify(err));
+        } finally {
+            setLocalLoading(false);
+        }
+    };
+
+    const handleSaveDraft = async () => {
+        if (!studentFormData) {
+            setLocalError("Student data is missing. Please go back and fill the form.");
+            return;
+        }
+
+        setLocalLoading(true);
+        setLocalError(null);
+
+        try {
+            const { saveDraftStudent } = await import('@/services/studentService');
+
+            // Prepare payload matching backend structure
+            const draftPayload = {
+                ...studentFormData,
+                // Map frontend 'madrasa' object to backend 'oldMadrasaInfo' array
+                oldMadrasaInfo: studentFormData.madrasa ? [studentFormData.madrasa] : [],
+                status: 'draft'
+            };
+
+            await saveDraftStudent(draftPayload);
+            toast.success("ড্রাফট সফলভাবে সংরক্ষণ করা হয়েছে!");
+            dispatch(clearStudentFormData());
+            // Optionally navigate to drafts page or home
+            window.location.href = '/all-students'; // Or wherever you want to redirect
+        } catch (err) {
+            setLocalError(err.message || "ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
+            toast.error("ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
         } finally {
             setLocalLoading(false);
         }
@@ -156,8 +190,12 @@ export default function Reciepe({ setNavigateToReciepe }) {
                 </div>
             </div>
             <div className="flex items-center justify-between mt-4 px-6 print:hidden">
-                <button className="w-full sm:w-auto px-10 py-2 text-blue-600 font-bold text-lg border-2 border-blue-500 rounded-lg bg-[#DFF2FF] hover:bg-blue-50 transition">
-                    ড্রাফট সেভ করুন
+                <button
+                    onClick={handleSaveDraft}
+                    disabled={localLoading}
+                    className="w-full sm:w-auto px-10 py-2 text-blue-600 font-bold text-lg border-2 border-blue-500 rounded-lg bg-[#DFF2FF] hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {localLoading ? 'সংরক্ষণ হচ্ছে...' : 'ড্রাফট সেভ করুন'}
                 </button>
 
                 <button onClick={handleSubmit} className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md" disabled={localLoading}>
