@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addIncome, resetIncomeStatus } from '@/lib/features/accounts/accountSlice';
+import toast from 'react-hot-toast';
 
 const NewIncomeForm = ({ setShowAddForm }) => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ const NewIncomeForm = ({ setShowAddForm }) => {
 
   useEffect(() => {
     if (success) {
-      alert('Income added successfully!');
+      toast.success('Income added successfully!');
       setFormData({
         roshidNo: '',
         donorName: '',
@@ -32,7 +33,7 @@ const NewIncomeForm = ({ setShowAddForm }) => {
       setShowAddForm(false);
     }
     if (error) {
-      alert(`Failed to add income: ${error.message || JSON.stringify(error)}`);
+      toast.error(`Failed to add income: ${error.message || JSON.stringify(error)}`);
       dispatch(resetIncomeStatus());
     }
   }, [success, error, dispatch, setShowAddForm]);

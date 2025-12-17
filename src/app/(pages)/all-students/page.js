@@ -18,6 +18,7 @@ import { saveAs } from "file-saver";
 import ClientOnly from "@/app/components/ClientOnly";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchAllStudents, updateStudent } from "@/lib/features/students/studentSlice";
+import toast from 'react-hot-toast';
 
 // shadcn SELECT
 import {
@@ -165,11 +166,11 @@ export default function DashboardPage() {
 
   const handleSubmit = async () => {
     if (selectedStudents.length === 0) {
-      alert("Please select students to update.");
+      toast.error("Please select students to update.");
       return;
     }
     if (!selectedOption && !['activate', 'archive'].includes(activeModal)) {
-      alert("Please select a value to update.");
+      toast.error("Please select a value to update.");
       return;
     }
 
@@ -179,11 +180,11 @@ export default function DashboardPage() {
       await Promise.all(
         selectedStudents.map(id => dispatch(updateStudent({ id, data: payload })).unwrap())
       );
-      alert("Students updated successfully!");
+      toast.success("Students updated successfully!");
       setSelectedStudents([]);
       closeModal();
     } catch (err) {
-      alert(`Failed to update students: ${err.message || JSON.stringify(err)}`);
+      toast.error(`Failed to update students: ${err.message || JSON.stringify(err)}`);
     }
   };
 
@@ -341,9 +342,9 @@ export default function DashboardPage() {
         <div className="h-6 w-1 bg-[#92A09A] mx-4"></div>
 
         <div className="flex items-center gap-3">
-          <a href="#" className="text-blue-600 font-medium">
+          <Link href="/drafts" className="text-blue-600 font-medium">
             ২ ড্রাফট
-          </a>
+          </Link>
 
           <Button
             variant="outline"

@@ -13,25 +13,26 @@ import NewIncomeForm from '@/app/components/account/NewIncomeForm'
 import YearlyFinancialReport from '@/app/components/account/YearlyFinancialReport'
 import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
+import toast from 'react-hot-toast'
 
 export default function Page() {
   const [showHistory, setShowHistory] = useState(false)
   const topMenu = ["সাধারণ হিসাব", "আয়ের রশিদ", "ব্যয়ের রশিদ", "বাৎসরিক হিসাব", "দাতা ব্যবস্থাপনা"]
   const [switchSections, setSwitchSections] = useState(1)
   const [showAddForm, setShowAddForm] = useState(false)
-  
+
   const { incomes, expenses, donors, financialSummary } = useSelector(state => state.accounts);
 
   const downloadCSV = (data, filename) => {
     if (!data || data.length === 0) {
-      alert("No data to export!");
+      toast.error("No data to export!");
       return;
     }
-  
+
     const headers = Object.keys(data[0]);
     const csvContent = [
       headers.join(','),
-      ...data.map(row => 
+      ...data.map(row =>
         headers.map(header => {
           let cell = row[header] === null || row[header] === undefined ? '' : row[header];
           cell = String(cell);
@@ -42,7 +43,7 @@ export default function Page() {
         }).join(',')
       )
     ].join('\n');
-  
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -91,7 +92,7 @@ export default function Page() {
           ];
           downloadCSV(summaryData, 'yearly_financial_report');
         } else {
-          alert("Financial summary data is not available.");
+          toast.error("Financial summary data is not available.");
         }
         break;
       case 5:
@@ -99,7 +100,7 @@ export default function Page() {
         downloadCSV(donors, 'donors_report');
         break;
       default:
-        alert("No section selected for export.");
+        toast.error("No section selected for export.");
     }
   };
 

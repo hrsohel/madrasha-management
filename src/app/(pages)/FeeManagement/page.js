@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMadrasaSettings, addOrUpdateFee, removeFee } from '@/lib/features/settings/settingsSlice';
 import { Save, Loader2, Plus, Trash2, Edit } from 'lucide-react';
+import toast from 'react-hot-toast';
+import ConfirmationModal from '@/app/components/ConfirmationModal';
 
 // Convert English numbers to Bangla
 const toBanglaNumber = (num) => {
@@ -23,8 +25,8 @@ export default function FeeManagementPage() {
   const [editingFee, setEditingFee] = useState(null);
   const [editAmount, setEditAmount] = useState('');
 
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [deleteFeeName, setDeleteFeeName] = useState(null);
 
   // Fetch madrasa settings on mount
   useEffect(() => {
@@ -34,9 +36,7 @@ export default function FeeManagementPage() {
   // Show success message temporarily
   useEffect(() => {
     if (success) {
-      setShowSuccess(true);
-      const timer = setTimeout(() => setShowSuccess(false), 3000);
-      return () => clearTimeout(timer);
+      // toast.success('Operation successful'); // Success handled in handlers for better messages
     }
   }, [success]);
 
@@ -47,7 +47,7 @@ export default function FeeManagementPage() {
         feeName: newFeeName.trim(),
         amount: parseInt(newFeeAmount)
       }));
-      setSuccessMessage(`${newFeeName} ফি যোগ/আপডেট করা হয়েছে`);
+      toast.success(`${newFeeName} ফি যোগ/আপডেট করা হয়েছে`);
       setNewFeeName('');
       setNewFeeAmount('');
     }
@@ -59,16 +59,23 @@ export default function FeeManagementPage() {
         feeName,
         amount: parseInt(editAmount)
       }));
-      setSuccessMessage(`${feeName} ফি আপডেট করা হয়েছে`);
+      toast.success(`${feeName} ফি আপডেট করা হয়েছে`);
       setEditingFee(null);
       setEditAmount('');
     }
   };
 
-  const handleDeleteFee = (feeName) => {
-    if (confirm(`আপনি কি নিশ্চিত ${feeName} ফি মুছে ফেলতে চান?`)) {
-      dispatch(removeFee(feeName));
-      setSuccessMessage(`${feeName} ফি মুছে ফেলা হয়েছে`);
+  const handleDeleteClick = (feeName) => {
+    setDeleteFeeName(feeName);
+    setIsConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteFeeName) {
+      dispatch(removeFee(deleteFeeName));
+      toast.success(`${deleteFeeName} ফি মুছে ফেলা হয়েছে`);
+      setIsConfirmOpen(false);
+      setDeleteFeeName(null);
     }
   };
 
@@ -91,15 +98,7 @@ export default function FeeManagementPage() {
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">ফি ম্যানেজমেন্ট</h1>
 
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg flex items-center">
-            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-            </svg>
-            {successMessage || 'সফলভাবে আপডেট করা হয়েছে!'}
-          </div>
-        )}
+        {/* Success Message Removed - Handled by Toast */}
 
         {/* Error Message */}
         {error && (
@@ -208,7 +207,7 @@ export default function FeeManagementPage() {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteFee(feeName)}
+                        onClick={() => handleDeleteClick(feeName)}
                         className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
                         disabled={loading}
                         title="মুছে ফেলুন"
@@ -246,6 +245,15 @@ export default function FeeManagementPage() {
           </div>
         )}
       </div>
+      <ConfirmationModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={confirmDelete}
+        title="ফি মুছুন"
+        message={`আপনি কি নিশ্চিত আপনি এই ফি মুছে ফেলতে চান?`}
+        confirmText="মুছে ফেলুন"
+        cancelText="বাতিল"
+      />
     </div>
   );
 }
