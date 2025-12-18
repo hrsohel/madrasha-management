@@ -14,6 +14,16 @@ import { addStudent } from "@/lib/features/students/studentSlice";
 import { updateDraftStudent } from "@/services/studentService";
 import StudentAdmissionReceipt from "@/app/components/StudentInfoComponent/StudentAdmissionReceipt";
 
+import { EditStudentModal } from "@/app/components/StudentInfoComponent/EditStudentModal";
+
+import AcademicYearInfo from "@/app/components/StudentInfoComponent/AcademicYearInfo";
+import AddressInfo from "@/app/components/StudentInfoComponent/AddressInfo";
+import FamilyInfo from "@/app/components/StudentInfoComponent/FamilyInfo";
+import GuardianInfo from "@/app/components/StudentInfoComponent/GuardianInfo";
+import StudentInfo from "@/app/components/StudentInfoComponent/StudentInfo";
+import AdmissionExamInfo from "@/app/components/StudentInfoComponent/AdmissionExamInfo";
+import { Printer } from "lucide-react";
+
 export default function DraftViewPage() {
     const { id } = useParams();
     const router = useRouter();
@@ -21,13 +31,11 @@ export default function DraftViewPage() {
     const { madrasaSettings } = useSelector((state) => state.settings);
 
     const [draft, setDraft] = useState(null);
-    const [editedDraft, setEditedDraft] = useState(null);
-    const [isEditing, setIsEditing] = useState(false);
     const [loading, setLoading] = useState(true);
     const [confirming, setConfirming] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState(null);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     useEffect(() => {
         fetchDraftDetails();
@@ -46,7 +54,6 @@ export default function DraftViewPage() {
 
             if (response.data.success && response.data.data) {
                 setDraft(response.data.data);
-                setEditedDraft(response.data.data);
             } else {
                 setError("Draft not found");
             }
@@ -54,61 +61,6 @@ export default function DraftViewPage() {
             setError(err.message || "Failed to load draft");
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleEditToggle = () => {
-        if (isEditing) {
-            setEditedDraft(draft); // Reset changes if cancelling
-        }
-        setIsEditing(!isEditing);
-    };
-
-    const handleInputChange = (section, field, value) => {
-        setEditedDraft(prev => {
-            if (section === 'student') {
-                return { ...prev, [field]: value };
-            }
-
-            const sectionKey = section === 'address' ? 'addresse' :
-                section === 'madrasa' ? 'oldMadrasaInfo' : section;
-
-            const currentSectionArray = prev[sectionKey] || [];
-            const currentSection = Array.isArray(currentSectionArray) ? (currentSectionArray[0] || {}) : (currentSectionArray || {});
-            const updatedSection = { ...currentSection, [field]: value };
-
-            return {
-                ...prev,
-                [sectionKey]: [updatedSection]
-            };
-        });
-    };
-
-    const handleFeeChange = (field, value) => {
-        setEditedDraft(prev => {
-            const currentFees = Array.isArray(prev.fees) ? prev.fees[0] : (prev.fees || {});
-            return {
-                ...prev,
-                fees: {
-                    ...currentFees,
-                    [field]: value
-                }
-            };
-        });
-    };
-
-    const handleSaveDraftUpdate = async () => {
-        setIsSaving(true);
-        try {
-            await updateDraftStudent(id, editedDraft);
-            setDraft(editedDraft);
-            setIsEditing(false);
-            toast.success("ড্রাফট আপডেট করা হয়েছে।");
-        } catch (err) {
-            console.error("Update failed:", err);
-            toast.error("আপডেট করতে ব্যর্থ হয়েছে।");
-        } finally {
-            setIsSaving(false);
         }
     };
 
@@ -186,232 +138,83 @@ export default function DraftViewPage() {
         return <div className="p-6 text-red-500">Error: {error || "Draft not found"}</div>;
     }
 
+    // Extract relevant data for sub-components (similar to StudentDetailsPage)
+    const studentData = {
+        ...draft,
+        guardian: draft.guardian ? draft.guardian[0] : null,
+        address: draft.addresse ? draft.addresse[0] : null,
+        admissionExamInfo: draft.oldMadrasaInfo ? draft.oldMadrasaInfo[0] : null,
+        fees: Array.isArray(draft.fees) ? draft.fees[0] : (draft.fees || {}),
+    };
+
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div className="p-6 bg-gray-50 min-h-screen printable-content">
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 print-button">
                 <div className="flex items-center gap-4">
                     <Link href="/drafts" className="flex items-center gap-2 text-gray-600 hover:text-gray-800">
                         <ArrowLeft className="w-5 h-5" />
                         <span className="font-medium">ফিরে যান</span>
                     </Link>
                     <div className="h-6 w-[1px] bg-gray-300"></div>
-                    <h1 className="text-xl font-bold text-[#246545]">ড্রাফট রিভিউ ও এডিট</h1>
+                    <h1 className="text-xl font-bold text-[#246545]">ড্রাফট শিক্ষার্থীর পূর্ণাঙ্গ তথ্য</h1>
                 </div>
 
                 <div className="flex gap-3">
                     <button
-                        onClick={handleEditToggle}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${isEditing ? 'bg-gray-200 text-gray-700' : 'bg-blue-50 text-blue-600 border border-blue-200 hover:bg-blue-100'
-                            }`}
+                        onClick={() => setIsEditModalOpen(true)}
+                        className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2"
                     >
-                        {isEditing ? <><X className="w-4 h-4" /> বাতিল</> : <><Edit2 className="w-4 h-4" /> এডিট করুন</>}
+                        <Edit2 className="w-5 h-5" />
+                        তথ্য সম্পাদনা করুন
                     </button>
-                    {isEditing && (
-                        <button
-                            onClick={handleSaveDraftUpdate}
-                            disabled={isSaving}
-                            className="flex items-center gap-2 px-4 py-2 bg-[#2B7752] text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
-                        >
-                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            সংরক্ষণ করুন
-                        </button>
-                    )}
+                    <button
+                        onClick={() => window.print()}
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2"
+                    >
+                        <Printer className="w-5 h-5" />
+                        প্রিন্ট করুন
+                    </button>
                 </div>
             </div>
 
-            {isEditing ? (
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 space-y-10">
-                    {/* Student Basic Info */}
-                    <section>
-                        <h2 className="text-lg font-bold text-gray-800 mb-6 pb-2 border-b">শিক্ষার্থীর মৌলিক তথ্য</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">নাম</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.name || ''}
-                                    onChange={(e) => handleInputChange('student', 'name', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">শ্রেণী</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.class || ''}
-                                    onChange={(e) => handleInputChange('student', 'class', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">রোল</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.roll || ''}
-                                    onChange={(e) => handleInputChange('student', 'roll', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">জন্ম তারিখ</label>
-                                <input
-                                    type="date"
-                                    value={editedDraft.dob || ''}
-                                    onChange={(e) => handleInputChange('student', 'dob', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">ফোন</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.phone || ''}
-                                    onChange={(e) => handleInputChange('student', 'phone', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500"
-                                />
-                            </div>
-                        </div>
-                    </section>
+            <div className="space-y-0">
+                <StudentInfo student={studentData} onUpdateSuccess={fetchDraftDetails} isDraft={true} />
+                {studentData.address && <AddressInfo address={studentData.address} studentId={studentData._id} onUpdateSuccess={fetchDraftDetails} isDraft={true} />}
+                {studentData.guardian && <FamilyInfo guardian={studentData.guardian} studentId={studentData._id} onUpdateSuccess={fetchDraftDetails} isDraft={true} />}
+                {studentData.admissionExamInfo && <GuardianInfo oldMadrasaInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={fetchDraftDetails} isDraft={true} />}
+                {studentData.admissionExamInfo && <AcademicYearInfo oldMadrasaInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={fetchDraftDetails} isDraft={true} />}
+                {studentData.admissionExamInfo && <AdmissionExamInfo admissionExamInfo={studentData.admissionExamInfo} studentId={studentData._id} onUpdateSuccess={fetchDraftDetails} isDraft={true} />}
 
-                    {/* Guardian Info */}
-                    <section>
-                        <h2 className="text-lg font-bold text-gray-800 mb-6 pb-2 border-b">অভিভাবকের তথ্য</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">পিতার নাম</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.guardian?.[0]?.fatherName || ''}
-                                    onChange={(e) => handleInputChange('guardian', 'fatherName', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">মাতার নাম</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.guardian?.[0]?.motherName || ''}
-                                    onChange={(e) => handleInputChange('guardian', 'motherName', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">অভিভাবকের নাম</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.guardian?.[0]?.guardianName || ''}
-                                    onChange={(e) => handleInputChange('guardian', 'guardianName', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">অভিভাবকের ফোন</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.guardian?.[0]?.guardianPhone || ''}
-                                    onChange={(e) => handleInputChange('guardian', 'guardianPhone', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Address Info */}
-                    <section>
-                        <h2 className="text-lg font-bold text-gray-800 mb-6 pb-2 border-b">বর্তমান ঠিকানা</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">বিভাগ</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.addresse?.[0]?.presentDivision || ''}
-                                    onChange={(e) => handleInputChange('address', 'presentDivision', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">জেলা</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.addresse?.[0]?.presentDistrict || ''}
-                                    onChange={(e) => handleInputChange('address', 'presentDistrict', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">উপজেলা</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.addresse?.[0]?.presentUpazila || ''}
-                                    onChange={(e) => handleInputChange('address', 'presentUpazila', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1">গ্রাম/মহল্লা</label>
-                                <input
-                                    type="text"
-                                    value={editedDraft.addresse?.[0]?.presentVillage || ''}
-                                    onChange={(e) => handleInputChange('address', 'presentVillage', e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                />
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Fees Info */}
-                    <section>
-                        <h2 className="text-lg font-bold text-gray-800 mb-6 pb-2 border-b">হিসাব ও ফি</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                            {Object.entries(madrasaSettings?.fees || {}).map(([key, defaultValue]) => (
-                                <div key={key}>
-                                    <label className="block text-sm font-medium text-gray-600 mb-1">{key}</label>
-                                    <input
-                                        type="number"
-                                        value={editedDraft.fees?.[0]?.[key] || ''}
-                                        onChange={(e) => handleFeeChange(key, e.target.value)}
-                                        className="w-full px-4 py-2 border rounded-lg"
-                                    />
-                                </div>
-                            ))}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-600 mb-1 text-red-600 font-bold">সাহায্য (ছাড়)</label>
-                                <input
-                                    type="number"
-                                    value={editedDraft.fees?.[0]?.helpAmount || 0}
-                                    onChange={(e) => handleFeeChange('helpAmount', e.target.value)}
-                                    className="w-full px-4 py-2 border border-red-200 rounded-lg text-red-600 font-bold"
-                                />
-                            </div>
-                        </div>
-                    </section>
+                {/* View Mode: Digital Receipt */}
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden print:no-shadow mt-10">
+                    <StudentAdmissionReceipt
+                        student={studentData}
+                        fees={studentData.fees}
+                        madrasaSettings={madrasaSettings}
+                    />
                 </div>
-            ) : (
-                <div className="space-y-8">
-                    {/* View Mode: Digital Receipt */}
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden print:no-shadow">
-                        <StudentAdmissionReceipt
-                            student={draft}
-                            guardian={draft.guardian?.[0] || {}}
-                            address={draft.addresse?.[0] || {}}
-                            fees={Array.isArray(draft.fees) ? draft.fees[0] : (draft.fees || {})}
-                            madrasaSettings={madrasaSettings}
-                        />
-                    </div>
 
-                    <div className="flex justify-center pb-12">
-                        <button
-                            onClick={() => setIsConfirmOpen(true)}
-                            disabled={confirming}
-                            className="px-16 py-4 bg-[#2B7752] text-white font-bold text-xl rounded-xl hover:bg-green-700 transition shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
-                        >
-                            {confirming ? <Loader2 className="animate-spin inline mr-2" /> : null}
-                            ভর্তি নিশ্চিত করুন
-                        </button>
-                    </div>
+                <div className="flex justify-center py-12 print-button">
+                    <button
+                        onClick={() => setIsConfirmOpen(true)}
+                        disabled={confirming}
+                        className="px-16 py-4 bg-[#2B7752] text-white font-bold text-xl rounded-xl hover:bg-green-700 transition shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                    >
+                        {confirming ? <Loader2 className="animate-spin inline mr-2" /> : null}
+                        ভর্তি নিশ্চিত করুন
+                    </button>
                 </div>
-            )}
+            </div>
+
+            {/* Edit Modal */}
+            <EditStudentModal
+                isOpen={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                studentData={draft}
+                onUpdateSuccess={fetchDraftDetails}
+                isDraft={true}
+            />
 
             <ConfirmationModal
                 isOpen={isConfirmOpen}
