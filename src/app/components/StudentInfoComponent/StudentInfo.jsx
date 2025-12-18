@@ -4,11 +4,14 @@ import Image from "next/image"; // Import Next.js Image component
 import profileImage from "../../../../public/studentprofile.jpg";
 import { useDispatch } from "react-redux";
 import { updateStudent, fetchStudentById } from "@/lib/features/students/studentSlice";
+import { updateDraftStudent } from "@/services/studentService";
+import toast from "react-hot-toast";
 
-export default function StudentInfo({ student }) {
+export default function StudentInfo({ student, onUpdateSuccess, isDraft = false }) {
   const [selectedAction, setSelectedAction] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({});
+  const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -91,11 +94,27 @@ export default function StudentInfo({ student }) {
 
 
     try {
-      await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
-      dispatch(fetchStudentById(studentId)); // Refetch student data to update UI
+      setLoading(true);
+      if (isDraft) {
+        // Backend update-draft expects flattened fields at root
+        await updateDraftStudent(studentId, { ...dataToUpdate, status: 'draft' });
+        toast.success("ড্রাফট সফলভাবে আপডেট করা হয়েছে!");
+      } else {
+        await dispatch(updateStudent({ id: studentId, data: dataToUpdate })).unwrap();
+        toast.success("তথ্য সফলভাবে আপডেট করা হয়েছে!");
+      }
+
+      if (onUpdateSuccess) {
+        onUpdateSuccess();
+      } else if (!isDraft) {
+        dispatch(fetchStudentById(studentId));
+      }
       setShowModal(false);
     } catch (error) {
       console.error("Failed to update student:", error);
+      toast.error("আপডেট ব্যর্থ হয়েছে।");
+    } finally {
+      setLoading(false);
     }
   };
 
