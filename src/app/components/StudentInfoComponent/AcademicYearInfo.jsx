@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
-import { updateStudentFullDetails } from "@/services/studentService";
+import { updateStudentFullDetails, updateDraftStudent } from "@/services/studentService";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/app/components/ConfirmationModal";
 
-export default function AcademicYearInfo({ oldMadrasaInfo, studentId, onUpdateSuccess }) {
+export default function AcademicYearInfo({ oldMadrasaInfo, studentId, onUpdateSuccess, isDraft = false }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,14 +38,19 @@ export default function AcademicYearInfo({ oldMadrasaInfo, studentId, onUpdateSu
   const confirmUpdate = async () => {
     setLoading(true);
     try {
-      const payload = {
-        oldMadrasaInfo: [{
-          ...oldMadrasaInfo,
-          ...madrasaInfo
-        }]
+      const mergedOldMadrasaInfo = {
+        ...oldMadrasaInfo,
+        ...madrasaInfo
       };
 
-      await updateStudentFullDetails(studentId, payload);
+      if (isDraft) {
+        // For drafts, send as a singular object 'oldMadrasaInfo' at root
+        await updateDraftStudent(studentId, { oldMadrasaInfo: mergedOldMadrasaInfo });
+      } else {
+        // For active students, send as an array 'oldMadrasaInfo'
+        await updateStudentFullDetails(studentId, { oldMadrasaInfo: [mergedOldMadrasaInfo] });
+      }
+
       toast.success("তথ্য সফলভাবে আপডেট করা হয়েছে!");
       if (onUpdateSuccess) onUpdateSuccess();
       setIsModalOpen(false);

@@ -1,9 +1,9 @@
 "use client";
-import logo from "../../../../public/Madrashalogo.png"; // Default logo
+
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchMadrasaSettings } from "@/lib/features/settings/settingsSlice";
-
+import logo from "../../../../public/SuperAdminLogo.png";
 import {
   LayoutDashboard,
   Database,
@@ -103,10 +103,11 @@ export default function Sidebar({ isOpen }) {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-emerald-200">
+      <div className="p-4 pl-6">
         <div className="flex items-center gap-2 text-xs text-emerald-700">
-          <div className="w-2 h-2 bg-emerald-600 rounded-full"></div>
-          <span>Software company</span>
+
+          <Image src={logo} alt="Logo" width={30} height={30} />
+          <p className="mt-2">© {new Date().getFullYear()} HudHudSoft.com</p>
         </div>
       </div>
     </aside>
