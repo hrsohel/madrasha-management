@@ -46,7 +46,7 @@ export default function Header({ onMenuClick }) {
     if (path.startsWith("/students/")) return "শিক্ষার্থীর পূর্ণ তথ্য";
     if (path.includes("/edit")) return "তথ্য সম্পাদনা";
 
-    return "মাদ্রাসা ম্যানেজমেন্ট";
+    return "HuDHuDSoft";
   };
 
   const currentPage = getPageName(pathname);
