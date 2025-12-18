@@ -23,18 +23,33 @@ export default function Header({ onMenuClick }) {
     router.push("/");
   };
 
-  // Map pathname to human-readable page names
-  const pageNames = {
-    "/": "Dashboard",
-    "/products": "Products",
-    "/products/[id]": "Product Details",
-    "/settings": "Settings",
-    "/messages": "Messages",
-    "/how-it-works": "How It Works",
+  // Function to get dynamic page names based on pathname
+  const getPageName = (path) => {
+    // Exact matches
+    const exactMatches = {
+      "/": "ডেশবোর্ড",
+      "/dashboard": "ডেশবোর্ড",
+      "/all-students": "সকল ছাত্র",
+      "/accounts": "হিসাব",
+      "/FeeManagement": "ফি ম্যানেজমেন্ট",
+      "/examinations": "পরীক্ষা",
+      "/marksheets": "মার্কশীট",
+      "/settings": "সেটিংস",
+      "/add-student": "নতুন ছাত্র যোগ করুন",
+      "/drafts": "ড্রাফট লিস্ট",
+    };
+
+    if (exactMatches[path]) return exactMatches[path];
+
+    // Dynamic matches
+    if (path.startsWith("/drafts/")) return "ড্রাফট শিক্ষার্থীর তথ্য";
+    if (path.startsWith("/students/")) return "শিক্ষার্থীর পূর্ণ তথ্য";
+    if (path.includes("/edit")) return "তথ্য সম্পাদনা";
+
+    return "মাদ্রাসা ম্যানেজমেন্ট";
   };
 
-  // Optional: fallback if route not in map
-  const currentPage = pageNames[pathname] || "Page";
+  const currentPage = getPageName(pathname);
 
   return (
     <div className="p-5">
