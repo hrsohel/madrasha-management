@@ -225,80 +225,73 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
 
             {/* Admission Info */}
             <div className="pt-4">
-              <h4 className="text-lg font-semibold text-gray-800 mb-4">ভর্তিসংক্রান্ত তথ্য</h4>
+              <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                ভর্তিসংক্রান্ত তথ্য
+              </h4>
+
+              {/* আইডি + আবাসিক অবস্থা */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">আইডি</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    আইডি
+                  </label>
                   <input
                     type="text"
                     name="uid"
                     placeholder="DUMS01"
                     className="w-full px-4 py-3 bg-gray-200 border border-gray-300 rounded-lg font-bold"
-                    value={formData.uid || ''}
+                    value={formData.uid || ""}
                     onChange={handleChange}
                     readOnly
-
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">আবাসিক অবস্থা</label>
-                  <select name="residential" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.residential || ''} onChange={handleChange}>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    আবাসিক অবস্থা
+                  </label>
+                  <select
+                    name="residential"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.residential || ""}
+                    onChange={handleChange}
+                  >
                     <option value="">নির্বাচন করুন</option>
                     {residentialOptions.map((option, index) => (
-                      <option key={index} value={option}>{option}</option>
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
                     ))}
                   </select>
                 </div>
               </div>
 
+              {/* রোল + বিভাগ */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">রোল</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    রোল
+                  </label>
                   <input
                     type="text"
                     name="roll"
                     placeholder="২"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                    value={formData.roll || ''}
+                    value={formData.roll || ""}
                     onChange={handleChange}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">শ্রেণি</label>
-                  <select name="class" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.class || ''} onChange={handleChange}>
-                    <option value="">নির্বাচন করুন</option>
-                    {classOptions.map((option, index) => (
-                      <option key={index} value={option}>{option}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">শাখা</label>
-                  <select name="section" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.section || ''} onChange={handleChange}>
-                    <option value="">নির্বাচন করুন</option>
-                    {sectionOptions.map((option, index) => (
-                      <option key={index} value={option}>{option}</option>
-                    ))}
-                  </select>
-                </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">শিফট</label>
-                  <select name="shift" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.shift || ''} onChange={handleChange}>
-                    <option value="">নির্বাচন করুন</option>
-                    {shiftOptions.map((option, index) => (
-                      <option key={index} value={option}>{option}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">বিভাগ</label>
-                  <select name="division" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.division || ''} onChange={handleChange}>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    বিভাগ
+                  </label>
+                  <select
+                    name="division"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.division || ""}
+                    onChange={handleChange}
+                  >
                     <option value="">নির্বাচন করুন</option>
                     <option value="নাজেরা">নাজেরা</option>
                     <option value="হিফজ">হিফজ</option>
@@ -306,17 +299,95 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                     <option value="কিতাব">কিতাব</option>
                   </select>
                 </div>
+              </div>
+
+              {/* শ্রেণি + শাখা */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    শ্রেণি
+                  </label>
+                  <select
+                    name="class"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.class || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="">নির্বাচন করুন</option>
+                    {classOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">সেশন</label>
-                  <select name="session" className="w-full px-4 py-3 border border-gray-300 rounded-lg" value={formData.session || ''} onChange={handleChange}>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    শাখা
+                  </label>
+                  <select
+                    name="section"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.section || ""}
+                    onChange={handleChange}
+                  >
                     <option value="">নির্বাচন করুন</option>
-                    <option value="25-26">২৫ - ২৬</option>
-                    <option value="24-25">২৪ - ২৫</option>
+                    {sectionOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
+
+              {/* শিফট + সেশন */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    শিফট
+                  </label>
+                  <select
+                    name="shift"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.shift || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="">নির্বাচন করুন</option>
+                    {shiftOptions.map((option, index) => (
+                      <option key={index} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                    সেশন
+                  </label>
+                  <select
+                    name="session"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
+                    value={formData.session || ""}
+                    onChange={handleChange}
+                  >
+                    <option value="">নির্বাচন করুন</option>
+                    {Array.from({ length: 26 }, (_, i) => 2005 + i)
+                      .map(startYear => `${startYear}-${startYear + 1}`)
+                      .reverse()
+                      .map(session => (
+                        <option key={session} value={session}>
+                          {session.replace(/\d+/g, match => String(+match - 2000))}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+              </div>
             </div>
+
           </div>
         </div>
 

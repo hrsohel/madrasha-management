@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { updateStudentFullDetails } from "@/services/studentService";
+import { updateStudentFullDetails, updateDraftStudent } from "@/services/studentService";
 import { X } from "lucide-react";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/app/components/ConfirmationModal";
@@ -14,7 +14,7 @@ const getIdFromBnName = (dataArray, bnName) => {
     return foundItem ? foundItem.id : '';
 };
 
-export function EditStudentModal({ isOpen, onClose, studentData, onUpdateSuccess }) {
+export function EditStudentModal({ isOpen, onClose, studentData, onUpdateSuccess, isDraft = false }) {
     // Initial state preparation
     const [formData, setFormData] = useState({
         student: {
@@ -262,28 +262,46 @@ export function EditStudentModal({ isOpen, onClose, studentData, onUpdateSuccess
     };
 
     const confirmUpdate = async () => {
-        // Prepare payload with explicit arrays and IDs preserved in formData
-        const payload = {
-            student: formData.student,
-            guardian: [formData.guardian],
-            addresse: [formData.address],
-            oldMadrasaInfo: [formData.madrasa],
-            fees: [formData.fees]
-        };
+        let payload;
 
-        console.log("Updating Student ID:", studentData._id);
+        if (isDraft) {
+            // Draft payload: Flatten student fields and use singular objects for nested sections
+            payload = {
+                ...formData.student,
+                guardian: formData.guardian,
+                addresse: formData.address, // Backend expects 'addresse' object
+                oldMadrasaInfo: formData.madrasa,
+                fees: formData.fees
+            };
+        } else {
+            // Regular student payload: Nested arrays (existing logic)
+            payload = {
+                student: formData.student,
+                guardian: [formData.guardian],
+                addresse: [formData.address],
+                oldMadrasaInfo: [formData.madrasa],
+                fees: [formData.fees]
+            };
+        }
+
+        console.log("Updating ID:", studentData._id, "isDraft:", isDraft);
         console.log("Payload:", payload);
 
         setLoading(true);
         try {
-            await updateStudentFullDetails(studentData._id, payload);
-            toast.success("তথ্য সফলভাবে আপডেট করা হয়েছে!");
+            if (isDraft) {
+                await updateDraftStudent(studentData._id, payload);
+            } else {
+                await updateStudentFullDetails(studentData._id, payload);
+            }
+
+            toast.success(isDraft ? "ড্রাফট সফলভাবে আপডেট করা হয়েছে!" : "তথ্য সফলভাবে আপডেট করা হয়েছে!");
             onUpdateSuccess();
             onClose();
             setIsConfirmOpen(false);
         } catch (error) {
             console.error("Update failed:", error);
-            toast.error("আপডেট ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।");
+            toast.error(isDraft ? "ড্রাফট আপডেট ব্যর্থ হয়েছে।" : "আপডেট ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।");
             setIsConfirmOpen(false);
         } finally {
             setLoading(false);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Pencil, X } from "lucide-react";
-import { updateStudentFullDetails } from "@/services/studentService";
+import { updateStudentFullDetails, updateDraftStudent } from "@/services/studentService";
 import { divisions, getDistrictsByDivision, getUpazilasByDistrict, getUnionsByUpazila } from "../add-student/locationData";
 import toast from "react-hot-toast";
 import ConfirmationModal from "@/app/components/ConfirmationModal";
@@ -11,7 +11,7 @@ const getIdFromBnName = (dataArray, bnName) => {
   return foundItem ? foundItem.id : '';
 };
 
-export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
+export default function AddressInfo({ address, studentId, onUpdateSuccess, isDraft = false }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -159,14 +159,19 @@ export default function AddressInfo({ address, studentId, onUpdateSuccess }) {
   const confirmUpdate = async () => {
     setLoading(true);
     try {
-      const payload = {
-        addresse: [{
-          ...formData,
-          isSameAsPresent: isSameAddress
-        }]
+      const addressData = {
+        ...formData,
+        isSameAsPresent: isSameAddress
       };
 
-      await updateStudentFullDetails(studentId, payload);
+      if (isDraft) {
+        // For drafts, send as a singular object 'addresse' at root
+        await updateDraftStudent(studentId, { addresse: addressData });
+      } else {
+        // For active students, send as an array 'addresse'
+        await updateStudentFullDetails(studentId, { addresse: [addressData] });
+      }
+
       toast.success("ঠিকানা সফলভাবে আপডেট করা হয়েছে!");
       if (onUpdateSuccess) onUpdateSuccess();
       setIsModalOpen(false);
