@@ -5,17 +5,19 @@ import { useSelector, useDispatch } from 'react-redux'
 import { addStudent, resetAddStudentStatus, clearStudentFormData } from '../../../lib/features/students/studentSlice'
 import { translateToBangla } from '../../../lib/utils'
 
-export default function Reciepe({ setNavigateToReciepe }) {
+export default function Reciepe({ setNavigateToReciepe, studentFormData: propFormData }) {
     const dispatch = useDispatch();
-    const studentFormData = useSelector((state) => state.students.studentFormData);
+    const reduxFormData = useSelector((state) => state.students.studentFormData);
+    const studentFormData = propFormData || reduxFormData;
     const { loading, error, success } = useSelector((state) => state.students);
     const { madrasaSettings } = useSelector((state) => state.settings);
 
-    const [localLoading, setLocalLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDraftLoading, setIsDraftLoading] = useState(false);
     const [localError, setLocalError] = useState(null);
 
     useEffect(() => {
-        setLocalLoading(loading);
+        setIsSubmitting(loading);
         if (error) {
             setLocalError(error.message || JSON.stringify(error));
         }
@@ -27,14 +29,18 @@ export default function Reciepe({ setNavigateToReciepe }) {
         }
     }, [loading, error, success, dispatch]);
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
         console.log(studentFormData)
         if (!studentFormData) {
             setLocalError("Student data is missing. Please go back and fill the form.");
             return;
         }
-        setLocalLoading(true);
+        setIsSubmitting(true);
         setLocalError(null);
         try {
             await dispatch(addStudent(studentFormData)).unwrap();
@@ -42,38 +48,34 @@ export default function Reciepe({ setNavigateToReciepe }) {
         } catch (err) {
             setLocalError(err.message || JSON.stringify(err));
         } finally {
-            setLocalLoading(false);
+            setIsSubmitting(false);
         }
     };
 
-    const handleSaveDraft = async () => {
+    const handleSaveDraft = async (e) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         if (!studentFormData) {
             setLocalError("Student data is missing. Please go back and fill the form.");
             return;
         }
 
-        setLocalLoading(true);
+        setIsDraftLoading(true);
         setLocalError(null);
-
         try {
             const { saveDraftStudent } = await import('@/services/studentService');
 
-            // Prepare payload matching backend structure (arrays for nested sections)
+            // Prepare payload matching requested structure (objects instead of arrays)
             const draftPayload = {
-                ...studentFormData,
-                // Ensure these are sent as arrays if they exist
-                guardian: studentFormData.guardian ? [studentFormData.guardian] : [],
-                addresse: studentFormData.address ? [studentFormData.address] : [],
-                fees: studentFormData.fees ? [studentFormData.fees] : [],
-                // Map frontend 'madrasa' object to backend 'oldMadrasaInfo' array
-                oldMadrasaInfo: studentFormData.madrasa ? [studentFormData.madrasa] : [],
+                student: studentFormData.student,
+                guardian: studentFormData.guardian,
+                address: studentFormData.address,
+                madrasa: studentFormData.madrasa,
+                fees: studentFormData.fees,
                 status: 'draft'
             };
-
-            // Remove the flattened versions to avoid confusion if needed, 
-            // but usually the backend ignores unexpected keys.
-            delete draftPayload.address;
-            delete draftPayload.madrasa;
 
             await saveDraftStudent(draftPayload);
             toast.success("ড্রাফট সফলভাবে সংরক্ষণ করা হয়েছে!");
@@ -84,7 +86,7 @@ export default function Reciepe({ setNavigateToReciepe }) {
             setLocalError(err.message || "ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
             toast.error("ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
         } finally {
-            setLocalLoading(false);
+            setIsDraftLoading(false);
         }
     };
     // Calculate total fee from selected fees (excluding help amounts)
@@ -200,15 +202,21 @@ export default function Reciepe({ setNavigateToReciepe }) {
             </div>
             <div className="flex items-center justify-between mt-4 px-6 print:hidden">
                 <button
+                    type="button"
                     onClick={handleSaveDraft}
-                    disabled={localLoading}
+                    disabled={isDraftLoading || isSubmitting}
                     className="w-full sm:w-auto px-10 py-2 text-blue-600 font-bold text-lg border-2 border-blue-500 rounded-lg bg-[#DFF2FF] hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {localLoading ? 'সংরক্ষণ হচ্ছে...' : 'ড্রাফট সেভ করুন'}
+                    {isDraftLoading ? 'সংরক্ষণ হচ্ছে...' : 'ড্রাফট সেভ করুন'}
                 </button>
 
-                <button onClick={handleSubmit} className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md" disabled={localLoading}>
-                    {localLoading ? 'জমা হচ্ছে...' : 'ভর্তি কনফার্ম করুন'}
+                <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="w-full sm:w-auto px-12 py-2 bg-[#2B7752] text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isSubmitting || isDraftLoading}
+                >
+                    {isSubmitting ? 'জমা হচ্ছে...' : 'ভর্তি কনফার্ম করুন'}
                 </button>
             </div>
             {localError && <p className="text-red-500 text-center mt-4">{localError}</p>}

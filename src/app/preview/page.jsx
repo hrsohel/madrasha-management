@@ -23,6 +23,58 @@ export default function page() {
     dispatch(fetchMadrasaSettings());
   }, [dispatch]);
 
+  // Normalize data for the preview components (PersonalInfo, etc.)
+  // These components expect the flat structure from the form, so we map them
+  const savedData = addedStudent?.data || addedStudent?.student || (addedStudent?.name ? addedStudent : {});
+
+  const normalizedData = {
+    student: (savedData.name || savedData.uid) ? { ...savedData } : (studentFormData?.student || {}),
+    guardian: (savedData.guardian?.[0] || savedData.fatherName) ? { ...(savedData.guardian?.[0] || savedData) } : (studentFormData?.guardian || {}),
+    address: (savedData.addresse?.[0] || savedData.presentVillage) ? {
+      ...(savedData.addresse?.[0] || savedData),
+      // Map nested to flat for compatibility with Preview components
+      presentVillage: savedData.addresse?.[0]?.present?.village || savedData.addresse?.[0]?.presentVillage || savedData.presentVillage,
+      presentUpazila: savedData.addresse?.[0]?.present?.upazila || savedData.addresse?.[0]?.presentUpazila || savedData.presentUpazila,
+      presentDistrict: savedData.addresse?.[0]?.present?.district || savedData.addresse?.[0]?.presentDistrict || savedData.presentDistrict,
+      presentDivision: savedData.addresse?.[0]?.present?.division || savedData.addresse?.[0]?.presentDivision || savedData.presentDivision,
+      permanentVillage: savedData.addresse?.[0]?.permanent?.village || savedData.addresse?.[0]?.permanentVillage || savedData.permanentVillage,
+      permanentUpazila: savedData.addresse?.[0]?.permanent?.upazila || savedData.addresse?.[0]?.permanentUpazila || savedData.permanentUpazila,
+      permanentDistrict: savedData.addresse?.[0]?.permanent?.district || savedData.addresse?.[0]?.permanentDistrict || savedData.permanentDistrict,
+      permanentDivision: savedData.addresse?.[0]?.permanent?.division || savedData.addresse?.[0]?.permanentDivision || savedData.permanentDivision,
+      isSameAsPresent: savedData.addresse?.[0]?.isSameAsPresent || savedData.isSameAsPresent,
+    } : (studentFormData?.address || {}),
+    madrasa: (savedData.oldMadrasaInfo?.[0] || savedData.oldMadrasaName) ? {
+      ...(savedData.oldMadrasaInfo?.[0] || savedData),
+      // Map API keys to form keys if they differ
+      oldMadrasaName: savedData.oldMadrasaInfo?.[0]?.oldMadrasaName || savedData.oldMadrasaInfo?.[0]?.name || savedData.oldMadrasaName,
+      oldMadrasaClass: savedData.oldMadrasaInfo?.[0]?.oldMadrasaClass || savedData.oldMadrasaInfo?.[0]?.lastClass || savedData.oldMadrasaClass,
+      oldMadrasaResult: savedData.oldMadrasaInfo?.[0]?.oldMadrasaResult || savedData.oldMadrasaInfo?.[0]?.lastResult || savedData.oldMadrasaResult,
+      talimiGuardianName: savedData.oldMadrasaInfo?.[0]?.talimiGuardianName || savedData.oldMadrasaInfo?.[0]?.localGuardianName || savedData.talimiGuardianName,
+      talimiGuardianPhone: savedData.oldMadrasaInfo?.[0]?.talimiGuardianPhone || savedData.oldMadrasaInfo?.[0]?.localGuardianPhone || savedData.talimiGuardianPhone,
+      admissionExaminer: savedData.oldMadrasaInfo?.[0]?.admissionExaminer || savedData.oldMadrasaInfo?.[0]?.recommenderName || savedData.admissionExaminer,
+      admissionResult: savedData.oldMadrasaInfo?.[0]?.admissionResult || savedData.oldMadrasaInfo?.[0]?.testResult || savedData.admissionResult,
+    } : (studentFormData?.madrasa || {}),
+    fees: (savedData.fees?.[0] || savedData.helpType) ? (() => {
+      const fees = savedData.fees?.[0] || savedData;
+      const total = fees.totalAmount || fees.total || (
+        (Number(fees.admissionFee) || 0) +
+        (Number(fees.libraryFee) || 0) +
+        (Number(fees.confirmFee) || 0) +
+        (Number(fees.ITFee) || 0) +
+        (Number(fees.IDCardFee) || 0) +
+        (Number(fees.kafelaFee) || 0) +
+        (Number(fees.booksFee) || 0)
+      );
+      const help = Number(fees.helpAmount) || Number(fees.help) || 0;
+      return {
+        ...fees,
+        totalAmount: total,
+        payableAmount: fees.payableAmount || fees.payable || (total - help),
+        helpAmount: help,
+      };
+    })() : (studentFormData?.fees || {}),
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -42,32 +94,34 @@ export default function page() {
           body {
             margin: 0 !important;
             padding: 0 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
           #print-section {
             margin: 0 !important;
-            padding: 8mm !important; /* Internal margin for the content */
+            padding: 4mm !important; /* Internal margin for the content */
           }
 
-          /* Reduce font sizes */
+          /* Adjusted font sizes for better legibility */
           #print-section {
-            font-size: 8px !important;
-            line-height: 1.1 !important;
+            font-size: 13px !important;
+            line-height: 1.3 !important;
           }
 
           #print-section h1 {
-            font-size: 12px !important;
+            font-size: 20px !important;
           }
 
           #print-section h2 {
-            font-size: 10px !important;
+            font-size: 18px !important;
           }
 
           #print-section h3,
           #print-section h4,
           #print-section h5,
           #print-section h6 {
-            font-size: 9px !important;
+            font-size: 15px !important;
           }
 
           /* Reduce gaps */
@@ -81,11 +135,16 @@ export default function page() {
             gap: 2px !important;
           }
 
-          /* Scale down overall */
+          #print-section .flex.items-end.justify-between {
+            break-inside: avoid !important;
+            page-break-inside: avoid !important;
+          }
+
+          /* Scale down overall to ensure single page fit with larger fonts */
           #print-section {
-            transform: scale(0.8);
+            transform: scale(0.85);
             transform-origin: top left;
-            width: 125% !important;
+            width: 117.6% !important;
           }
         }
       `}</style>
@@ -110,23 +169,23 @@ export default function page() {
           <div id="print-section">
             {
               navigateToFormReciepe === 1 ? <>
-                <Preview studentData={studentFormData.student} guardianData={studentFormData.guardian} addressData={studentFormData.address} madrasaData={studentFormData.madrasa} feesData={studentFormData.fees} />
-                <PersonalInfo studentData={studentFormData.student} />
-                <GuadianInfo guardianData={studentFormData.guardian} />
-                <Addrress addressData={studentFormData.address} />
-                <MadrshaInfo madrasaData={studentFormData.madrasa} />
-                <Talimi madrasaData={studentFormData.madrasa} />
-                <Reciepe setNavigateToReciepe={setNavigateToReciepe} studentFormData={studentFormData} />
+                <Preview studentData={normalizedData.student} guardianData={normalizedData.guardian} addressData={normalizedData.address} madrasaData={normalizedData.madrasa} feesData={normalizedData.fees} />
+                <PersonalInfo studentData={normalizedData.student} />
+                <GuadianInfo guardianData={normalizedData.guardian} />
+                <Addrress addressData={normalizedData.address} />
+                <MadrshaInfo madrasaData={normalizedData.madrasa} />
+                <Talimi madrasaData={normalizedData.madrasa} />
+                <Reciepe setNavigateToReciepe={setNavigateToReciepe} studentFormData={normalizedData} />
               </> :
-                navigateToFormReciepe === 2 ? <Admissionfrom setNavigateToReciepe={setNavigateToReciepe} /> :
+                navigateToFormReciepe === 2 ? <Admissionfrom setNavigateToReciepe={setNavigateToReciepe} studentData={normalizedData.student} guardianData={normalizedData.guardian} addressData={normalizedData.address} madrasaData={normalizedData.madrasa} feesData={normalizedData.fees} madrasaSettings={madrasaSettings} /> :
                   navigateToFormReciepe === 3 ? (
                     <ReciepeForAdmission2
                       setNavigateToReciepe={setNavigateToReciepe}
-                      studentData={studentFormData.student}
-                      guardianData={studentFormData.guardian}
-                      addressData={studentFormData.address}
-                      madrasaData={studentFormData.madrasa}
-                      feesData={studentFormData.fees}
+                      studentData={normalizedData.student}
+                      guardianData={normalizedData.guardian}
+                      addressData={normalizedData.address}
+                      madrasaData={normalizedData.madrasa}
+                      feesData={normalizedData.fees}
                       madrasaSettings={madrasaSettings}
                       addedStudent={addedStudent}
                     />

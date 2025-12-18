@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { addStudent, resetAddStudentStatus, setStudentFormData, clearStudentFormData } from '@/lib/features/students/studentSlice';
@@ -13,6 +14,7 @@ import AddStudentForm5 from '../components/add-student/AddStudentForm5';
 import Preview from '../components/preview/Preview';
 
 export default function AddStudentPage() {
+  const router = useRouter();
   const [pagination, setPagination] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
   // const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
@@ -69,16 +71,16 @@ export default function AddStudentPage() {
     if (success) {
       toast.success("Student added successfully!");
       dispatch(resetAddStudentStatus());
-      dispatch(clearStudentFormData()); // Clear form data from Redux
-      // Optionally reset form or navigate
+
+      // Navigate to preview page after a short delay to allow toast to be seen
       setTimeout(() => {
-        setPagination(1);
-      }, 0);
+        router.push('/preview');
+      }, 1500);
     }
     if (error) {
       toast.error(`Error: ${error.message || error.field || JSON.stringify(error)}`);
     }
-  }, [success, error, dispatch]);
+  }, [success, error, dispatch, router]);
 
   if (!isInitialized) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

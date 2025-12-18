@@ -2,8 +2,9 @@ import Image from 'next/image'
 import React from 'react'
 import Reciepe from './Reciepe'
 import ReciepForAdmissionForm from './ReciepForAdmissionForm'
+import { translateToBangla } from '../../../lib/utils'
 
-export default function Admissionfrom({setNavigateToReciepe}) {
+export default function Admissionfrom({ setNavigateToReciepe, studentData, guardianData, addressData, madrasaData, feesData, madrasaSettings }) {
     return (
         <>
             <div className='border'>
@@ -13,17 +14,21 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                 >
                     <div
                         style={{
-                            backgroundImage: `url("/802422a1353a261fc2a0056a2430a594a0d6f235.png")`,
+                            backgroundImage: madrasaSettings?.logo ? `url("${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}")` : `url("/802422a1353a261fc2a0056a2430a594a0d6f235.png")`,
                             backgroundSize: "1200px 1200px"
                         }}
                         className='absolute top-0 left-0 right-0 w-full h-full -z-10 bg-no-repeat bg-center opacity-20 bg-cover'></div>
-                    <h1 className='text-[30px] font-normal text-center'>دارالعلوم معين السنة سريمنغل</h1>
+                    <h1 className='text-[30px] font-normal text-center'>دارالعلوم معين السنة سريমনগল</h1>
                     <div className='flex items-center justify-around'>
                         <div className='flex items-center justify-center gap-4'>
-                            <Image src="/802422a1353a261fc2a0056a2430a594a0d6f235.png" className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover' width={1000} height={1000} alt='public\802422a1353a261fc2a0056a2430a594a0d6f235.png' />
+                            {madrasaSettings?.logo ? (
+                                <img src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.logo}`} className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover' alt='logo' />
+                            ) : (
+                                <Image src="/802422a1353a261fc2a0056a2430a594a0d6f235.png" className='w-[70px] h-[70px] rounded-full block border-[1px] border-[#71847B] object-cover' width={100} height={100} alt='logo' />
+                            )}
                             <div>
-                                <h1 className='text-[21px] font-[500] text-[#424D47]'>দারুল উলুম মূঈনুস সুন্নাহ, শ্রীমঙ্গল</h1>
-                                <h3 className='text-[15px] font-[400] text-[#424D47]'>ভানুগাছ রোড , রেল গেট, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট </h3>
+                                <h1 className='text-[21px] font-[500] text-[#424D47]'>{madrasaSettings?.name?.bangla || "দারুল উলুম মূঈনুস সুন্নাহ, শ্রীমঙ্গল"}</h1>
+                                <h3 className='text-[15px] font-[400] text-[#424D47]'>{madrasaSettings?.location?.bangla || "ভানুগাছ রোড , রেল গেট, শ্রীমঙ্গল, মৌলভীবাজার, সিলেট"}</h3>
                             </div>
                         </div>
                         <div>
@@ -33,19 +38,19 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                             </svg>
                         </div>
                         <div>
-                            <h1 className='text-[21px] font-[500] text-[#424D47]'>Darul Ulum Muinus Sunnah Sreemangal</h1>
-                            <h3 className='text-[15px] font-[400] text-[#424D47]'>darululummuinussunnah@gmail.com || +880 1611-109960</h3>
+                            <h1 className='text-[21px] font-[500] text-[#424D47]'>{madrasaSettings?.name?.english || "Darul Ulum Muinus Sunnah Sreemangal"}</h1>
+                            <h3 className='text-[15px] font-[400] text-[#424D47]'>{madrasaSettings?.contact?.email || "darululum@gmail.com"} || {madrasaSettings?.contact?.phone || "+880 1611-109960"}</h3>
                         </div>
                     </div>
                     <div className='flex items-center justify-evenly w-full px-24'>
                         <div className=' w-full'>
-                            <p className='flex items-center justify-start gap-6'><span>ফরম নং</span> <span>:</span> <span>75</span></p>
+                            <p className='flex items-center justify-start gap-6'><span>ফরম নং</span> <span>:</span> <span>{studentData?.formNo || "---"}</span></p>
                         </div>
                         <div className='bg-[#2B7752] p-2 w-[300px] text-center'>
                             <p className='text-white'>ভর্তি ফরম </p>
                         </div>
                         <div className=' w-full'>
-                            <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>১২ নভেম্বর ২০২৫</span></p>
+                            <p className='flex items-center justify-end gap-6'><span>তারিখ</span> <span>:</span> <span>{new Date().toLocaleDateString('bn-BD', { year: 'numeric', month: 'long', day: 'numeric' })}</span></p>
                         </div>
                     </div>
                     <div className='pl-6 mt-6'>
@@ -60,30 +65,30 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                             </div>
                             <div>
                                 <p>নাম</p>
-                                <p>মোঃ আরিফুর রহমান খান</p>
+                                <p>{studentData?.name || "N/A"}</p>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>জন্ম তারিখ</p>
-                                    <p>২০ জানুয়ারি ২০২০ , ৫ বছর</p>
+                                    <p>{studentData?.dob || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>জন্মসনদ/NID </p>
-                                    <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮</p>
+                                    <p>{studentData?.nid || studentData?.birthCertificate || "N/A"}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>জেন্ডার</p>
-                                    <p>ছাত্র</p>
+                                    <p>{translateToBangla(studentData?.gender) || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>রক্তের গ্রুপ</p>
-                                    <p>O+</p>
+                                    <p>{translateToBangla(studentData?.bloodGroup) || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>মোবাইল নম্বর</p>
-                                    <p>+৮৮০১৭৭৫৬২৩২৬</p>
+                                    <p>{studentData?.phone || "N/A"}</p>
                                 </div>
                             </div>
                         </div>
@@ -96,39 +101,39 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>আইডি</p>
-                                    <p>DUMS01</p>
+                                    <p>{studentData?.uid || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>আবাসিক অবস্থা</p>
-                                    <p>আবাসিক</p>
+                                    <p>{translateToBangla(studentData?.residential) || "N/A"}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>রোল নম্বর</p>
-                                    <p>২</p>
+                                    <p>{studentData?.roll || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>শ্রেণী</p>
-                                    <p>নার্সারি</p>
+                                    <p>{translateToBangla(studentData?.class) || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>শাখা</p>
-                                    <p>ক</p>
+                                    <p>{translateToBangla(studentData?.section) || "N/A"}</p>
                                 </div>
                             </div>
                             <div className='flex items-center justify-between gap-4'>
                                 <div>
                                     <p>শিফট</p>
-                                    <p>সকাল</p>
+                                    <p>{translateToBangla(studentData?.shift) || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>বিভাগ</p>
-                                    <p>নুরানী</p>
+                                    <p>{translateToBangla(studentData?.division) || "N/A"}</p>
                                 </div>
                                 <div>
                                     <p>সেশন</p>
-                                    <p>২৪ - ২৫</p>
+                                    <p>{translateToBangla(studentData?.session) || "N/A"}</p>
                                 </div>
                             </div>
                         </div>
@@ -144,22 +149,22 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                         <h1 className='text-[#63736C] absolute top-1/2 left-0 -translate-y-1/2 pr-4 bg-white py-1 font-sembold text-[18px]'>বর্তমান ঠিকানা  </h1>
                                     </div>
                                 </div>
-                                <div className='flex items-center justify-between gap-4'>
+                                <div className='grid grid-cols-2 gap-4'>
                                     <div>
                                         <p>গ্রাম</p>
-                                        <p>শাহজালাল </p>
+                                        <p>{addressData?.present?.village || addressData?.presentVillage || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>উপজেলা/থানা </p>
-                                        <p>সুরমা </p>
+                                        <p>{addressData?.present?.upazila || addressData?.presentUpazila || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>জেলা </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.present?.district || addressData?.presentDistrict || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>বিভাগ </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.present?.division || addressData?.presentDivision || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -169,22 +174,22 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                         <h1 className='text-[#63736C] absolute top-1/2 left-0 -translate-y-1/2 pr-4 bg-white py-1 font-sembold text-[18px]'>স্থায়ী ঠিকানা  </h1>
                                     </div>
                                 </div>
-                                <div className='flex items-center justify-between gap-4'>
+                                <div className='grid grid-cols-2 gap-4'>
                                     <div>
                                         <p>গ্রাম</p>
-                                        <p>শাহজালাল </p>
+                                        <p>{addressData?.permanent?.village || addressData?.permanentVillage || (addressData?.isSameAsPresent ? addressData?.presentVillage : addressData?.permanentVillage) || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>উপজেলা/থানা </p>
-                                        <p>সুরমা </p>
+                                        <p>{addressData?.permanent?.upazila || addressData?.permanentUpazila || (addressData?.isSameAsPresent ? addressData?.presentUpazila : addressData?.permanentUpazila) || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>জেলা </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.permanent?.district || addressData?.permanentDistrict || (addressData?.isSameAsPresent ? addressData?.presentDistrict : addressData?.permanentDistrict) || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>বিভাগ </p>
-                                        <p>সিলেট </p>
+                                        <p>{addressData?.permanent?.division || addressData?.permanentDivision || (addressData?.isSameAsPresent ? addressData?.presentDivision : addressData?.permanentDivision) || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -204,15 +209,15 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.fatherName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.fatherPhone || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.fatherNid || guardianData?.fatherNID || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -225,15 +230,15 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.motherName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.motherPhone || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.motherNid || guardianData?.motherNID || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -246,19 +251,19 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>সম্পর্ক </p>
-                                        <p>পিতা</p>
+                                        <p>{guardianData?.guardianRelation || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>নাম</p>
-                                        <p>মোঃ আরিফুর রহমান খান </p>
+                                        <p>{guardianData?.guardianName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{guardianData?.guardianPhone || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>NID </p>
-                                        <p>৯৮৪৬৫৩১৬৮৭৪৩৯৮ </p>
+                                        <p>{guardianData?.guardianNid || guardianData?.guardianNID || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -273,15 +278,15 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>নাম</p>
-                                        <p>দারুল উলুম মূঈনুস সুন্নাহ</p>
+                                        <p>{madrasaData?.name || madrasaData?.oldMadrasaName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>সর্বশেষ উত্তীর্ণ ক্লাস</p>
-                                        <p>নাজেরা </p>
+                                        <p>{madrasaData?.lastClass || madrasaData?.oldMadrasaClass || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>সর্বশেষ উত্তীর্ণ রেজাল্ট </p>
-                                        <p>মুমতাজ  </p>
+                                        <p>{madrasaData?.lastResult || madrasaData?.oldMadrasaResult || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -296,19 +301,19 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                                 <div className='flex items-center justify-between gap-4'>
                                     <div>
                                         <p>হযরতের নাম </p>
-                                        <p>মোঃ আরিফুর রহমান খান</p>
+                                        <p>{madrasaData?.localGuardianName || madrasaData?.talimiGuardianName || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>হযরতের মোবাইল নম্বর</p>
-                                        <p>+৮৮০১৭৭৫৬২৩২৬ </p>
+                                        <p>{madrasaData?.localGuardianPhone || madrasaData?.talimiGuardianPhone || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>পরীক্ষকের নাম/ সুপারিশ করি </p>
-                                        <p>মোঃ আরিফুর রহমান খান  </p>
+                                        <p>{madrasaData?.recommenderName || madrasaData?.admissionExaminer || "N/A"}</p>
                                     </div>
                                     <div>
                                         <p>ফলাফল</p>
-                                        <p>মুমতাজ </p>
+                                        <p>{madrasaData?.testResult || madrasaData?.admissionResult || "N/A"}</p>
                                     </div>
                                 </div>
                             </div>
@@ -323,13 +328,20 @@ export default function Admissionfrom({setNavigateToReciepe}) {
                             <hr />
                             <p className='mt-2'>অভিভাবকের স্বাক্ষর</p>
                         </div>
-                        <div>
+                        <div className='relative'>
+                            {madrasaSettings?.signature && (
+                                <img
+                                    src={`${process.env.NEXT_PUBLIC_API_BASE_URL}${madrasaSettings.signature}`}
+                                    className='absolute -top-12 left-1/2 -translate-x-1/2 w-24 h-12 object-contain'
+                                    alt='Secretary Signature'
+                                />
+                            )}
                             <hr />
                             <p className='mt-2'>শিক্ষা সচিবের স্বাক্ষর</p>
                         </div>
                     </div>
                 </div>
-                <ReciepForAdmissionForm />
+                <ReciepForAdmissionForm studentData={studentData} guardianData={guardianData} addressData={addressData} madrasaData={madrasaData} feesData={feesData} madrasaSettings={madrasaSettings} />
             </div>
         </>
     )
