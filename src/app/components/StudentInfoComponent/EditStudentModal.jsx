@@ -340,7 +340,32 @@ export function EditStudentModal({ isOpen, onClose, studentData, onUpdateSuccess
                                     <SelectWrapper label="শাখা" value={formData.student.section} onChange={(v) => handleChange('student', 'section', v)} options={sectionOptions} />
                                     <SelectWrapper label="শিফট" value={formData.student.shift} onChange={(v) => handleChange('student', 'shift', v)} options={shiftOptions} />
                                     <SelectWrapper label="আবাসিক অবস্থা" value={formData.student.residential} onChange={(v) => handleChange('student', 'residential', v)} options={residentialOptions} />
-                                    <SelectWrapper label="সেশন" value={formData.student.session} onChange={(v) => handleChange('student', 'session', v)} options={["24-25", "25-26"]} />
+                                    <div className="space-y-1">
+                                        <label className="text-sm font-semibold text-gray-700">সেশন</label>
+                                        <div className="flex items-center gap-2">
+                                            <Input
+                                                placeholder="২০২৪"
+                                                value={formData.student.session?.split('-')[0] || ''}
+                                                onChange={(e) => {
+                                                    const start = e.target.value;
+                                                    const end = formData.student.session?.split('-')[1] || '';
+                                                    handleChange('student', 'session', [start, end].filter(Boolean).join('-'));
+                                                }}
+                                                className="focus-visible:ring-2 focus-visible:ring-[#2B7752] border-gray-300"
+                                            />
+                                            <span className="text-gray-500 font-bold">-</span>
+                                            <Input
+                                                placeholder="২০২৫"
+                                                value={formData.student.session?.split('-')[1] || ''}
+                                                onChange={(e) => {
+                                                    const start = formData.student.session?.split('-')[0] || '';
+                                                    const end = e.target.value;
+                                                    handleChange('student', 'session', [start, end].filter(Boolean).join('-'));
+                                                }}
+                                                className="focus-visible:ring-2 focus-visible:ring-[#2B7752] border-gray-300"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

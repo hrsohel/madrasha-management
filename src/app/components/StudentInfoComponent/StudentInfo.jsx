@@ -464,15 +464,31 @@ export default function StudentInfo({ student, onUpdateSuccess, isDraft = false 
                   <label className="block text-sm text-gray-700 mb-2">
                     সেসন
                   </label>
-                  <select
-                    name="session"
-                    value={formData.session}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  >
-                    <option>25-26</option>
-                    <option>24-25</option>
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="২০২৪"
+                      value={formData.session?.split('-')[0] || ''}
+                      onChange={(e) => {
+                        const start = e.target.value;
+                        const end = formData.session?.split('-')[1] || '';
+                        setFormData(prev => ({ ...prev, session: [start, end].filter(Boolean).join('-') }));
+                      }}
+                    />
+                    <span className="text-gray-500 font-bold">-</span>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      placeholder="২০২৫"
+                      value={formData.session?.split('-')[1] || ''}
+                      onChange={(e) => {
+                        const start = formData.session?.split('-')[0] || '';
+                        const end = e.target.value;
+                        setFormData(prev => ({ ...prev, session: [start, end].filter(Boolean).join('-') }));
+                      }}
+                    />
+                  </div>
                 </div>
 
                 {/* জেলার (Gender) */}

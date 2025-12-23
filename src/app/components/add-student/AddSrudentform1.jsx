@@ -367,22 +367,31 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
                   <label className="block text-sm font-bold text-gray-700 mb-2">
                     সেশন
                   </label>
-                  <select
-                    name="session"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg"
-                    value={formData.session || ""}
-                    onChange={handleChange}
-                  >
-                    <option value="">নির্বাচন করুন</option>
-                    {Array.from({ length: 26 }, (_, i) => 2005 + i)
-                      .map(startYear => `${startYear}-${startYear + 1}`)
-                      .reverse()
-                      .map(session => (
-                        <option key={session} value={session}>
-                          {session.replace(/\d+/g, match => String(+match - 2000))}
-                        </option>
-                      ))}
-                  </select>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="২০২৪"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      value={formData.session?.split('-')[0] || ''}
+                      onChange={(e) => {
+                        const start = e.target.value;
+                        const end = formData.session?.split('-')[1] || '';
+                        onDataChange({ session: [start, end].filter(Boolean).join('-') });
+                      }}
+                    />
+                    <span className="text-gray-500 font-bold">-</span>
+                    <input
+                      type="text"
+                      placeholder="২০২৫"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      value={formData.session?.split('-')[1] || ''}
+                      onChange={(e) => {
+                        const start = formData.session?.split('-')[0] || '';
+                        const end = e.target.value;
+                        onDataChange({ session: [start, end].filter(Boolean).join('-') });
+                      }}
+                    />
+                  </div>
                 </div>
 
               </div>
