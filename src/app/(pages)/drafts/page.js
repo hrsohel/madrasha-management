@@ -98,12 +98,12 @@ export default function DraftsPage() {
                         <p className="text-gray-500 mb-6">
                             আপনি এখনও কোনো ছাত্র ড্রাফট সংরক্ষণ করেননি।
                         </p>
-                        <Link
+                        <a
                             href="/add-student"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#2B7752] text-white rounded-lg hover:bg-[#246545] transition"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-[#2B7752] text-white rounded-lg hover:bg-[#246545] transition no-underline"
                         >
                             নতুন ছাত্র যোগ করুন
-                        </Link>
+                        </a>
                     </div>
                 </div>
             )}

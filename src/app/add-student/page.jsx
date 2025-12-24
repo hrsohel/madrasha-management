@@ -17,6 +17,7 @@ export default function AddStudentPage() {
   const router = useRouter();
   const [pagination, setPagination] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
+  const mountCount = React.useRef(0);
   // const [localProfileImageFile, setLocalProfileImageFile] = useState(null); // Local state for the actual File object
 
 
@@ -25,28 +26,11 @@ export default function AddStudentPage() {
   const studentFormData = useSelector((state) => state.students.studentFormData);
 
   const handleFormDataChange = useCallback((section, data) => {
-    // Check if the data contains a profileImage file
-    if (section === 'student' && data.profileImage instanceof File) {
-      // setLocalProfileImageFile(data.profileImage); // Store the actual File object locally
-      // Dispatch a serializable representation for Redux state (e.g., for preview)
-      dispatch(setStudentFormData({
-        [section]: {
-          ...studentFormData[section],
-          // profileImage: URL.createObjectURL(data.profileImage), // Store URL for preview
-          profileImage: data.profileImage, // Store URL for preview
-        },
-      }));
-    } else {
-      // For all other data, proceed as normal
-      const newSectionData = {
-        ...studentFormData[section],
-        ...data,
-      };
-      dispatch(setStudentFormData({
-        [section]: newSectionData,
-      }));
-    }
-  }, [dispatch, studentFormData]);
+    // Dispatch directly - Redux reducer will handle merging with existing state
+    dispatch(setStudentFormData({
+      [section]: data,
+    }));
+  }, [dispatch]);
 
   const handleSubmit = () => {
     console.log("Submitting form data:", studentFormData);
@@ -61,16 +45,29 @@ export default function AddStudentPage() {
     dispatch(addStudent(formDataForSubmission));
   };
 
-  // Clear form data when component mounts to ensure fresh state
+  // Clear form data when component mounts
   useEffect(() => {
+    mountCount.current += 1;
     dispatch(clearStudentFormData());
     setIsInitialized(true);
+
+    // Also check if we have a flag in localStorage to clear
+    const shouldClear = typeof window !== 'undefined' && localStorage.getItem('clearStudentForm');
+    if (shouldClear) {
+      dispatch(clearStudentFormData());
+      localStorage.removeItem('clearStudentForm');
+    }
   }, [dispatch]);
 
   useEffect(() => {
     if (success) {
       toast.success("Student added successfully!");
       dispatch(resetAddStudentStatus());
+
+      // Set flag in localStorage so next time user visits add-student page, it clears
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('clearStudentForm', 'true');
+      }
 
       // Navigate to preview page after a short delay to allow toast to be seen
       setTimeout(() => {

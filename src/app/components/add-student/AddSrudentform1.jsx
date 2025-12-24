@@ -37,7 +37,8 @@ export default function AddSrudentform1({ setPagination, formData, onDataChange 
     };
 
     fetchStudentId();
-  }, []); // Run once on mount
+  }, [formData.uid, onDataChange]); // Include onDataChange to avoid stale closures
+
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;

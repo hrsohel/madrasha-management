@@ -354,10 +354,10 @@ export default function DashboardPage() {
             ডাটা এক্সপোর্ট
           </Button>
 
-          <Button onClick={() => history.push("/add-student")} className="bg-[#2B7752] text-white rounded-sm w-[150px] font-semibold flex py-5 items-center justify-center gap-1">
+          <a href="/add-student" className="bg-[#2B7752] text-white rounded-sm w-[150px] font-semibold flex py-5 items-center justify-center gap-1 no-underline hover:bg-[#246545] transition-colors">
             <CirclePlus size={22} />
             নতুন ছাত্র
-          </Button>
+          </a>
         </div>
       </div>
 
