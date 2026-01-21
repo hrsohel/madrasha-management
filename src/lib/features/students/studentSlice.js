@@ -22,29 +22,23 @@ export const addStudent = createAsyncThunk(
             sectionData = sectionData[0];
           }
 
-          if (section === 'student' && sectionData?.profileImage instanceof File) {
-            formData.append('profileImage', sectionData.profileImage);
-            // Append other student data fields, excluding profileImage
-            for (const key in sectionData) {
-              if (sectionData.hasOwnProperty(key) && key !== 'profileImage') {
-                if (sectionData[key] !== null && sectionData[key] !== undefined) {
-                  formData.append(`student[${key}]`, sectionData[key]);
-                }
-              }
+          if (section === 'student') {
+            const { profileImage, ...otherStudentData } = sectionData;
+
+            // Handle profile image
+            if (profileImage instanceof File) {
+              formData.append('profileImage', profileImage);
+            } else if (typeof profileImage === 'string' && profileImage.length > 0) {
+              // If it's a string, it's an existing path (likely from a draft)
+              // Include it in the JSON so backend can preserve it
+              otherStudentData.profileImage = profileImage;
             }
+
+            // Append student section as stringified JSON
+            formData.append('student', JSON.stringify(otherStudentData));
           } else if (sectionData && typeof sectionData === 'object') {
-            // Append other section data fields
-            for (const key in sectionData) {
-              if (sectionData.hasOwnProperty(key)) {
-                const value = sectionData[key];
-                // Only append if value is not null/undefined
-                if (value !== null && value !== undefined) {
-                  // If value is an object (except for specific cases), it might need stringification
-                  // but for this API, most fields are simple values or handled by nested keys
-                  formData.append(`${section}[${key}]`, value);
-                }
-              }
-            }
+            // Append other sections as stringified JSON
+            formData.append(section, JSON.stringify(sectionData));
           }
         }
       }
@@ -60,6 +54,20 @@ export const addStudent = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Async Thunk for saving a draft student
+export const saveDraft = createAsyncThunk(
+  'students/saveDraft',
+  async (draftData, { rejectWithValue }) => {
+    try {
+      const { saveDraftStudent } = await import('@/services/studentService');
+      const response = await saveDraftStudent(draftData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed to save draft");
     }
   }
 );
@@ -167,6 +175,9 @@ const studentSlice = createSlice({
       madrasa: {},
       fees: {},
     },
+    draftLoading: false,
+    draftSuccess: false,
+    draftError: null,
   },
   reducers: {
     setStudentFormData: (state, action) => {
@@ -191,6 +202,8 @@ const studentSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.success = false;
+      state.draftSuccess = false;
+      state.draftError = null;
     },
     clearSelectedStudent: (state) => {
       state.selectedStudent = null;
@@ -265,6 +278,22 @@ const studentSlice = createSlice({
       .addCase(updateStudent.rejected, (state, action) => {
         state.isUpdating = false;
         state.error = action.payload;
+      })
+      // Reducers for saveDraft
+      .addCase(saveDraft.pending, (state) => {
+        state.draftLoading = true;
+        state.draftError = null;
+        state.draftSuccess = false;
+      })
+      .addCase(saveDraft.fulfilled, (state) => {
+        state.draftLoading = false;
+        state.draftSuccess = true;
+        state.draftError = null;
+      })
+      .addCase(saveDraft.rejected, (state, action) => {
+        state.draftLoading = false;
+        state.draftError = action.payload;
+        state.draftSuccess = false;
       });
   },
 });

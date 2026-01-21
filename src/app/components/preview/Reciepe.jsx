@@ -58,16 +58,14 @@ export default function Reciepe({ setNavigateToReciepe, studentFormData: propFor
             e.stopPropagation();
         }
         if (!studentFormData) {
-            setLocalError("Student data is missing. Please go back and fill the form.");
+            toast.error("শিক্ষার্থীর তথ্য পাওয়া যায়নি। অনুগ্রহ করে সব তথ্য পূরণ করুন।");
             return;
         }
 
-        setIsDraftLoading(true);
-        setLocalError(null);
         try {
-            const { saveDraftStudent } = await import('@/services/studentService');
+            const { saveDraft } = await import('../../../lib/features/students/studentSlice');
 
-            // Prepare payload matching requested structure (objects instead of arrays)
+            // Prepare payload matching requested structure
             const draftPayload = {
                 student: studentFormData.student,
                 guardian: studentFormData.guardian,
@@ -77,16 +75,12 @@ export default function Reciepe({ setNavigateToReciepe, studentFormData: propFor
                 status: 'draft'
             };
 
-            await saveDraftStudent(draftPayload);
+            await dispatch(saveDraft(draftPayload)).unwrap();
             toast.success("ড্রাফট সফলভাবে সংরক্ষণ করা হয়েছে!");
             dispatch(clearStudentFormData());
-            // Optionally navigate to drafts page or home
-            window.location.href = '/all-students'; // Or wherever you want to redirect
+            window.location.href = '/all-students';
         } catch (err) {
-            setLocalError(err.message || "ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
-            toast.error("ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
-        } finally {
-            setIsDraftLoading(false);
+            toast.error(err?.message || err || "ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।");
         }
     };
     // Calculate total fee from selected fees (excluding help amounts)
