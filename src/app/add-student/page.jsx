@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { addStudent, resetAddStudentStatus, setStudentFormData, clearStudentFormData } from '@/lib/features/students/studentSlice';
+import { addStudent, resetAddStudentStatus, setStudentFormData, clearStudentFormData, saveDraft } from '@/lib/features/students/studentSlice';
 
 import AddSrudentform1 from '../components/add-student/AddSrudentform1';
 import AddSrudentform2 from "../components/add-student/AddStudentForm2";
@@ -43,6 +43,20 @@ export default function AddStudentPage() {
       },
     };
     dispatch(addStudent(formDataForSubmission));
+  };
+
+  const handleNextStep = (nextPage) => {
+    // Auto-save draft whenever we move to the next step
+    if (nextPage > pagination) {
+      dispatch(saveDraft(studentFormData));
+    }
+    setPagination(nextPage);
+  };
+
+  const handlePreview = () => {
+    // Save draft one last time before going to preview
+    dispatch(saveDraft(studentFormData));
+    router.push("/preview");
   };
 
   // Clear form data when component mounts
@@ -88,15 +102,16 @@ export default function AddStudentPage() {
       <div className="">
         <TopPagination pagination={pagination} />
         {
-          pagination === 1 ? <AddSrudentform1 setPagination={setPagination} formData={studentFormData.student} onDataChange={(data) => handleFormDataChange('student', data)} /> :
-            pagination === 2 ? <AddSrudentform2 setPagination={setPagination} formData={studentFormData.guardian} onDataChange={(data) => handleFormDataChange('guardian', data)} /> :
-              pagination === 3 ? <AddStudentform3 setPagination={setPagination} formData={studentFormData.address} onDataChange={(data) => handleFormDataChange('address', data)} /> :
-                pagination === 4 ? <AddStudentform4 setPagination={setPagination} formData={studentFormData.madrasa} onDataChange={(data) => handleFormDataChange('madrasa', data)} /> :
+          pagination === 1 ? <AddSrudentform1 setPagination={handleNextStep} formData={studentFormData.student} onDataChange={(data) => handleFormDataChange('student', data)} /> :
+            pagination === 2 ? <AddSrudentform2 setPagination={handleNextStep} formData={studentFormData.guardian} onDataChange={(data) => handleFormDataChange('guardian', data)} /> :
+              pagination === 3 ? <AddStudentform3 setPagination={handleNextStep} formData={studentFormData.address} onDataChange={(data) => handleFormDataChange('address', data)} /> :
+                pagination === 4 ? <AddStudentform4 setPagination={handleNextStep} formData={studentFormData.madrasa} onDataChange={(data) => handleFormDataChange('madrasa', data)} /> :
                   pagination === 5 ? (
                     <AddStudentForm5
-                      setPagination={setPagination}
+                      setPagination={handleNextStep}
                       formData={studentFormData.fees}
                       onDataChange={(data) => handleFormDataChange('fees', data)}
+                      onPreview={handlePreview}
                     />
                   ) : <></>
         }

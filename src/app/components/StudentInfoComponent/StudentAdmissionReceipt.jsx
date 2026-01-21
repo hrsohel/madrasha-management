@@ -12,12 +12,13 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
   const feeEntries = Object.entries(allFeeDefinitions);
 
   // Calculate total fees dynamically
-  const totalFees = feeEntries.reduce((sum, [feeName]) => {
-    const val = Number(fees?.[feeName] || 0);
+  const totalFees = fees?.totalFees || feeEntries.reduce((sum, [feeName]) => {
+    // Check both flat structure (legacy) and feeItems (new)
+    const val = Number(fees?.feeItems?.[feeName] || fees?.[feeName] || 0);
     return sum + (isNaN(val) ? 0 : val);
   }, 0);
 
-  const payableAmount = totalFees - (fees?.helpAmount || 0);
+  const payableAmount = fees?.finalAmount || (totalFees - (fees?.helpAmount || 0));
 
   // Placeholder for converting number to words (requires a proper library or implementation)
   const numberToWords = (num) => {
@@ -151,7 +152,7 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <div key={feeName} className="flex">
                 <span className="font-semibold w-32">{feeName}</span>
                 <span className="mr-2">:</span>
-                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+                <span>{toBanglaNumber(fees?.feeItems?.[feeName] || fees?.[feeName] || 0)} ৳</span>
               </div>
             ))}
           </div>
@@ -178,7 +179,7 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <div key={feeName} className="flex">
                 <span className="font-semibold w-32">{feeName}</span>
                 <span className="mr-2">:</span>
-                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+                <span>{toBanglaNumber(fees?.feeItems?.[feeName] || fees?.[feeName] || 0)} ৳</span>
               </div>
             ))}
           </div>
@@ -191,7 +192,7 @@ export default function StudentAdmissionReceipt({ fees, student, madrasaSettings
               <div key={feeName} className="flex">
                 <span className="font-semibold w-32">{feeName}</span>
                 <span className="mr-2">:</span>
-                <span>{toBanglaNumber(fees?.[feeName] || 0)} ৳</span>
+                <span>{toBanglaNumber(fees?.feeItems?.[feeName] || fees?.[feeName] || 0)} ৳</span>
               </div>
             ))}
           </div>
