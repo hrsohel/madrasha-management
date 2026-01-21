@@ -33,15 +33,38 @@ export const updateStudentFullDetails = async (id, data) => {
 
 export const saveDraftStudent = async (data) => {
     try {
-        const response = await axios.post(
-            `${API_BASE_URL}/api/v1/students/students/save-draft`,
-            data,
-            {
-                headers: {
-                    ...getAuthHeader(),
-                    'Content-Type': 'application/json'
+        let body = data;
+        let headers = {
+            ...getAuthHeader(),
+            'Content-Type': 'application/json'
+        };
+
+        // Check if data should be FormData (if it contains a File)
+        const hasFile = data.student?.profileImage instanceof File;
+        if (hasFile) {
+            const formData = new FormData();
+            // Append nested objects as stringified JSON for backend parseField to handle
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    if (typeof data[key] === 'object' && !(data[key] instanceof File)) {
+                        formData.append(key, JSON.stringify(data[key]));
+                    } else {
+                        formData.append(key, data[key]);
+                    }
                 }
             }
+            // Multer specifically looks for 'profileImage' field
+            if (data.student?.profileImage instanceof File) {
+                formData.append('profileImage', data.student.profileImage);
+            }
+            body = formData;
+            delete headers['Content-Type']; // Let browser set boundary
+        }
+
+        const response = await axios.post(
+            `${API_BASE_URL}/api/v1/students/students/save-draft`,
+            body,
+            { headers }
         );
         return response.data;
     } catch (error) {
@@ -67,15 +90,37 @@ export const getDraftStudents = async () => {
 
 export const updateDraftStudent = async (id, data) => {
     try {
-        const response = await axios.put(
-            `${API_BASE_URL}/api/v1/students/students/update-draft/${id}`,
-            data,
-            {
-                headers: {
-                    ...getAuthHeader(),
-                    'Content-Type': 'application/json'
+        let body = data;
+        let headers = {
+            ...getAuthHeader(),
+            'Content-Type': 'application/json'
+        };
+
+        const hasFile = data.profileImage instanceof File || data.student?.profileImage instanceof File;
+        if (hasFile) {
+            const formData = new FormData();
+            for (const key in data) {
+                if (data.hasOwnProperty(key)) {
+                    if (typeof data[key] === 'object' && !(data[key] instanceof File)) {
+                        formData.append(key, JSON.stringify(data[key]));
+                    } else {
+                        formData.append(key, data[key]);
+                    }
                 }
             }
+            if (data.profileImage instanceof File) {
+                formData.append('profileImage', data.profileImage);
+            } else if (data.student?.profileImage instanceof File) {
+                formData.append('profileImage', data.student.profileImage);
+            }
+            body = formData;
+            delete headers['Content-Type'];
+        }
+
+        const response = await axios.put(
+            `${API_BASE_URL}/api/v1/students/students/update-draft/${id}`,
+            body,
+            { headers }
         );
         return response.data;
     } catch (error) {
