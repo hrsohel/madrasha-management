@@ -238,6 +238,56 @@ export default function StudentInfo({ student, onUpdateSuccess, isDraft = false 
                   </div>
                 </div>
               </div>
+
+              {/* Fees Info */}
+              {student?.fees && (
+                <div className="pt-6">
+                  <div className="flex items-center gap-2 w-full mt-5">
+                    <h1 className="text-[#63736C] text-lg font-semibold whitespace-nowrap">
+                      ফি সংক্রান্ত তথ্য
+                    </h1>
+                    <div className="h-[1px] w-full bg-[#92A09A]"></div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-x-8 gap-y-4 mt-2">
+                    {/* Display dynamic fee items */}
+                    {student.fees.feeItems && typeof student.fees.feeItems === 'object' &&
+                      Object.entries(student.fees.feeItems).map(([feeName, amount]) => (
+                        <div key={feeName}>
+                          <p className="text-sm text-[#63736C] font-semibold mb-1">{feeName}</p>
+                          <p className="text-[#424D47] font-semibold">{amount} ৳</p>
+                        </div>
+                      ))}
+
+                    {/* Help Type */}
+                    {student.fees.helpType && student.fees.helpType !== 'None' && (
+                      <div>
+                        <p className="text-sm text-[#63736C] font-semibold mb-1">সাহায্যের ধরণ</p>
+                        <p className="text-[#424D47] font-semibold">{student.fees.helpType}</p>
+                      </div>
+                    )}
+
+                    {/* Help Amount */}
+                    {student.fees.helpAmount > 0 && (
+                      <div>
+                        <p className="text-sm text-[#63736C] font-semibold mb-1">ছাড়ের পরিমাণ</p>
+                        <p className="text-red-600 font-semibold">{student.fees.helpAmount} ৳</p>
+                      </div>
+                    )}
+
+                    {/* Total Fees */}
+                    <div>
+                      <p className="text-sm text-[#63736C] font-semibold mb-1">মোট ফি</p>
+                      <p className="text-blue-700 font-bold">{student.fees.totalFees || 0} ৳</p>
+                    </div>
+
+                    {/* Final Amount */}
+                    <div>
+                      <p className="text-sm text-[#63736C] font-semibold mb-1">প্রদেয় মোট</p>
+                      <p className="text-[#2B7752] font-bold text-lg">{student.fees.finalAmount || 0} ৳</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

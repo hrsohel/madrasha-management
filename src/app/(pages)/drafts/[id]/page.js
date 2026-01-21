@@ -99,10 +99,11 @@ export default function DraftViewPage() {
                 madrasa: draft.oldMadrasaInfo?.[0] || {}
             };
 
-            // Remove internal DB fields from nested objects
+            // Keep internal DB fields like _id for backend promotion logic
             const clean = (obj) => {
                 if (!obj) return {};
-                const { _id, id, createdAt, updatedAt, __v, ...rest } = obj;
+                // Remove timestamps and version keys, but KEEP _id
+                const { createdAt, updatedAt, __v, id, ...rest } = obj;
                 return rest;
             };
 
@@ -110,14 +111,11 @@ export default function DraftViewPage() {
             studentData.address = clean(studentData.address);
             studentData.fees = clean(studentData.fees);
             studentData.madrasa = clean(studentData.madrasa);
+            // Note: studentData.student still has _id from draft spread above
 
             await dispatch(addStudent(studentData)).unwrap();
 
-            // Delete draft upon success
-            await axios.delete(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/v1/students/students/delete-draft/${id}`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            // Redundant delete removed as backend addStudent promotes draft to active
 
             toast.success("ভর্তি সফলভাবে কনফার্ম করা হয়েছে!");
             router.push("/all-students");
